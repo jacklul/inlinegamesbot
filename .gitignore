@@ -11,8 +11,6 @@ composer.phar
 /*.cgi
 /*.txt
 
-!webhook_example.php
-!webhook_example.cgi
 !prehook.php
 
 src/Commands/User/announcements.txt
