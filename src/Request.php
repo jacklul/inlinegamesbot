@@ -639,7 +639,7 @@ class Request
         $data = [
             'url' => $url,
             'max_connections' => 100,   // Maximum limit
-            'allowed_updates' => ['message', 'edited_message', 'inline_query', 'chosen_inline_result', 'callback_query']    // Only receive those
+            'allowed_updates' => ['message', 'inline_query', 'chosen_inline_result', 'callback_query']    // Only receive those
         ];
 
         if (!is_null($file)) {

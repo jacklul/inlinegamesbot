@@ -201,14 +201,6 @@ class DB
                 $chat_id = $message->getChat()->getId();
                 return self::insertTelegramUpdate($update_id, $chat_id, $message_id, null, null, null, null);
             }
-        } elseif ($update->getUpdateType() == 'edited_message') {
-            $edited_message = $update->getEditedMessage();
-
-            if (self::insertEditedMessageRequest($edited_message)) {
-                $chat_id = $edited_message->getChat()->getId();
-                $edited_message_local_id = self::$pdo->lastInsertId();
-                return self::insertTelegramUpdate($update_id, $chat_id, null, null, null, null, $edited_message_local_id);
-            }
         } elseif ($update->getUpdateType() == 'inline_query') {
             $inline_query = $update->getInlineQuery();
 
@@ -325,22 +317,6 @@ class DB
 
         //Insert user and the relation with the chat
         self::insertUser($from, $date, $chat);
-
-        return true;
-    }
-
-    public static function insertEditedMessageRequest(Message &$edited_message)
-    {
-        if (!self::isDbConnected()) {
-            return false;
-        }
-
-        $date = self::getTimestamp(time());
-        $from = $edited_message->getFrom();
-        $user_id = null;
-        if (is_object($from)) {
-            self::insertUser($from, $date);
-        }
 
         return true;
     }
