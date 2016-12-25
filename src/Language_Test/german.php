@@ -19,6 +19,7 @@ $translation = [
     'button_play_again' => 'Spiel nochmal',
     'button_create' => 'Neue sitzung erstellen',
     'button_language' => 'Sprache',
+    'button_rules' => 'Spielregeln',
 
     // States
     'state_waiting_for_opponent' => '{STR} wartet auf Gegner zu verbinden...' . "\n" . 'Drücken Sie <b>"Beitreten"</b> um beizutreten.',
