@@ -19,20 +19,29 @@
  *
  */
 
-// ------------ Config START ------------
-$QUERY_STRING_AUTH = '';
+set_time_limit(15);
 
+ini_set('log_errors', 1);
+ini_set('error_log', 'error.log');
+
+// ------------ Config START ------------
 $PROJECT_DIR = __DIR__ . '/src/';
 $TEMP_DIR = __DIR__ . '/tmp/';
 
 $API_KEY = '';
 $BOT_USERNAME = '';
+
 $MYSQL_CREDENTIALS = [
     'host'     => 'localhost',
     'user'     => '',
     'password' => '',
     'database' => '',
 ];
+
+$QUERY_STRING_AUTH = '';
+
+$MESSAGE_LIMITS = 'Telegram API limits reached - unable to handle this request!';
+
 // ------------- Config END -------------
 
 if(!defined('STDIN') && !isset($_GET[$QUERY_STRING_AUTH])) {
@@ -43,16 +52,73 @@ if(!defined('STDIN') && !isset($_GET[$QUERY_STRING_AUTH])) {
     $POST = implode(' ', $argv);
 }
 
-set_time_limit(5);
+$POST_DATA = json_decode(file_get_contents("php://input"), true);
 
-ini_set('log_errors', 1);
-ini_set('error_log', 'error.log');
-
-if (!is_dir($TEMP_DIR)) {
-    mkdir($TEMP_DIR);
+$user_id = null;
+if (isset($POST_DATA['callback_query']['from']['id'])) {
+    $user_id = $POST_DATA['callback_query']['from']['id'];
+} elseif (isset($POST_DATA['inline_query']['from']['id'])) {
+    $user_id = $POST_DATA['inline_query']['from']['id'];
+} elseif (isset($POST_DATA['chosen_inline_result']['from']['id'])) {
+    $user_id = $POST_DATA['chosen_inline_result']['from']['id'];
+} elseif (isset($POST_DATA['message']['from']['id'])) {
+    $user_id = $POST_DATA['message']['from']['id'];
+} elseif (isset($POST_DATA['edited_message']['from']['id'])) {
+    $user_id = $POST_DATA['edited_message']['from']['id'];
+} elseif (isset($POST_DATA['channel_post']['from']['id'])) {
+    $user_id = $POST_DATA['channel_post']['from']['id'];
+} elseif (isset($POST_DATA['edited_channel_post']['from']['id'])) {
+    $user_id = $POST_DATA['edited_channel_post']['from']['id'];
 }
 
-// Do the magic!
+if (!is_null($user_id) && file_exists($TEMP_DIR . '/' . $user_id . '.block') && time() < (filemtime($TEMP_DIR . '/' . $user_id . '.block') + 60)) {
+    exit;
+}
+
+if (!is_null($user_id)) {
+    if (file_exists($TEMP_DIR . '/' . $user_id . '.limit')) {
+        $reply = file_get_contents($TEMP_DIR . '/' . $user_id . '.limit');
+
+        if (preg_match("/retry_after\"\:(.*)\}\}/", $reply, $matches)) {
+            $time = $matches[1] - (time() - filemtime($TEMP_DIR . '/' . $user_id . '.limit')) + 1;
+        }
+
+        if ((!empty($time) && $time > 0) || (time() < (filemtime($TEMP_DIR . '/' . $user_id . '.limit') + 60))) {
+            if (isset($POST_DATA['callback_query']['id'])) {
+                $REPLY = [
+                    'method' => 'answerCallbackQuery',
+                    'callback_query_id' => $POST['callback_query']['id'],
+                    'text' => $MESSAGE_LIMITS . (!empty($time) ? "\n\n" . "Wait $time seconds!":''),
+                    'show_alert' => true,
+                ];
+            } elseif (isset($POST_DATA['inline_query']['id'])) {
+                $REPLY = [
+                    'method' => 'answerInlineQuery',
+                    'inline_query_id' => $POST['inline_query']['id'],
+                    'switch_pm_text' => $MESSAGE_LIMITS . (!empty($time) ? "\n\n" . "Wait $time seconds!":''),
+                    'inline_query_offset' => null,
+                    'cache_time' => 60,
+                    'results' => [],
+                ];
+            } elseif (isset($POST_DATA['message']['chat']['id'])) {
+                $REPLY = [
+                    'method' => 'sendMessage',
+                    'chat_id' => $POST['message']['chat']['id'],
+                    'text' => $MESSAGE_LIMITS . (!empty($time) ? "\n\n" . "Wait $time seconds!":''),
+                ];
+            }
+
+            if (!empty($REPLY)) {
+                header("Status: 200 OK");
+                header("Content-Type: application/json");
+                echo json_encode($REPLY, true);
+            }
+
+            exit;
+        }
+    }
+}
+
 require __DIR__ . '/vendor/autoload.php';
 
 $COMMANDS_DIR = $PROJECT_DIR . '/Commands/';
@@ -63,6 +129,10 @@ foreach(scandir($PROJECT_DIR) as $class) {
             require_once($PROJECT_DIR . '/' . $class);
         }
     }
+}
+
+if (!is_dir($TEMP_DIR)) {
+    mkdir($TEMP_DIR);
 }
 
 try {

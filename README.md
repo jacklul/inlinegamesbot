@@ -12,7 +12,7 @@ This bot is intended to work with webhooks only, it may work with getUpdates but
 - install dependencies with Composer - `composer install`
 - check install instructions of [akalongman/php-telegram-bot](https://github.com/akalongman/php-telegram-bot)
 - create DB structure for this bot using `structure.sql` file
-- check `webhook_example.php` (if you want to use `prehook.php` also check `webhook_example.cgi`) in `examples` directory
+- check `webhook_example.php` in `examples` directory
 
 ## Contributing
 
