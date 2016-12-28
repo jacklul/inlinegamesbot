@@ -73,7 +73,7 @@ class ErrorreportCommand extends AdminCommand
                             'document' => $result_library_error_id,
                         ];
 
-                        $result_php_error = Request::sendDocument($data_admin);
+                        $result_library_error = Request::sendDocument($data_admin);
                     } else {
                         $data_admin = [
                             'chat_id' => $admin,
