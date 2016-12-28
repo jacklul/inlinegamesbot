@@ -84,7 +84,7 @@ class ContactCommand extends UserCommand
         // DISABLED
 
         $lines = file(__DIR__ . '/contact_banned.txt');
-        foreach($lines as $line) {
+        foreach ($lines as $line) {
             if (trim($line) == $user_id) {
                 if ($callback_query) {
                     $data_query['text'] = 'You\'re banned from using this!';

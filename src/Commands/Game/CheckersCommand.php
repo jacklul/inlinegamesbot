@@ -694,8 +694,8 @@ class CheckersCommand extends UserCommand
                                 ]
                             )
                         ];
-                    };
-                }
+                };
+            }
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
