@@ -323,26 +323,31 @@ class Request
             return new ServerResponse($fake_response, $bot_name);
         }
 
-        $timeout = 60;
-        while (true) {
-            $requests = DB::getOutgoingRequestCount();
+        $limited_methods = [
+            'sendMessage',
+            'editMessageText',
+        ];
 
-            if ($requests < 25) {
-                break;
+        if ((isset($data['chat_id']) || isset($data['inline_message_id'])) && in_array($action, $limited_methods)) {
+            $timeout = 60;
+
+            while (true) {
+                $requests = DB::getOutgoingRequestCount((isset($data['chat_id']) ? $data['chat_id'] : null), (isset($data['inline_message_id']) ? $data['inline_message_id'] : null));
+
+                if ($requests['CURRENT'] <= 0 && ((isset($data['inline_message_id']) && $requests['TOTAL'] < 30) || (isset($data['chat_id']) && $data['chat_id'] > 0 && $requests['TOTAL'] < 30) || (isset($data['chat_id']) && $data['chat_id'] < 0 && $requests['TOTAL'] < 20))) {
+                    break;
+                }
+
+                sleep(1);
+                $timeout--;
+
+                if ($timeout <= 0) {
+                    throw new TelegramException("Timed out while waiting for a request slot!");
+                }
             }
 
-            if ($timeout <= 0) {
-                touch('tmp/block.tmp');
-                throw new TelegramException('Timed out while waiting for a request slot!');
-            }
-
-            $random_time = 1000000 + mt_rand(0, 50000);
-            $timeout = $timeout - ($random_time / 1000000);
-
-            usleep($random_time);
+            DB::insertOutgoingRequest($action, (isset($data['chat_id']) ? $data['chat_id'] : null), (isset($data['inline_message_id']) ? $data['inline_message_id'] : null));
         }
-
-        DB::insertOutgoingRequest($action);
 
         $response = json_decode(self::executeCurl($action, $data), true);
 

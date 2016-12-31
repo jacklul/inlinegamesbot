@@ -41,8 +41,9 @@ CREATE TABLE IF NOT EXISTS `query` (
 
 CREATE TABLE IF NOT EXISTS `request` (
   `id` bigint UNSIGNED AUTO_INCREMENT COMMENT 'Unique identifier for this entry',
-  `method` CHAR(100) NULL DEFAULT NULL COMMENT 'Request method',
-  `data` TEXT NULL DEFAULT NULL COMMENT 'Request data',
+  `chat_id` bigint NULL DEFAULT NULL COMMENT 'Unique chat identifier',
+  `inline_message_id` char(255) NULL DEFAULT NULL COMMENT 'Identifier of the sent inline message',
+  `method` char(255) DEFAULT NULL COMMENT 'Request method',
   `created_at` timestamp NULL DEFAULT NULL COMMENT 'Entry date creation',
 
   PRIMARY KEY (`id`)

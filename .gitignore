@@ -14,3 +14,5 @@ composer.phar
 src/Commands/User/announcements.txt
 src/Commands/User/contact_banned.txt
 src/Commands/Game/TestgameCommand.php
+
+test/

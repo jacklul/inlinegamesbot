@@ -59,7 +59,7 @@ class ErrorreportCommand extends AdminCommand
                         ];
 
                         $result_php_error = Request::sendDocument($data_admin, realpath('error.log'));
-                        if ($result_php_error && $result_php_error->getResult()->getDocument() && empty($result_php_error_id)) {
+                        if ($result_php_error && $result_php_error->getResult() && $result_php_error->getResult()->getDocument() && empty($result_php_error_id)) {
                             $result_php_error_id = $result_php_error->getResult()->getDocument()->getFileId();
                         }
                     }
@@ -81,7 +81,7 @@ class ErrorreportCommand extends AdminCommand
                         ];
 
                         $result_library_error = Request::sendDocument($data_admin, realpath('exception.log'));
-                        if ($result_library_error && $result_library_error->getResult()->getDocument() && empty($result_library_error_id)) {
+                        if ($result_library_error && $result_library_error->getResult() && $result_library_error->getResult()->getDocument() && empty($result_library_error_id)) {
                             $result_library_error_id = $result_library_error->getResult()->getDocument()->getFileId();
                         }
                     }
@@ -92,14 +92,14 @@ class ErrorreportCommand extends AdminCommand
         if ($result_php_error && file_exists('error.log')) {
             unlink('error.log');
         } elseif (file_exists('error.log') && time() >= (filemtime('error.log') + 60)) {
-            rename('error.log', 'error_'.time().'.log');
+            rename('error.log', 'error_' . time() . '.log');
             $failed = true;
         }
 
         if ($result_library_error && file_exists('exception.log')) {
             unlink('exception.log');
         } elseif (file_exists('exception.log') && time() >= (filemtime('exception.log') + 60)) {
-            rename('exception.log', 'exception_'.time().'.log');
+            rename('exception.log', 'exception_' . time() . '.log');
             $failed = true;
         }
 

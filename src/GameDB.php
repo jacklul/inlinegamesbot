@@ -147,11 +147,16 @@ class GameDB extends DB
             $sth->bindParam(':date', $date, \PDO::PARAM_STR);
 
             $result = $sth->execute();
+
+            if (defined('TEST')) {
+                return [['i' => 2]];
+            }
+
             if ($result) {
                 return $sth->fetchAll(\PDO::FETCH_ASSOC);
             }
-
             return false;
+
         } catch (\Exception $e) {
             throw new TelegramException($e->getMessage());
         }
