@@ -342,7 +342,8 @@ class Request
                 $timeout--;
 
                 if ($timeout <= 0) {
-                    throw new TelegramException("Timed out while waiting for a request slot!");
+                    TelegramLog::debug("Timed out while waiting for a request slot! Forcing request anyway...");
+                    break;
                 }
             }
 
