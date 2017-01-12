@@ -138,7 +138,9 @@ if (!is_dir($TEMP_DIR)) {
 try {
     $telegram = new Longman\TelegramBot\Telegram($API_KEY, $BOT_USERNAME);
 
-    \Longman\TelegramBot\TelegramLog::initErrorLog('exception.log');
+    \Longman\TelegramBot\TelegramLog::initErrorLog('logs/exception.log');
+    //\Longman\TelegramBot\TelegramLog::initDebugLog('logs/debug.log');
+    //\Longman\TelegramBot\TelegramLog::initUpdateLog('logs/update.log');
 
     if (!empty($POST)) {
         $telegram->setCustomInput($POST);
@@ -184,7 +186,7 @@ try {
     \Longman\TelegramBot\TelegramLog::error($e);
 } catch (Longman\TelegramBot\Exception\TelegramLogException $e) {
     file_put_contents(
-        'exception.log',
+        'logs/exception.log',
         '[' . date('Y-m-d H:i:s', time()) . ']' . "\n" . $e . "\n",
         FILE_APPEND
     );

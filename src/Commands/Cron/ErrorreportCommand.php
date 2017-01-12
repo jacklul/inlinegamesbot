@@ -43,11 +43,11 @@ class ErrorreportCommand extends AdminCommand
 
         foreach ($this->getTelegram()->getAdminList() as $admin) {
             if ($admin != $botId) {
-                if (file_exists('error.log') && time() >= (filemtime('error.log') + 60)) {
+                if (file_exists('logs/error.log') && time() >= (filemtime('logs/error.log') + 60)) {
                     if (!empty($result_php_error_id)) {
                         $data_admin = [
                             'chat_id' => $admin,
-                            'caption' => 'PHP Error (' . date('Y-m-d', filemtime('error.log')) . ' at ' . date('H:i:s', filemtime('error.log')) . ')',
+                            'caption' => 'PHP Error (' . date('Y-m-d', filemtime('logs/error.log')) . ' at ' . date('H:i:s', filemtime('logs/error.log')) . ')',
                             'document' => $result_php_error_id,
                         ];
 
@@ -55,21 +55,21 @@ class ErrorreportCommand extends AdminCommand
                     } else {
                         $data_admin = [
                             'chat_id' => $admin,
-                            'caption' => 'PHP Error (' . date('Y-m-d', filemtime('error.log')) . ' at ' . date('H:i:s', filemtime('error.log')) . ')',
+                            'caption' => 'PHP Error (' . date('Y-m-d', filemtime('logs/error.log')) . ' at ' . date('H:i:s', filemtime('logs/error.log')) . ')',
                         ];
 
-                        $result_php_error = Request::sendDocument($data_admin, realpath('error.log'));
+                        $result_php_error = Request::sendDocument($data_admin, realpath('logs/error.log'));
                         if ($result_php_error && $result_php_error->getResult() && $result_php_error->getResult()->getDocument() && empty($result_php_error_id)) {
                             $result_php_error_id = $result_php_error->getResult()->getDocument()->getFileId();
                         }
                     }
                 }
 
-                if (file_exists('exception.log') && time() >= (filemtime('exception.log') + 60)) {
+                if (file_exists('logs/exception.log') && time() >= (filemtime('logs/exception.log') + 60)) {
                     if (!empty($result_library_error_id)) {
                         $data_admin = [
                             'chat_id' => $admin,
-                            'caption' => 'Library Error (' . date('Y-m-d', filemtime('exception.log')) . ' at ' . date('H:i:s', filemtime('exception.log')) . ')',
+                            'caption' => 'Library Error (' . date('Y-m-d', filemtime('logs/exception.log')) . ' at ' . date('H:i:s', filemtime('logs/exception.log')) . ')',
                             'document' => $result_library_error_id,
                         ];
 
@@ -77,10 +77,10 @@ class ErrorreportCommand extends AdminCommand
                     } else {
                         $data_admin = [
                             'chat_id' => $admin,
-                            'caption' => 'Library Error (' . date('Y-m-d', filemtime('exception.log')) . ' at ' . date('H:i:s', filemtime('exception.log')) . ')',
+                            'caption' => 'Library Error (' . date('Y-m-d', filemtime('logs/exception.log')) . ' at ' . date('H:i:s', filemtime('logs/exception.log')) . ')',
                         ];
 
-                        $result_library_error = Request::sendDocument($data_admin, realpath('exception.log'));
+                        $result_library_error = Request::sendDocument($data_admin, realpath('logs/exception.log'));
                         if ($result_library_error && $result_library_error->getResult() && $result_library_error->getResult()->getDocument() && empty($result_library_error_id)) {
                             $result_library_error_id = $result_library_error->getResult()->getDocument()->getFileId();
                         }
@@ -89,17 +89,17 @@ class ErrorreportCommand extends AdminCommand
             }
         }
 
-        if ($result_php_error && file_exists('error.log')) {
-            unlink('error.log');
-        } elseif (file_exists('error.log') && time() >= (filemtime('error.log') + 60)) {
-            rename('error.log', 'error_' . time() . '.log');
+        if ($result_php_error && file_exists('logs/error.log')) {
+            unlink('logs/error.log');
+        } elseif (file_exists('logs/error.log') && time() >= (filemtime('logs/error.log') + 60)) {
+            rename('logs/error.log', 'error_' . time() . '.log');
             $failed = true;
         }
 
-        if ($result_library_error && file_exists('exception.log')) {
-            unlink('exception.log');
-        } elseif (file_exists('exception.log') && time() >= (filemtime('exception.log') + 60)) {
-            rename('exception.log', 'exception_' . time() . '.log');
+        if ($result_library_error && file_exists('logs/exception.log')) {
+            unlink('logs/exception.log');
+        } elseif (file_exists('logs/exception.log') && time() >= (filemtime('logs/exception.log') + 60)) {
+            rename('logs/exception.log', 'exception_' . time() . '.log');
             $failed = true;
         }
 
