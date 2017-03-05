@@ -26,7 +26,7 @@ $translation = [
     // Game symbols
     'game_chamber' => '🔘',
     'game_chamber_hit' => '🔴',
-    'game_empty_field' => ' ',
+    'game_empty_field' => '.',
 
     // Results
     'result_survived' => '{STR} survived!',

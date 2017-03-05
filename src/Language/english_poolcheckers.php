@@ -28,7 +28,7 @@ $translation = [
     'XK' => '◾️️',
     'O' => '⚪️',
     'OK' => '◽️️',
-    'game_empty_field' => ' ',
+    'game_empty_field' => '.',
 
     // Game text
     'game_selected_pawn' => '(Selected: {STR})',

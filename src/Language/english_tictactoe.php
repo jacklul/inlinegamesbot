@@ -30,5 +30,5 @@ $translation = [
     'O_win' => '⭕',
     'X_lost' => '✖',
     'O_lost' => '🔘',
-    'game_empty_field' => ' ',
+    'game_empty_field' => '.',
 ];
