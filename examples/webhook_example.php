@@ -22,7 +22,7 @@
 set_time_limit(15);
 
 ini_set('log_errors', 1);
-ini_set('error_log', 'error.log');
+ini_set('error_log', 'logs/error.log');
 
 // ------------ Config START ------------
 $PROJECT_DIR = __DIR__ . '/src/';
