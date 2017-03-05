@@ -102,10 +102,9 @@ class RockpaperscissorsCommand extends UserCommand
                     $guest_mention = $guest_user['mention'];
                 }
 				
-				$this_user_fullname = htmlentities($this_user_fullname);
-				$host_fullname = htmlentities($host_fullname);
-				$guest_fullname = htmlentities($guest_fullname);
-
+                $this_user_fullname = htmlentities($this_user_fullname);
+                $host_fullname = htmlentities($host_fullname);
+                $guest_fullname = htmlentities($guest_fullname);
 
                 if (isset($data['language'])) {
                     $this->strings = Strings::load($this->name, $data['language']);
