@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `game` (
   `host_id` bigint NULL DEFAULT NULL COMMENT 'Unique user identifier',
   `guest_id` bigint NULL DEFAULT NULL COMMENT 'Unique user identifier',
   `game` CHAR(50) NULL DEFAULT NULL COMMENT 'Game script identifier',
-  `data` TEXT DEFAULT 'NULL' COMMENT 'Game data',
+  `data` TEXT COMMENT 'Game data',
   `inline_message_id` CHAR(255) NULL DEFAULT NULL COMMENT 'Identifier of the message',
   `created_at` timestamp NULL DEFAULT NULL COMMENT 'Entry date creation',
   `updated_at` timestamp NULL DEFAULT NULL COMMENT 'Entry date update',
