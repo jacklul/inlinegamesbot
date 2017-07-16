@@ -31,7 +31,7 @@ class DebugLog
             $backtrace = debug_backtrace();
 
             $prefix = '';
-            if (isset($backtrace[1])) {
+            if (isset($backtrace[1]['class'])) {
                 $prefix = $backtrace[1]['class'] . '\\' . $backtrace[1]['function'] . ': ';
             }
 
