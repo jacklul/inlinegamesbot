@@ -22,7 +22,7 @@
         },
         "BOT_WEBHOOK": {
             "description": "Webhook URL (webhook will be set automatically after deployment)",
-            "value": "https://your-project.herokuapp.com/webhook"
+            "value": "https://YOURAPPNAME.herokuapp.com/webhook"
         },
         "BOT_SECRET": {
             "description": "Secret variable used to secure the web hook",
