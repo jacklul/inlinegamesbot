@@ -24,7 +24,7 @@
             "value": ""
         },
         "BOT_WEBHOOK": {
-            "description": "Webhook URL",
+            "description": "Webhook URL - be sure to run `php bin/bot a=set` from the console to set the webhook!",
             "value": "https://your-project.herokuapp.com/webhook"
         },
         "BOT_SECRET": {
