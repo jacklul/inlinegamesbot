@@ -80,7 +80,7 @@ class Game
             throw new BotException('Game code is empty!');
         }
 
-        DebugLog::log($id . ' (' . $game_code . ')');
+        DebugLog::log($id);
 
         if (DB::isDbConnected()) {
             $this->storage = 'Bot\Storage\BotDB';

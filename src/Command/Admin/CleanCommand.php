@@ -47,17 +47,10 @@ class CleanCommand extends AdminCommand
             $cleanInterval = 86400;  // 86400 seconds = 1 day
         }
 
-        if (DB::isDbConnected()) {
-            $storage = 'Bot\Storage\BotDB';
-        } elseif (getenv('DATABASE_URL')) {
-            $storage = 'Bot\Storage\DB';
-        } else {
-            $storage = 'Bot\Storage\JsonFile';
-        }
-
         $game = new Game('_', '_', $this);
+        $storage = $game->getStorage();
 
-        $inactive = $game->getStorage()::action('list', $cleanInterval);
+        $inactive = $storage::action('list', $cleanInterval);
 
         $edited = 0;
         $cleaned = 0;
