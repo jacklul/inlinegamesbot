@@ -37,6 +37,7 @@ class CleanCommand extends AdminCommand
             $text = trim($message->getText(true));
         }
 
+        $chat_id = $message->getFrom()->getId();
         $cleanInterval = $this->getConfig('clean_interval');
 
         if (isset($text) && is_numeric($text) && $text > 0) {
@@ -52,9 +53,12 @@ class CleanCommand extends AdminCommand
 
         $inactive = $storage::action('list', $cleanInterval);
 
-        $edited = 0;
         $cleaned = 0;
+        $edited = 0;
+        $error = 0;
         foreach ($inactive as $inactive_game) {
+            Request::sendChatAction(['chat_id' => $chat_id, 'action' => 'typing']);
+
             $data = $storage::action('get', $inactive_game['id']);
 
             if (isset($data['game_code'])) {
@@ -76,6 +80,8 @@ class CleanCommand extends AdminCommand
                     } else {
                         DebugLog::log('Failed to edit message for game ID \'' . $inactive_game['id'] . '\', error: ' . $result->getDescription());
                     }
+                } else {
+                    $error++;
                 }
             }
 
@@ -99,8 +105,8 @@ class CleanCommand extends AdminCommand
 
         if ($message) {
             $data = [];
-            $data['chat_id'] = $message->getFrom()->getId();
-            $data['text'] = 'Cleaned ' . $cleaned . ' games, edited ' . $edited . ' messages, removed ' . $removed . ' temporary files!';
+            $data['chat_id'] = $chat_id;
+            $data['text'] = 'Cleaned ' . $cleaned . ' games, edited ' . $edited . ' messages, ' . $error . ' errored.' . PHP_EOL . 'Removed ' . $removed . ' temporary files!';
 
             return Request::sendMessage($data);
         }

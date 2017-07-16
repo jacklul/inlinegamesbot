@@ -38,11 +38,14 @@ class ReportCommand extends AdminCommand
             $message = $edited_message;
         }
 
+        $chat_id = $message->getFrom()->getId();
         $dirsToSend = $this->getConfig('dirs_to_report');
 
         if (empty($dirsToSend) || !is_array($dirsToSend)) {
             throw new BotException('Config variable \'dirs_to_report\' must be an array!');
         }
+
+        Request::sendChatAction(['chat_id' => $chat_id, 'action' => 'typing']);
 
         $filesToSend = [];
 
@@ -109,7 +112,7 @@ class ReportCommand extends AdminCommand
 
         if ($message) {
             $data = [];
-            $data['chat_id'] = $message->getFrom()->getId();
+            $data['chat_id'] = $chat_id;
 
             if (!empty($alreadySent)) {
                 if (!$sendFailed) {
