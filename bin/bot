@@ -63,7 +63,7 @@ $config = [
                 ]
             ],
             'cleangames' => [
-                'clean_interval' => 86400,
+                'clean_interval' => 3600,
             ],
         ],
     ],
