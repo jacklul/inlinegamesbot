@@ -9,10 +9,7 @@
         }
     ],
     "addons": [
-        "heroku-postgresql",
-        {
-            "plan": "hobby-dev"
-        }
+        "heroku-postgresql"
     ],
     "env": {
         "BOT_TOKEN": {
