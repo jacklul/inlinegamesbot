@@ -403,8 +403,11 @@ class Game
         }
 
         if (!$this->getUser('host') || !$this->getUser('guest')) {
+            $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
+
             TelegramLog::error('Game was started but one of the players wasn\'t in this game.');
-            return false;
+
+            return $this->answerCallbackQuery(__("Error!"), true);
         }
 
         if (!isset($this->data['data'])) {
