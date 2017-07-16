@@ -36,9 +36,6 @@
     },
     "scripts": {
         "check-code": [
-            "./vendor/bin/phpcs --standard=PSR2 -snp --encoding=utf-8 src/ --report-width=120"
-        ],
-        "check-code-win": [
             "php vendor/squizlabs/php_codesniffer/scripts/phpcs --standard=PSR2 -snp --encoding=utf-8 src/ --report-width=120"
         ]
     }
