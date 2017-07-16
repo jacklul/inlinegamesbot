@@ -796,7 +796,7 @@ class Checkers extends Game
 
         if ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host')) {
             if ($this->data['data']['vote']['host']['surrender']) {
-                DebugLog::log($this->getCurrentUser()->tryMention() . ' surrendered');
+                DebugLog::log($this->getCurrentUserMention() . ' surrendered');
 
                 $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
                 $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
@@ -811,7 +811,7 @@ class Checkers extends Game
                 }
             }
 
-            DebugLog::log($this->getCurrentUser()->tryMention() . ' voted to surrender');
+            DebugLog::log($this->getCurrentUserMention() . ' voted to surrender');
             $this->data['data']['vote']['host']['surrender'] = true;
 
             if ($this->manager->setData($this->data)) {
@@ -819,7 +819,7 @@ class Checkers extends Game
             }
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
             if ($this->data['data']['vote']['guest']['surrender']) {
-                DebugLog::log($this->getCurrentUser()->tryMention() . ' surrendered');
+                DebugLog::log($this->getCurrentUserMention() . ' surrendered');
 
                 $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
                 $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
@@ -834,7 +834,7 @@ class Checkers extends Game
                 }
             }
 
-            DebugLog::log($this->getCurrentUser()->tryMention() . ' voted to surrender');
+            DebugLog::log($this->getCurrentUserMention() . ' voted to surrender');
             $this->data['data']['vote']['guest']['surrender'] = true;
 
             if ($this->manager->setData($this->data)) {
@@ -868,7 +868,7 @@ class Checkers extends Game
             $this->data['data']['vote']['host']['draw'] = true;
 
             if ($this->manager->setData($this->data)) {
-                DebugLog::log($this->getCurrentUser()->tryMention() . ' voted to draw');
+                DebugLog::log($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
             }
@@ -876,7 +876,7 @@ class Checkers extends Game
             $this->data['data']['vote']['guest']['draw'] = true;
 
             if ($this->manager->setData($this->data)) {
-                DebugLog::log($this->getCurrentUser()->tryMention() . ' voted to draw');
+                DebugLog::log($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
             }

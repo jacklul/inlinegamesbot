@@ -275,7 +275,7 @@ class Game
         $this->data['players']['data'] = null;
 
         if ($this->manager->setData($this->data)) {
-            return $this->editMessage(__('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUser('host')->tryMention()]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+            return $this->editMessage(__('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
         }
 
         return false;
@@ -289,21 +289,21 @@ class Game
     protected function joinAction()
     {
         if (!$this->getUser('host')) {
-            DebugLog::log($this->getCurrentUser()->tryMention());
+            DebugLog::log($this->getCurrentUserMention());
 
             $this->data['players']['host'] = $this->getCurrentUser(true);
 
             if ($this->manager->setData($this->data)) {
-                return $this->editMessage(__('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUser('host')->tryMention()]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+                return $this->editMessage(__('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
             }
         } elseif (!$this->getUser('guest')) {
             if ($this->getCurrentUserId() != $this->getUserId('host') || (getenv('DEBUG') && $this->getCurrentUserId() == getenv('BOT_ADMIN'))) {
-                DebugLog::log($this->getCurrentUser()->tryMention());
+                DebugLog::log($this->getCurrentUserMention());
 
                 $this->data['players']['guest'] = $this->getCurrentUser(true);
 
                 if ($this->manager->setData($this->data)) {
-                    return $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUser('guest')->tryMention()]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUser('host')->tryMention()]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
+                    return $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
                 }
             } else {
                 return $this->answerCallbackQuery(__("You cannot play with yourself!"), true);
@@ -328,16 +328,16 @@ class Game
 
         if ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host')) {
             if ($this->getUser('guest')) {
-                DebugLog::log($this->getCurrentUser()->tryMention());
+                DebugLog::log($this->getCurrentUserMention());
 
                 $this->data['players']['host'] = $this->data['players']['guest'];
                 $this->data['players']['guest'] = null;
 
                 if ($this->manager->setData($this->data)) {
-                    return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $this->getCurrentUser()->tryMention()]) . PHP_EOL . __("{PLAYER} is waiting for opponent to join...", ['{PLAYER}' => $this->getUser('host')->tryMention()]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+                    return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $this->getCurrentUserMention()]) . PHP_EOL . __("{PLAYER} is waiting for opponent to join...", ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
                 }
             } else {
-                DebugLog::log($this->getCurrentUser()->tryMention());
+                DebugLog::log($this->getCurrentUserMention());
 
                 $this->data['players']['host'] = null;
 
@@ -346,7 +346,7 @@ class Game
                 }
             }
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
-            DebugLog::log($this->getCurrentUser()->tryMention());
+            DebugLog::log($this->getCurrentUserMention());
 
             $this->data['players']['guest'] = null;
 
@@ -369,13 +369,13 @@ class Game
     protected function kickAction()
     {
         if ($this->getUserId('host') && $this->getCurrentUserId() == $this->getUserId('host')) {
-            DebugLog::log($this->getCurrentUser()->tryMention() . ' kicked ' . $this->getUser('guest')->tryMention());
+            DebugLog::log($this->getCurrentUserMention() . ' kicked ' . $this->getUserMention('guest'));
 
-            $user = $this->getUser('guest')->tryMention();
+            $user = $this->getUserMention('guest');
             $this->data['players']['guest'] = null;
 
             if ($this->manager->setData($this->data)) {
-                return $this->editMessage(__('{PLAYER_GUEST} was kicked...', ['{PLAYER_GUEST}' => $user]) . PHP_EOL . __("{PLAYER} is waiting for opponent to join...", ['{PLAYER}' => $this->getUser('host')->tryMention()]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+                return $this->editMessage(__('{PLAYER_GUEST} was kicked...', ['{PLAYER_GUEST}' => $user]) . PHP_EOL . __("{PLAYER} is waiting for opponent to join...", ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
             }
         } elseif ($this->getUserId('host')) {
             return $this->answerCallbackQuery(__("You're not the host!"), true);
@@ -411,7 +411,7 @@ class Game
             $this->data['data'] = [];
         }
 
-        DebugLog::log($this->getCurrentUser()->tryMention());
+        DebugLog::log($this->getCurrentUserMention());
 
         $result = $this->gameAction();
 
