@@ -1,0 +1,12 @@
+# PhpStorm
+.idea/
+
+# Composer
+vendor/
+compoer.phar
+
+# Project
+.env
+var/
+app/config.php
+app/language/*.mo
