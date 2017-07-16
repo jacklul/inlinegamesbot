@@ -1,0 +1,42 @@
+{
+    "name": "Inline Games",
+    "description": "A Telegram bot providing games that can be played in any chat.",
+    "authors": [
+        {
+            "name": "Jack'lul",
+            "email": "jacklulcat@gmail.com",
+            "homepage": "https://jacklul.com"
+        }
+    ],
+    "type": "project",
+    "require": {
+        "php": "^7.0",
+        "ext-curl": "*",
+        "ext-pdo": "*",
+        "ext-gettext": "*",
+        "ext-mbstring": "*",
+        "ext-zip": "*",
+        "ext-pgsql": "*",
+        "longman/telegram-bot": "dev-master as 0.45.0",
+        "php-telegram-bot/telegram-bot-manager": "^1.2.1",
+        "vlucas/phpdotenv": "^2.4.0",
+        "gettext/gettext": "^4.3.0",
+        "spatie/emoji": "^1.0.5",
+        "ad7six/dsn": "^0.4.0"
+    },
+    "require-dev": {
+        "heroku/heroku-buildpack-php": "*",
+        "squizlabs/php_codesniffer": "^2.8",
+        "symfony/symfony": "^3.3.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bot\\": "src/"
+        }
+    },
+    "scripts": {
+        "check-code": [
+            "php vendor/squizlabs/php_codesniffer/scripts/phpcs --standard=PSR2 -snp --encoding=utf-8 src/ --report-width=120"
+        ]
+    }
+}

@@ -1,0 +1,10 @@
+# Github files
+/.github
+/docs
+*.md
+
+# Project files
+/test
+/*.png
+*.xcf
+*.psd

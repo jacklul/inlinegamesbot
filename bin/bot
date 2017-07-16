@@ -1,0 +1,157 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Inline Games - Telegram Bot (@inlinegamesbot)
+ *
+ * (c) 2017 Jack'lul <jacklulcat@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
+use Bot\Helper\DebugLog;
+use Dotenv\Dotenv;
+use Gettext\Translator;
+use Longman\TelegramBot\Exception\TelegramException;
+use Longman\TelegramBot\Exception\TelegramLogException;
+use Longman\TelegramBot\TelegramLog;
+use TelegramBot\TelegramBotManager\BotManager;
+
+/**
+ * Define root path
+ */
+define("ROOT_PATH", realpath(__DIR__ . '/../'));
+
+/**
+ * Define application paths
+ */
+define("BIN_PATH", ROOT_PATH . '/bin');
+define("APP_PATH", ROOT_PATH . '/app');
+define("SRC_PATH", ROOT_PATH . '/src');
+define("VAR_PATH", ROOT_PATH . '/var');
+
+/**
+ * Load Composer's autoloader
+ */
+require_once ROOT_PATH . '/vendor/autoload.php';
+
+/**
+ * Load environment variables with Dotenv
+ */
+if (file_exists(ROOT_PATH . '/.env')) {
+    $env = new Dotenv(ROOT_PATH);
+    $env->load();
+    $env->required(['BOT_TOKEN', 'BOT_USERNAME']);
+}
+
+/**
+ * Default configuration
+ */
+$config = [
+    'api_key'      => getenv('BOT_TOKEN'),
+    'bot_username' => getenv('BOT_USERNAME'),
+    'secret'       => getenv('BOT_SECRET'),
+    'commands' => [
+        'paths' => [
+            SRC_PATH . '/Command',
+        ],
+        'configs' => [
+            'report' => [
+                'dirs_to_report' => [
+                    VAR_PATH . '/logs',
+                    VAR_PATH . '/crashdumps'
+                ]
+            ],
+            'cleangames' => [
+                'clean_interval' => 86400,
+            ],
+        ],
+    ],
+    'webhook' => [
+        'url'             => getenv('BOT_WEBHOOK'),
+        'max_connections' => 20,
+        'allowed_updates' => [
+            'message',
+            'inline_query',
+            'chosen_inline_result',
+            'callback_query',
+        ],
+    ],
+    'logging' => [
+        'error'  => VAR_PATH . '/logs/Error.log',
+    ],
+    'validate_request' => true,
+    'limiter' => [
+        'enabled' => true,
+        'options' => [
+            'interval' => 0.33,
+        ],
+    ],
+    'botan' => [
+        'token'   => getenv('BOTAN_TOKEN'),
+        'options' => [
+            'timeout' => 5,
+        ],
+    ],
+    'cron' => [
+        'groups' => [
+            'default' => [
+                '/report',
+                '/clean',
+            ],
+        ],
+    ],
+];
+
+if (!empty($admin = (integer)getenv('BOT_ADMIN'))) {
+    $config['admins'] = [$admin];
+}
+
+if (!empty(getenv('DB_HOST'))) {
+    $config['mysql']['host'] = getenv('DB_HOST');
+    $config['mysql']['user'] = getenv('DB_USER');
+    $config['mysql']['password'] = getenv('DB_PASS');
+    $config['mysql']['database'] = getenv('DB_NAME');
+}
+
+/**
+ * Load user configuration and merge it with default
+ */
+if (file_exists(APP_PATH . '/config.php')) {
+    $default_config = $config;
+
+    include_once APP_PATH . '/config.php';
+
+    if (isset($config) && is_array($config)) {
+        $config = array_merge($default_config, $config);
+    }
+}
+
+/**
+ * Register '__()' function (gettext compatible translation system)
+ */
+(new Translator())->register();
+
+/**
+ * Print notice about debug mode
+ */
+DebugLog::log('RUNNING IN DEBUG MODE');
+
+/**
+ * Run the bot
+ */
+try {
+    $bot = new BotManager((isset($config) ? $config:[]));
+    $bot->run();
+} catch (TelegramLogException $e) {
+} catch (TelegramException $e) {
+    TelegramLog::error($e);
+} catch (Exception $e) {
+    TelegramLog::error($e);
+} catch (Throwable $e) {
+    TelegramLog::error($e);
+} finally {
+    if (isset($e) && is_object($e)) {
+        error_log($e->getMessage() . PHP_EOL);
+    }
+}

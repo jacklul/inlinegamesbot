@@ -1,0 +1,45 @@
+{
+    "name": "Inline Games",
+    "description": "A Telegram bot providing games that can be played in any chat.",
+    "repository": "https://github.com/jacklul/inlinegamesbot",
+    "logo": "https://raw.githubusercontent.com/jacklul/inlinegamesbot/master/logo.png",
+    "buildpacks": [
+        {
+          "url": "https://github.com/heroku/heroku-buildpack-php"
+        }
+    ],
+    "addons": [
+        "heroku-postgresql",
+        {
+            "plan": "hobby-dev"
+        }
+    ],
+    "env": {
+        "BOT_TOKEN": {
+            "description": "Bot API token obtained from @BotFather",
+            "value": ""
+        },
+        "BOT_USERNAME": {
+            "description": "Bot username set in @BotFather",
+            "value": ""
+        },
+        "BOT_WEBHOOK": {
+            "description": "Webhook URL",
+            "value": "https://your-project.herokuapp.com/webhook"
+        },
+        "BOT_SECRET": {
+            "description": "Secret variable used to secure the web hook",
+            "generator": "secret"
+        },
+        "BOT_ADMIN": {
+            "description": "Admin user's Telegram ID",
+            "value": "",
+            "required": false
+        },
+        "BOTAN_TOKEN": {
+            "description": "Token for bot analytics provided by Botan.io",
+            "value": "",
+            "required": false
+        }
+    }
+}
