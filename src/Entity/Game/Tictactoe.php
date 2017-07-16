@@ -127,6 +127,10 @@ class Tictactoe extends Game
      */
     protected function gameAction()
     {
+        if ($this->getCurrentUserId() != $this->getUserId('host') && $this->getCurrentUserId() != $this->getUserId('guest')) {
+            return $this->answerCallbackQuery(__("You're not in this game!"), true);
+        }
+
         $data = &$this->data['data'];
 
         $this->defineSymbols();

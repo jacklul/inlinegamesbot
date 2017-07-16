@@ -386,11 +386,7 @@ class Game
      */
     protected function startAction()
     {
-        if (!$this->getUserId('host') || !$this->getUserId('guest')) {
-            return false;
-        }
-
-        if ($this->getCurrentUserId() != $this->getUserId('host') && $this->getCurrentUserId() != $this->getUserId('guest')) {
+        if ($this->getCurrentUserId() == $this->getUserId('host') || $this->getCurrentUserId() == $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
         }
 
@@ -398,7 +394,9 @@ class Game
             return $this->answerCallbackQuery(__("You're not the host!"), true);
         }
 
-        $this->data['active'] = true;
+        if (!$this->getUser('host') || !$this->getUser('guest')) {
+            return false;
+        }
 
         if (!isset($this->data['data'])) {
             $this->data['data'] = [];

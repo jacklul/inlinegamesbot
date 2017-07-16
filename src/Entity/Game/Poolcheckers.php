@@ -142,6 +142,10 @@ class Poolcheckers extends Game
      */
     protected function gameAction()
     {
+        if ($this->getCurrentUserId() != $this->getUserId('host') && $this->getCurrentUserId() != $this->getUserId('guest')) {
+            return $this->answerCallbackQuery(__("You're not in this game!"), true);
+        }
+
         $data = &$this->data['data'];
 
         $this->defineSymbols();
@@ -942,6 +946,10 @@ class Poolcheckers extends Game
      */
     protected function forfeitAction()
     {
+        if ($this->getCurrentUserId() != $this->getUserId('host') && $this->getCurrentUserId() != $this->getUserId('guest')) {
+            return $this->answerCallbackQuery(__("You're not in this game!"), true);
+        }
+
         $this->defineSymbols();
 
         $this->max_y = count($this->data['data']['board']);
@@ -993,8 +1001,6 @@ class Poolcheckers extends Game
             if ($this->manager->setData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
             }
-        } else {
-            return $this->answerCallbackQuery();
         }
 
         return false;
@@ -1007,6 +1013,10 @@ class Poolcheckers extends Game
      */
     protected function drawAction()
     {
+        if ($this->getCurrentUserId() != $this->getUserId('host') && $this->getCurrentUserId() != $this->getUserId('guest')) {
+            return $this->answerCallbackQuery(__("You're not in this game!"), true);
+        }
+
         $this->defineSymbols();
 
         $this->max_y = count($this->data['data']['board']);
@@ -1030,8 +1040,6 @@ class Poolcheckers extends Game
             }
         } elseif ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host') || $this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You already voted!"), true);
-        } else {
-            return $this->answerCallbackQuery();
         }
 
         return false;
