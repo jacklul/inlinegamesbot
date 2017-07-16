@@ -53,11 +53,18 @@ class CleanCommand extends AdminCommand
 
         $inactive = $storage::action('list', $cleanInterval);
 
+        $chat_action_start = 0;
+
         $cleaned = 0;
         $edited = 0;
         $error = 0;
         foreach ($inactive as $inactive_game) {
-            Request::sendChatAction(['chat_id' => $chat_id, 'action' => 'typing']);
+            if ($chat_action_start < strtotime('-5 seconds')) {
+                Request::sendChatAction(['chat_id' => $chat_id, 'action' => 'typing']);
+                $chat_action_start = time();
+            }
+
+            DebugLog::log('Cleaning: ' . $inactive_game['id']);
 
             $data = $storage::action('get', $inactive_game['id']);
 
@@ -67,7 +74,7 @@ class CleanCommand extends AdminCommand
                 if ($game->canRun()) {
                     $result = Request::editMessageText(
                         [
-                            'inline_message_id' => $inactive_game['id'],
+                            'inline_message_id' => trim($inactive_game['id']),
                             'text' => '<b>' . $game->getGame()::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __("This game session is empty.") . '</i>',
                             'reply_markup' => $this->createInlineKeyboard($data['game_code']),
                             'parse_mode' => 'HTML',
@@ -77,17 +84,17 @@ class CleanCommand extends AdminCommand
 
                     if ($result->isOk()) {
                         $edited++;
+                        DebugLog::log('Message edited successfully');
                     } else {
                         $error++;
-                        DebugLog::log('Failed to edit message for game ID \'' . $inactive_game['id'] . '\', error: ' . $result->getDescription());
+                        DebugLog::log('Failed to edit message: ' . $result->getDescription());
                     }
                 }
             }
 
-            DebugLog::log('Cleaned: ' . $inactive_game['id']);
-
             if ($storage::action('remove', $inactive_game['id'])) {
                 $cleaned++;
+                DebugLog::log('Removed from database');
             }
         }
 

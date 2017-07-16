@@ -1003,7 +1003,7 @@ class Poolcheckers extends Game
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
             }
         } else {
-            TelegramLog::debug('Someone else executed forfeit action?');
+            DebugLog::log('Someone else executed forfeit action?');
             return $this->answerCallbackQuery();
         }
 
