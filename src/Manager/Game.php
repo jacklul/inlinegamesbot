@@ -269,7 +269,7 @@ class Game
     {
         $cron_check_file = VAR_PATH . '/cron';
 
-        if (!file_exists($cron_check_file) || filemtime($cron_check_file) < strtotime('-1 hour')) {
+        if (!file_exists($cron_check_file) || filemtime($cron_check_file) < strtotime('-5 minutes')) {
             if (flock(fopen($cron_check_file, "a+"), LOCK_EX)) {
                 touch($cron_check_file);
 
