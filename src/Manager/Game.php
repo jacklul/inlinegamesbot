@@ -168,7 +168,7 @@ class Game
             return Request::emptyResponse();
         }
 
-        DebugLog::log('BEGIN HANDLE');
+        DebugLog::log('BEGIN HANDLING THE GAME');
 
         $result = false;
         if ($callback_query) {
@@ -185,7 +185,7 @@ class Game
             Botan::track($this->getUpdate(), $this->getGame()::getTitle() . ' (new session)');  // track new game initialized event
         }
 
-        DebugLog::log('END HANDLE');
+        DebugLog::log('GAME HANDLED');
 
         $this->runScheduledCommands();
 
