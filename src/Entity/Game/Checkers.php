@@ -142,7 +142,7 @@ class Checkers extends Game
      */
     protected function gameAction()
     {
-        if ($this->getCurrentUserId() != $this->getUserId('host') && $this->getCurrentUserId() != $this->getUserId('guest')) {
+        if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
         }
 
@@ -784,7 +784,7 @@ class Checkers extends Game
      */
     protected function forfeitAction()
     {
-        if ($this->getCurrentUserId() != $this->getUserId('host') && $this->getCurrentUserId() != $this->getUserId('guest')) {
+        if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
         }
 
@@ -851,7 +851,7 @@ class Checkers extends Game
      */
     protected function drawAction()
     {
-        if ($this->getCurrentUserId() != $this->getUserId('host') && $this->getCurrentUserId() != $this->getUserId('guest')) {
+        if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
         }
 

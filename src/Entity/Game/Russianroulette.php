@@ -123,7 +123,7 @@ class Russianroulette extends Game
      */
     protected function gameAction()
     {
-        if ($this->getCurrentUserId() != $this->getUserId('host') && $this->getCurrentUserId() != $this->getUserId('guest')) {
+        if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
         }
 
