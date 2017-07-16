@@ -269,10 +269,14 @@ class Game
     {
         $cron_check_file = VAR_PATH . '/cron';
 
-        if ((!file_exists($cron_check_file) || filemtime($cron_check_file) < strtotime('-1 hour')) && flock(fopen($cron_check_file, "a+"), LOCK_EX)) {
-            DebugLog::log('Running scheduled commands!');
+        if (!file_exists($cron_check_file) || filemtime($cron_check_file) < strtotime('-1 hour')) {
+            if (flock(fopen($cron_check_file, "a+"), LOCK_EX)) {
+                touch($cron_check_file);
 
-            $this->telegram->runCommands(['/report', '/clean']);
+                DebugLog::log('Running scheduled commands!');
+
+                $this->telegram->runCommands(['/report', '/clean']);
+            }
         }
     }
 }

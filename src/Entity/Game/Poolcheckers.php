@@ -993,6 +993,8 @@ class Poolcheckers extends Game
             if ($this->manager->setData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
             }
+        } else {
+            return $this->answerCallbackQuery();
         }
 
         return false;
@@ -1028,6 +1030,8 @@ class Poolcheckers extends Game
             }
         } elseif ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host') || $this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You already voted!"), true);
+        } else {
+            return $this->answerCallbackQuery();
         }
 
         return false;

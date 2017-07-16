@@ -306,6 +306,8 @@ class Game
             } else {
                 return $this->answerCallbackQuery(__("You cannot play with yourself!"), true);
             }
+        } else {
+            return $this->answerCallbackQuery();
         }
 
         return false;
@@ -345,6 +347,8 @@ class Game
             if ($this->manager->setData($this->data)) {
                 return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
             }
+        } else {
+            return $this->answerCallbackQuery();
         }
 
         return false;
@@ -357,7 +361,7 @@ class Game
      */
     protected function kickAction()
     {
-        if ($this->getCurrentUserId() == $this->getUserId('host')) {
+        if ($this->getUserId('host') && $this->getCurrentUserId() == $this->getUserId('host')) {
             DebugLog::log($this->getCurrentUser()->tryMention() . ' kicked ' . $this->getUser('guest')->tryMention());
 
             $user = $this->getUser('guest')->tryMention();
@@ -366,10 +370,10 @@ class Game
             if ($this->manager->setData($this->data)) {
                 return $this->editMessage(__('{PLAYER_GUEST} was kicked...', ['{PLAYER_GUEST}' => $user]) . PHP_EOL . __("{PLAYER} is waiting for opponent to join...", ['{PLAYER}' => $this->getUser('host')->tryMention()]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
             }
+        } elseif ($this->getUserId('host')) {
+            return $this->answerCallbackQuery(__("You're not the host!"), true);
         } else {
-            if ($this->getUserId('host')) {
-                return $this->answerCallbackQuery(__("You're not the host!"), true);
-            }
+            return $this->answerCallbackQuery();
         }
 
         return false;
