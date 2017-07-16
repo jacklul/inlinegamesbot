@@ -88,9 +88,9 @@ class External
 
                 return self::$engine::insertToStorage($id, $data);
             case 'lock':
-                return self::$engine::lockStorage();
+                return self::$engine::lockStorage($id);
             case 'unlock':
-                return self::$engine::unlockStorage();
+                return self::$engine::unlockStorage($id);
             case 'list':
                 return self::$engine::listFromStorage($id);
             case 'remove':
