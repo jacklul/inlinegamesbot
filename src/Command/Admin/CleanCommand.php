@@ -50,19 +50,19 @@ class CleanCommand extends AdminCommand
         if (DB::isDbConnected()) {
             $storage = 'Bot\Storage\BotDB';
         } elseif (getenv('DATABASE_URL')) {
-            $storage = 'Bot\Storage\External';
+            $storage = 'Bot\Storage\DB';
         } else {
             $storage = 'Bot\Storage\JsonFile';
         }
 
         $game = new Game('_', '_', $this);
 
-        $inactive = $game->getStorage()::storage('list', $cleanInterval);
+        $inactive = $game->getStorage()::action('list', $cleanInterval);
 
         $edited = 0;
         $cleaned = 0;
         foreach ($inactive as $inactive_game) {
-            $data = $storage::storage('get', $inactive_game['id']);
+            $data = $storage::action('get', $inactive_game['id']);
 
             if (isset($data['game_code'])) {
                 $game = new Game($inactive_game['id'], $data['game_code'], $this);
@@ -88,7 +88,7 @@ class CleanCommand extends AdminCommand
 
             DebugLog::log('Cleaned: ' . $inactive_game['id']);
 
-            if ($storage::storage('remove', $inactive_game['id'])) {
+            if ($storage::action('remove', $inactive_game['id'])) {
                 $cleaned++;
             }
         }

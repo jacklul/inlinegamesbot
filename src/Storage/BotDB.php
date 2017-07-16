@@ -36,7 +36,7 @@ class BotDB extends DB
      * @return array|bool|mixed
      * @throws BotException
      */
-    public static function storage($action, $id, $data = [])
+    public static function action($action, $id, $data = [])
     {
         if (empty($action)) {
             throw new BotException('Action is empty!');
@@ -50,9 +50,9 @@ class BotDB extends DB
 
         switch ($action) {
             default:
-            case 'get':
+            case 'read':
                 return self::selectFromStorage($id);
-            case 'put':
+            case 'save':
                 if (empty($data)) {
                     throw new BotException('Data is empty!');
                 }
@@ -87,9 +87,7 @@ class BotDB extends DB
                         }
 
                         touch($structure_check);
-                    }
-
-                    if (!$result) {
+                    } else {
                         throw new BotException('Failed to create DB structure!');
                     }
                 } catch (BotException $e) {

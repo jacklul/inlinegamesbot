@@ -8,7 +8,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Storage\Handler;
+namespace Bot\Storage\Driver;
 
 use AD7six\Dsn\Dsn;
 use Bot\Exception\BotException;
@@ -18,11 +18,11 @@ use PDO;
 use PDOException;
 
 /**
- * Class MySQL
+ * Class PostgreSQL
  *
- * @package Bot\Storage\Handler
+ * @package Bot\Storage\Driver
  */
-class MySQL
+class PostgreSQL
 {
     /**
      * PDO object
@@ -32,9 +32,52 @@ class MySQL
     private static $external_pdo;
 
     /**
+     * This is 'proxy' function to server actions
+     *
+     * @param $action
+     * @param $id
+     * @param array  $data
+     *
+     * @return array|bool|mixed
+     * @throws BotException
+     */
+    public static function action($action, $id, $data = [])
+    {
+        if (empty($action)) {
+            throw new BotException('Action is empty!');
+        }
+
+        if (empty($id)) {
+            throw new BotException('Id is empty!');
+        }
+
+        self::initializeStorage();
+
+        switch ($action) {
+            default:
+            case 'read':
+                return self::selectFromStorage($id);
+            case 'save':
+                if (empty($data)) {
+                    throw new BotException('Data is empty!');
+                }
+
+                return self::insertToStorage($id, $data);
+            case 'lock':
+                return self::lockStorage($id);
+            case 'unlock':
+                return self::unlockStorage($id);
+            case 'list':
+                return self::listFromStorage($id);
+            case 'remove':
+                return self::deleteFromStorage($id);
+        }
+    }
+
+    /**
      * Initialize PDO connection and 'storage' table
      */
-    public static function initializeStorage()
+    private static function initializeStorage()
     {
         if (!defined('TB_STORAGE')) {
             define('TB_STORAGE', 'storage');
@@ -42,13 +85,17 @@ class MySQL
             $dsn = Dsn::parse(getenv('DATABASE_URL'));
             $dsn = $dsn->toArray();
 
+            if ($dsn['engine'] === 'postgres') {
+                $dsn['engine'] = 'pgsql';
+            }
+
             try {
-                self::$external_pdo = new PDO('mysql:' . ':host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
+                self::$external_pdo = new PDO($dsn['engine'] . ':host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
                 self::$external_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
             } catch (PDOException $e) {
                 throw new TelegramException($e->getMessage());
             }
-
+            
             DebugLog::log('Connected to database');
 
             if (!file_exists($structure_check = VAR_PATH . '/db_structure_created') && file_exists($structure = ROOT_PATH . '/structure.sql')) {
@@ -81,12 +128,12 @@ class MySQL
      * @return array|bool|mixed
      * @throws BotException
      */
-    public static function selectFromStorage($id)
+    private static function selectFromStorage($id)
     {
         try {
             $sth = self::$external_pdo->prepare('
-                SELECT * FROM `' . TB_STORAGE . '`
-                WHERE `id` = :id
+                SELECT * FROM ' . TB_STORAGE . '
+                WHERE id = :id
             ');
 
             $sth->bindParam(':id', $id, PDO::PARAM_STR);
@@ -111,17 +158,17 @@ class MySQL
      * @return bool
      * @throws BotException
      */
-    public static function insertToStorage($id, $data)
+    private static function insertToStorage($id, $data)
     {
         try {
             $sth = self::$external_pdo->prepare('
-                INSERT INTO `' . TB_STORAGE . '`
-                (`id`, `data`, `created_at`, `updated_at`)
+                INSERT INTO ' . TB_STORAGE . '
+                (id, data, created_at, updated_at)
                 VALUES
                 (:id, :data, :date, :date)
-                ON DUPLICATE KEY UPDATE
-                    `data`       = VALUES(`data`),
-                    `updated_at` = VALUES(`updated_at`)
+                ON CONFLICT (id) DO UPDATE 
+                  SET   data       = :data,
+                        updated_at = :date
             ');
 
             $data = json_encode($data);
@@ -139,12 +186,12 @@ class MySQL
 
     /**
      * Lock the row to prevent another process modifying it
-
+     *
      * @param $id
      *
      * @return bool
      */
-    public static function lockStorage($id)
+    private static function lockStorage($id)
     {
         if (!is_dir(VAR_PATH . '/tmp')) {
             mkdir(VAR_PATH . '/tmp', 0755, true);
@@ -160,7 +207,7 @@ class MySQL
      *
      * @return bool
      */
-    public static function unlockStorage($id)
+    private static function unlockStorage($id)
     {
         return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.json', "a+"), LOCK_UN) && unlink(VAR_PATH . '/tmp/' . $id .  '.json');
     }
@@ -173,7 +220,7 @@ class MySQL
      * @return array|bool
      * @throws BotException
      */
-    public static function listFromStorage($time = 0)
+    private static function listFromStorage($time = 0)
     {
         if ($time < 0) {
             throw new BotException('Time cannot be a negative number!');
@@ -181,8 +228,8 @@ class MySQL
 
         try {
             $sth = self::$external_pdo->prepare('
-                SELECT * FROM `' . TB_STORAGE . '`
-                WHERE `updated_at` < :date
+                SELECT * FROM ' . TB_STORAGE . '
+                WHERE updated_at < :date
             ');
 
             $date = date('Y-m-d H:i:s', strtotime('-' . $time . ' seconds'));
@@ -207,12 +254,12 @@ class MySQL
      * @return array|bool|mixed
      * @throws BotException
      */
-    public static function deleteFromStorage($id)
+    private static function deleteFromStorage($id)
     {
         try {
             $sth = self::$external_pdo->prepare('
-                DELETE FROM `' . TB_STORAGE . '`
-                WHERE `id` = :id
+                DELETE FROM ' . TB_STORAGE . '
+                WHERE id = :id
             ');
 
             $sth->bindParam(':id', $id, PDO::PARAM_STR);

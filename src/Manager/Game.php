@@ -85,7 +85,7 @@ class Game
         if (DB::isDbConnected()) {
             $this->storage = 'Bot\Storage\BotDB';
         } elseif (getenv('DATABASE_URL')) {
-            $this->storage = 'Bot\Storage\External';
+            $this->storage = 'Bot\Storage\DB';
         } else {
             $this->storage = 'Bot\Storage\JsonFile';
         }
@@ -154,7 +154,7 @@ class Game
         $callback_query = $this->getUpdate()->getCallbackQuery();
         $chosen_inline_result = $this->getUpdate()->getChosenInlineResult();
 
-        if (!$this->storage::storage('lock', $this->id)) {
+        if (!$this->storage::action('lock', $this->id)) {
             if ($callback_query = $this->update->getCallbackQuery()) {
                 return Request::answerCallbackQuery(
                     [
@@ -174,13 +174,13 @@ class Game
         if ($callback_query) {
             $result = $this->game->handleAction(explode(';', $callback_query->getData())[1]);
 
-            $this->storage::storage('unlock', $this->id);
+            $this->storage::action('unlock', $this->id);
 
             Botan::track($this->getUpdate(), $this->getGame()::getTitle());  // track game traffic
         } elseif ($chosen_inline_result) {
             $result =  $this->game->handleAction('new');
 
-            $this->storage::storage('unlock', $this->id);
+            $this->storage::action('unlock', $this->id);
 
             Botan::track($this->getUpdate(), $this->getGame()::getTitle() . ' (new session)');  // track new game initialized event
         }
@@ -230,7 +230,7 @@ class Game
     public function getData()
     {
         DebugLog::log($this->id);
-        return $this->storage::storage('get', $this->id);
+        return $this->storage::action('read', $this->id);
     }
 
     /**
@@ -245,7 +245,7 @@ class Game
 
         $data['game_code'] = $this->game::getCode();    // make sure we have the game code in the data array for /clean command!
 
-        return $this->storage::storage('put', $this->id, $data);
+        return $this->storage::action('save', $this->id, $data);
     }
 
     /**

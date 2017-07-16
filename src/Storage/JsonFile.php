@@ -33,7 +33,7 @@ class JsonFile
      * @return array|bool|mixed
      * @throws BotException
      */
-    public static function storage($action, $id, $data = [])
+    public static function action($action, $id, $data = [])
     {
         if (empty($action)) {
             throw new BotException('Action is empty!');
@@ -47,9 +47,9 @@ class JsonFile
 
         switch ($action) {
             default:
-            case 'get':
+            case 'read':
                 return self::get($id);
-            case 'put':
+            case 'save':
                 if (empty($data)) {
                     throw new BotException('Data is empty!');
                 }
