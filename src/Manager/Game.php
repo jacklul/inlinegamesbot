@@ -90,8 +90,6 @@ class Game
             $this->storage = 'Bot\Storage\JsonFile';
         }
 
-        $this->storage = 'Bot\Storage\DB';
-
         DebugLog::log('Using \'' . $this->storage . '\' storage');
 
         $this->id = $id;
