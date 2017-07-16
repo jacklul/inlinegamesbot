@@ -62,7 +62,7 @@ $config = [
                     VAR_PATH . '/crashdumps'
                 ]
             ],
-            'cleangames' => [
+            'clean' => [
                 'clean_interval' => 3600,
             ],
         ],
@@ -126,6 +126,12 @@ if (file_exists(APP_PATH . '/config.php')) {
         $config = array_merge($default_config, $config);
     }
 }
+
+/**
+ * Error logging
+ */
+ini_set('log_errors', 1);
+ini_set('error_log', (isset($config['logging']['error']) ? $config['logging']['error'] : ROOT_PATH . '/error.log'));
 
 /**
  * Register '__()' function (gettext compatible translation system)
