@@ -20,6 +20,8 @@ use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Entities\User;
 use Longman\TelegramBot\Request;
+use Longman\TelegramBot\TelegramLog;
+use MongoDB\Driver\Server;
 
 /**
  * Class Game
@@ -307,7 +309,7 @@ class Game
                 return $this->answerCallbackQuery(__("You cannot play with yourself!"), true);
             }
         } else {
-            return $this->answerCallbackQuery();
+            return $this->answerCallbackQuery(__("This game is full!"));
         }
 
         return false;
@@ -320,6 +322,10 @@ class Game
      */
     protected function quitAction()
     {
+        if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
+            return $this->answerCallbackQuery(__("You're not in this game!"), true);
+        }
+
         if ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host')) {
             if ($this->getUser('guest')) {
                 DebugLog::log($this->getCurrentUser()->tryMention());
@@ -348,6 +354,7 @@ class Game
                 return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
             }
         } else {
+            TelegramLog::error('Quitting an empty game?');
             return $this->answerCallbackQuery();
         }
 
@@ -373,6 +380,7 @@ class Game
         } elseif ($this->getUserId('host')) {
             return $this->answerCallbackQuery(__("You're not the host!"), true);
         } else {
+            TelegramLog::error('Kick executed on a game without a host?');
             return $this->answerCallbackQuery();
         }
 
@@ -395,6 +403,7 @@ class Game
         }
 
         if (!$this->getUser('host') || !$this->getUser('guest')) {
+            TelegramLog::error('Game was started but one of the players wasn\'t in this game.');
             return false;
         }
 
@@ -404,11 +413,19 @@ class Game
 
         DebugLog::log($this->getCurrentUser()->tryMention());
 
-        return $this->gameAction();
+        $result = $this->gameAction();
+
+        if (!$result instanceof ServerResponse) {
+            TelegramLog::error('gameAction routed from startAction returned an error!');
+        }
+
+        return $result;
     }
 
     /**
      * Handle the game action
+     *
+     * This is just a dummy function.
      *
      * @return bool|ServerResponse|mixed
      */

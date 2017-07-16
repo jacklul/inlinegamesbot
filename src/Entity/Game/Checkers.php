@@ -14,6 +14,7 @@ use Bot\Entity\Game;
 use Bot\Helper\DebugLog;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
+use Longman\TelegramBot\TelegramLog;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -839,6 +840,8 @@ class Checkers extends Game
             if ($this->manager->setData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
             }
+        } else {
+            TelegramLog::error('Someone else executed forfeit action?');
         }
 
         return false;
@@ -876,7 +879,7 @@ class Checkers extends Game
 
                 return $this->gameAction();
             }
-        } elseif ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host') || $this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
+        } else {
             return $this->answerCallbackQuery(__("You already voted!"), true);
         }
 
