@@ -20,11 +20,11 @@
             "value": ""
         },
         "BOT_USERNAME": {
-            "description": "Bot username set in @BotFather",
+            "description": "Bot username set in @BotFather (without '@' symbol)",
             "value": ""
         },
         "BOT_WEBHOOK": {
-            "description": "Webhook URL - be sure to run `php bin/bot a=set` from the console to set the webhook!",
+            "description": "Webhook URL (webhook will be set automatically after deployment)",
             "value": "https://your-project.herokuapp.com/webhook"
         },
         "BOT_SECRET": {
@@ -41,5 +41,8 @@
             "value": "",
             "required": false
         }
+    },
+    "scripts": {
+        "postdeploy": "php bin/bot a=set"
     }
 }
