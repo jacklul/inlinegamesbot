@@ -78,10 +78,9 @@ class CleanCommand extends AdminCommand
                     if ($result->isOk()) {
                         $edited++;
                     } else {
+                        $error++;
                         DebugLog::log('Failed to edit message for game ID \'' . $inactive_game['id'] . '\', error: ' . $result->getDescription());
                     }
-                } else {
-                    $error++;
                 }
             }
 
