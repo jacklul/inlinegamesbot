@@ -841,7 +841,8 @@ class Checkers extends Game
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
             }
         } else {
-            TelegramLog::error('Someone else executed forfeit action?');
+            TelegramLog::debug('Someone else executed forfeit action?');
+            return $this->answerCallbackQuery();
         }
 
         return false;

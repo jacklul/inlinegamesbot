@@ -354,7 +354,7 @@ class Game
                 return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
             }
         } else {
-            TelegramLog::error('Quitting an empty game?');
+            TelegramLog::debug('Quitting an empty game?');
             return $this->answerCallbackQuery();
         }
 
@@ -380,7 +380,7 @@ class Game
         } elseif ($this->getUserId('host')) {
             return $this->answerCallbackQuery(__("You're not the host!"), true);
         } else {
-            TelegramLog::error('Kick executed on a game without a host?');
+            TelegramLog::debug('Kick executed on a game without a host?');
             return $this->answerCallbackQuery();
         }
 
@@ -403,11 +403,8 @@ class Game
         }
 
         if (!$this->getUser('host') || !$this->getUser('guest')) {
-            $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
-
-            TelegramLog::error('Game was started but one of the players wasn\'t in this game.');
-
-            return $this->answerCallbackQuery(__("Error!"), true);
+            TelegramLog::debug('Game was started but one of the players wasn\'t in this game.');
+            return $this->answerCallbackQuery();
         }
 
         if (!isset($this->data['data'])) {
@@ -417,10 +414,6 @@ class Game
         DebugLog::log($this->getCurrentUser()->tryMention());
 
         $result = $this->gameAction();
-
-        if (!$result instanceof ServerResponse) {
-            TelegramLog::error('gameAction routed from startAction returned an error!');
-        }
 
         return $result;
     }
