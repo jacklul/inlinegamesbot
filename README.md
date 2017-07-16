@@ -1,3 +1,5 @@
+# THIS IS AN OLD VERSION OF THE PROJECT
+
 # Inline Games - Telegram Bot
 
 This is basically a simple bot showcasing [Bots 2.0](https://core.telegram.org/bots/2-0-intro#new-inline-keyboards) 'inline keyboards' feature in [Telegram](https://telegram.org).
@@ -16,10 +18,10 @@ This bot is intended to work with webhooks only, it may work with getUpdates but
 
 ## Contributing
 
-See [CONTRIBUTING](https://github.com/jacklul/inlinegamesbot/blob/master/CONTRIBUTING.md) for more information.
+See [CONTRIBUTING](CONTRIBUTING.md) for more information.
 
 ## License
 
 **GNU General Public License v3.0**
 
-See [LICENSE](https://github.com/jacklul/inlinegamesbot/blob/master/LICENSE.md) for full license information.
+See [LICENSE](LICENSE.md) for full license information.

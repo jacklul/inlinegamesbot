@@ -357,7 +357,7 @@ class RussianrouletteCommand extends UserCommand
                             $move = $guest_fullname;
                         }
 
-                        $currentMove = "\n" . $this->strings['game_current_turn'] . ' ' . $move;
+                        $currentMove = "\n\n" . $this->strings['game_current_turn'] . ' ' . $move;
                     }
 
                     $result = Game::updateGame($gameId, json_encode($data));

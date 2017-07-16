@@ -41,8 +41,13 @@ class InlinequeryCommand extends SystemCommand
     {
         $update = $this->getUpdate();
         $inline_query = $update->getInlineQuery();
+
+        if (!$inline_query) {
+            return Request::emptyResponse();
+        }
+
         $query = trim($inline_query->getQuery());
-        $data = ['inline_query_id' => $inline_query->getId(), 'cache_time' => 300];
+        $data = ['inline_query_id' => $inline_query->getId(), 'cache_time' => 3600];
 
         $articles = [];
         $articles[] = [
@@ -140,7 +145,7 @@ class InlinequeryCommand extends SystemCommand
             $data['cache_time'] = 10;
             $data['is_personal'] = true;
         }
-        
+
         if ($query == 'dev' && $this->getTelegram()->isAdmin()) {
             $articles[] = [
                 'id' => 'g99',

@@ -23,7 +23,7 @@ namespace Longman\TelegramBot;
 
 class Strings
 {
-    public static $multi_language_enabled = true;
+    public static $multi_language_enabled = false;
     public static $numPublicLanguages;
     public static $defaultstrings = [];
 
