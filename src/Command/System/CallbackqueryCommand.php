@@ -28,10 +28,14 @@ class CallbackqueryCommand extends SystemCommand
 
         DebugLog::log('Data: ' . $callback_query->getData());
 
-        $game = new Game($callback_query->getInlineMessageId(), explode(';', $callback_query->getData())[0], $this);
+        $data = $callback_query->getData();
 
-        if ($game->canRun()) {
-            return $game->run();
+        if ($this->isDataValid($data)) {
+            $game = new Game($callback_query->getInlineMessageId(), explode(';', $data)[0], $this);
+
+            if ($game->canRun()) {
+                return $game->run();
+            }
         }
 
         return Request::answerCallbackQuery(
@@ -41,5 +45,16 @@ class CallbackqueryCommand extends SystemCommand
             'show_alert' => true,
             ]
         );
+    }
+
+    private function isDataValid($data)
+    {
+        $data = explode(';', $data);
+
+        if (count($data) >= 2) {
+            return true;
+        }
+
+        return false;
     }
 }
