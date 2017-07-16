@@ -66,7 +66,7 @@ $config = [
     ],
     'webhook' => [
         'url'             => getenv('BOT_WEBHOOK'),
-        'max_connections' => 50,
+        'max_connections' => 20,
         'allowed_updates' => [
             'message',
             'inline_query',
