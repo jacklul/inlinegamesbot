@@ -140,7 +140,7 @@ class Rockpaperscissors extends Game
             $arg = $callbackquery_data[2];
         }
 
-        if ($command == 'start') {
+        if ($command === 'start') {
             $data['host_pick'] = '';
             $data['guest_pick'] = '';
             $data['host_wins'] = 0;

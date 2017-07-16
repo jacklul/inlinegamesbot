@@ -160,7 +160,7 @@ class Poolcheckers extends Game
             $args = explode('-', $callbackquery_data[2]);
         }
 
-        if ($command == 'start') {
+        if ($command === 'start') {
             if (isset($data['settings']) && $data['settings']['X'] == 'host') {
                 $data['settings']['X'] = 'guest';
                 $data['settings']['O'] = 'host';
