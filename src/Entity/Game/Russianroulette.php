@@ -213,6 +213,8 @@ class Russianroulette extends Game
 
                 if ($this->manager->setData($this->data)) {
                     return $this->editMessage($gameOutput . PHP_EOL . PHP_EOL . __('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->gameKeyboard($hit));
+                } else {
+                    return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
                 }
             } else {
                 $gameOutput = '<b>' . __("{PLAYER} survived!", ['{PLAYER}' => '</b>' . $this->getCurrentUserMention() . '<b>']) . '</b>' . PHP_EOL;
@@ -237,6 +239,8 @@ class Russianroulette extends Game
                 $this->getUserMention('host') . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($hit)
             );
+        } else {
+            return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
         }
     }
 

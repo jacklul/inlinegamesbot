@@ -177,6 +177,8 @@ class Rockpaperscissors extends Game
                     if ($data['host_pick'] == '' || $data['guest_pick'] == '') {
                         return $this->answerCallbackQuery();
                     }
+                } else {
+                    return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
                 }
             } else {
                 DebugLog::log('Invalid move data: ' . $arg);
@@ -236,6 +238,8 @@ class Rockpaperscissors extends Game
                 $this->getUserMention('host') . $hostPick . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . $guestPick . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($isOver)
             );
+        } else {
+            return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
         }
     }
 

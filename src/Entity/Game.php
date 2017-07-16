@@ -68,7 +68,8 @@ class Game
         $action = $action . 'Action';
 
         if (!method_exists($this, $action)) {
-            throw new BotException('Method \'' . $action . '\ doesn\'t exist!');
+            DebugLog::log('Method \'' . $action . '\ doesn\'t exist!');
+            return $this->answerCallbackQuery();
         }
 
         DebugLog::log($action);
@@ -94,7 +95,6 @@ class Game
         DebugLog::log('CRASHED');
 
         if (!empty($this->data)) {
-            error_log('Crashed...');
             CrashDump::dump($this->manager->getId());
 
             $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
@@ -276,9 +276,9 @@ class Game
 
         if ($this->manager->setData($this->data)) {
             return $this->editMessage(__('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+        } else {
+            return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
         }
-
-        return false;
     }
 
     /**
@@ -295,6 +295,8 @@ class Game
 
             if ($this->manager->setData($this->data)) {
                 return $this->editMessage(__('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+            } else {
+                return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
             }
         } elseif (!$this->getUser('guest')) {
             if ($this->getCurrentUserId() != $this->getUserId('host') || (getenv('DEBUG') && $this->getCurrentUserId() == getenv('BOT_ADMIN'))) {
@@ -304,6 +306,8 @@ class Game
 
                 if ($this->manager->setData($this->data)) {
                     return $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
+                } else {
+                    return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
                 }
             } else {
                 return $this->answerCallbackQuery(__("You cannot play with yourself!"), true);
@@ -311,8 +315,6 @@ class Game
         } else {
             return $this->answerCallbackQuery(__("This game is full!"));
         }
-
-        return false;
     }
 
     /**
@@ -335,6 +337,8 @@ class Game
 
                 if ($this->manager->setData($this->data)) {
                     return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $this->getCurrentUserMention()]) . PHP_EOL . __("{PLAYER} is waiting for opponent to join...", ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+                } else {
+                    return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
                 }
             } else {
                 DebugLog::log($this->getCurrentUserMention());
@@ -343,6 +347,8 @@ class Game
 
                 if ($this->manager->setData($this->data)) {
                     return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
+                } else {
+                    return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
                 }
             }
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
@@ -352,13 +358,13 @@ class Game
 
             if ($this->manager->setData($this->data)) {
                 return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
+            } else {
+                return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
             }
         } else {
             DebugLog::log('Quitting an empty game?');
             return $this->answerCallbackQuery();
         }
-
-        return false;
     }
 
     /**
@@ -376,6 +382,8 @@ class Game
 
             if ($this->manager->setData($this->data)) {
                 return $this->editMessage(__('{PLAYER_GUEST} was kicked...', ['{PLAYER_GUEST}' => $user]) . PHP_EOL . __("{PLAYER} is waiting for opponent to join...", ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+            } else {
+                return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
             }
         } elseif ($this->getUserId('host')) {
             return $this->answerCallbackQuery(__("You're not the host!"), true);
@@ -383,8 +391,6 @@ class Game
             DebugLog::log('Kick executed on a game without a host?');
             return $this->answerCallbackQuery();
         }
-
-        return false;
     }
 
     /**

@@ -369,6 +369,8 @@ class Checkers extends Game
                 $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($data['board'], $isOver, $data['move_counter'])
             );
+        } else {
+            return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
         }
     }
 
@@ -808,6 +810,8 @@ class Checkers extends Game
                         $this->getUserMention('host') . ' (' . (($this->data['data']['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($this->data['data']['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                         $this->gameKeyboard($this->data['data']['board'], 'surrender')
                     );
+                } else {
+                    return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
                 }
             }
 
@@ -816,6 +820,8 @@ class Checkers extends Game
 
             if ($this->manager->setData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
+            } else {
+                return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
             }
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
             if ($this->data['data']['vote']['guest']['surrender']) {
@@ -831,6 +837,8 @@ class Checkers extends Game
                         $this->getUserMention('host') . ' (' . (($this->data['data']['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($this->data['data']['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                         $this->gameKeyboard($this->data['data']['board'], 'surrender')
                     );
+                } else {
+                    return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
                 }
             }
 
@@ -839,13 +847,13 @@ class Checkers extends Game
 
             if ($this->manager->setData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
+            } else {
+                return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
             }
         } else {
             DebugLog::log('Someone else executed forfeit action?');
             return $this->answerCallbackQuery();
         }
-
-        return false;
     }
 
     /**
@@ -871,6 +879,8 @@ class Checkers extends Game
                 DebugLog::log($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
+            } else {
+                return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
             }
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest') && !$this->data['data']['vote']['guest']['draw']) {
             $this->data['data']['vote']['guest']['draw'] = true;
@@ -879,11 +889,11 @@ class Checkers extends Game
                 DebugLog::log($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
+            } else {
+                return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
             }
         } else {
             return $this->answerCallbackQuery(__("You already voted!"), true);
         }
-
-        return false;
     }
 }
