@@ -21,7 +21,6 @@ use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Entities\User;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\TelegramLog;
-use MongoDB\Driver\Server;
 
 /**
  * Class Game
@@ -95,6 +94,7 @@ class Game
         DebugLog::log('CRASHED');
 
         if (!empty($this->data)) {
+            error_log('Crashed...');
             CrashDump::dump($this->manager->getId());
 
             $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
