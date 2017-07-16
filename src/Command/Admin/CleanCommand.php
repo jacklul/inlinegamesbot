@@ -112,7 +112,7 @@ class CleanCommand extends AdminCommand
         if ($message) {
             $data = [];
             $data['chat_id'] = $chat_id;
-            $data['text'] = 'Cleaned ' . $cleaned . ' games, edited ' . $edited . ' messages, ' . $error . ' errored.' . PHP_EOL . 'Removed ' . $removed . ' temporary files!';
+            $data['text'] = 'Cleaned ' . $cleaned . ' games, edited ' . $edited . ' messages, ' . $error . ' errored.' . PHP_EOL . 'Removed ' . $removed . ' temporary files.';
 
             return Request::sendMessage($data);
         }
