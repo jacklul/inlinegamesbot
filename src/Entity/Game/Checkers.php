@@ -214,7 +214,7 @@ class Checkers extends Game
         if ($command !== 'forfeit' && $command !== 'draw') {
             if ($this->getCurrentUserId() === $this->getUserId($data['settings'][$data['current_turn']])) {
                 if ($data['current_selection'] != '') {
-                    DebugLog::log('Game selection: ' . $data['current_selection']);
+                    DebugLog::log('Current selection: ' . $data['current_selection']);
 
                     if ($data['current_selection'] == $args[0] . $args[1]) {
                         if ($data['current_selection_lock'] == false) {

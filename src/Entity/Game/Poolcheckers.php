@@ -213,7 +213,7 @@ class Poolcheckers extends Game
         if ($command !== 'forfeit' && $command !== 'draw') {
             if ($this->getCurrentUserId() === $this->getUserId($data['settings'][$data['current_turn']])) {
                 if ($data['current_selection'] != '') {
-                    DebugLog::log('Game selection: ' . $data['current_selection']);
+                    DebugLog::log('Current selection: ' . $data['current_selection']);
 
                     if ($data['current_selection'] == $args[0] . $args[1]) {
                         if ($data['current_selection_lock'] == false) {
@@ -252,15 +252,12 @@ class Poolcheckers extends Game
 
                             if (strpos($data['board'][$args[0]][$args[1]], 'K') === false && (($data['current_turn'] == 'X' && $args[1] == 7) || ($data['current_turn'] == 'O' && $args[1] == 0))) {
                                 $data['board'][$args[0]][$args[1]] .= 'K';
-                                $canChain = false;
                             }
 
                             if ($possibleMoves['kills'][$args[0] . $args[1]] != '') {
                                 $data['board'][$possibleMoves['kills'][$args[0] . $args[1]][0]][$possibleMoves['kills'][$args[0] . $args[1]][1]] = '';
                                 $killed = true;
                             }
-
-
 
                             if ($killed == true && $this->possibleMoves($data['board'], $command[0].$command[1], true, null, $data['current_selection'][0].$data['current_selection'][1])) {
                                 $data['current_selection_lock'] = true;
