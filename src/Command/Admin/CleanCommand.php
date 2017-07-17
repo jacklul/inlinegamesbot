@@ -55,6 +55,8 @@ class CleanCommand extends AdminCommand
             $cleanInterval = 86400;  // 86400 seconds = 1 day
         }
 
+        set_time_limit(90);
+
         $game = new Game('_', '_', $this);
         $storage = $game->getStorage();
 
