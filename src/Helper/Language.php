@@ -44,15 +44,7 @@ class Language
         $t = new Translator();
 
         if (file_exists(APP_PATH . '/language/messages.' . $language . '.po')) {
-            if (!file_exists(VAR_PATH . '/language/messages.' . $language . '/.php')) {
-                $translation = Translations::fromPoFile(APP_PATH . '/language/messages.' . $language . '.po');
-
-                if (!is_dir(VAR_PATH . '/language/')) {
-                    mkdir(VAR_PATH . '/language/', 0755, true);
-                }
-
-                $translation->toPhpArrayFile(VAR_PATH . '/language/messages.' . $language . '.php');
-            }
+            self::compileToArray($language);
 
             $t->loadTranslations(VAR_PATH . '/language/messages.' . $language . '.php');
 
@@ -85,6 +77,24 @@ class Language
         }
 
         return $languages;
+    }
+
+    /**
+     * Compile .po file into .php array file
+     *
+     * @param $language
+     */
+    private static function compileToArray($language)
+    {
+        if (!file_exists(VAR_PATH . '/language/messages.' . $language . '/.php')) {
+            $translation = Translations::fromPoFile(APP_PATH . '/language/messages.' . $language . '.po');
+
+            if (!is_dir(VAR_PATH . '/language/')) {
+                mkdir(VAR_PATH . '/language/', 0755, true);
+            }
+
+            $translation->toPhpArrayFile(VAR_PATH . '/language/messages.' . $language . '.php');
+        }
     }
 
     /**
