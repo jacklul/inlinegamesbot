@@ -94,17 +94,11 @@ class Game
 
         DebugLog::log('CRASHED');
 
-        if (!empty($this->data)) {
-            CrashDump::dump($this->manager->getId());
+        CrashDump::dump($this->manager->getId());
 
-            $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
+        $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
 
-            return $this->answerCallbackQuery(__('Critical error!', true));
-        }
-
-        $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
-
-        return $this->answerCallbackQuery();
+        return $this->answerCallbackQuery(__('Critical error!', true));
     }
 
     /**

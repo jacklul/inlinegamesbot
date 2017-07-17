@@ -89,31 +89,45 @@ class MySQL
                 self::$external_pdo = new PDO('mysql:' . ':host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
                 self::$external_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
             } catch (PDOException $e) {
-                throw new TelegramException($e->getMessage());
+                error_log($e->getMessage());
+                DebugLog::log('Connection to the database failed');
+                //throw new TelegramException($e->getMessage());
             }
 
-            DebugLog::log('Connected to database');
+            if (self::isDbConnected()) {
+                DebugLog::log('Connected to database');
 
-            if (!file_exists($structure_check = VAR_PATH . '/db_structure_created') && file_exists($structure = ROOT_PATH . '/structure.sql')) {
-                DebugLog::log('Creating database structure...');
+                if (!file_exists($structure_check = VAR_PATH . '/db_structure_created') && file_exists($structure = ROOT_PATH . '/structure.sql')) {
+                    DebugLog::log('Creating database structure...');
 
-                try {
-                    if ($result = self::$external_pdo->query(file_get_contents($structure))) {
-                        if (!is_dir(VAR_PATH)) {
-                            mkdir(VAR_PATH, 0755, true);
+                    try {
+                        if ($result = self::$external_pdo->query(file_get_contents($structure))) {
+                            if (!is_dir(VAR_PATH)) {
+                                mkdir(VAR_PATH, 0755, true);
+                            }
+
+                            touch($structure_check);
                         }
 
-                        touch($structure_check);
+                        if (!$result) {
+                            throw new BotException('Failed to create DB structure!');
+                        }
+                    } catch (BotException $e) {
+                        throw new TelegramException($e->getMessage());
                     }
-
-                    if (!$result) {
-                        throw new BotException('Failed to create DB structure!');
-                    }
-                } catch (BotException $e) {
-                    throw new TelegramException($e->getMessage());
                 }
             }
         }
+    }
+
+    /**
+     * Check if database connection has been created
+     *
+     * @return bool
+     */
+    public static function isDbConnected()
+    {
+        return self::$external_pdo !== null;
     }
 
     /**
@@ -126,6 +140,10 @@ class MySQL
      */
     private static function selectFromStorage($id)
     {
+        if (!self::isDbConnected()) {
+            return false;
+        }
+
         try {
             $sth = self::$external_pdo->prepare('
                 SELECT * FROM `' . TB_STORAGE . '`
@@ -156,6 +174,10 @@ class MySQL
      */
     private static function insertToStorage($id, $data)
     {
+        if (!self::isDbConnected()) {
+            return false;
+        }
+
         try {
             $sth = self::$external_pdo->prepare('
                 INSERT INTO `' . TB_STORAGE . '`
@@ -189,6 +211,10 @@ class MySQL
      */
     private static function lockStorage($id)
     {
+        if (!self::isDbConnected()) {
+            return false;
+        }
+
         if (!is_dir(VAR_PATH . '/tmp')) {
             mkdir(VAR_PATH . '/tmp', 0755, true);
         }
@@ -205,6 +231,10 @@ class MySQL
      */
     private static function unlockStorage($id)
     {
+        if (!self::isDbConnected()) {
+            return false;
+        }
+
         return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.json', "a+"), LOCK_UN) && unlink(VAR_PATH . '/tmp/' . $id .  '.json');
     }
 
@@ -218,6 +248,10 @@ class MySQL
      */
     private static function listFromStorage($time = 0)
     {
+        if (!self::isDbConnected()) {
+            return false;
+        }
+
         if ($time < 0) {
             throw new BotException('Time cannot be a negative number!');
         }
@@ -252,6 +286,10 @@ class MySQL
      */
     private static function deleteFromStorage($id)
     {
+        if (!self::isDbConnected()) {
+            return false;
+        }
+
         try {
             $sth = self::$external_pdo->prepare('
                 DELETE FROM `' . TB_STORAGE . '`
