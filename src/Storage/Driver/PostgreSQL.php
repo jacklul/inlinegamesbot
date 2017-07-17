@@ -14,6 +14,7 @@ use AD7six\Dsn\Dsn;
 use Bot\Exception\BotException;
 use Bot\Helper\Debug;
 use Longman\TelegramBot\Exception\TelegramException;
+use Longman\TelegramBot\TelegramLog;
 use PDO;
 use PDOException;
 
@@ -60,7 +61,7 @@ class PostgreSQL
                 self::$pdo = new PDO('pgsql:' . 'host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
                 self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
             } catch (PDOException $e) {
-                error_log($e->getMessage());
+                TelegramLog::error($e->getMessage());
                 Debug::log('Connection to the database failed!');
                 return false;
             }

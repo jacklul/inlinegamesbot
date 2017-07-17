@@ -18,6 +18,7 @@ use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Entities\User;
 use Longman\TelegramBot\Request;
+use Longman\TelegramBot\TelegramLog;
 
 /**
  * Class Game
@@ -374,7 +375,7 @@ class Game
             }
         } else {
             $error = 'User quitting an empty game?';
-            error_log($error);
+            TelegramLog::error($error);
             Debug::log($error);
             Debug::dump($this->manager->getId());
             return $this->answerCallbackQuery();
@@ -405,7 +406,7 @@ class Game
             }
         } else {
             $error = 'Kick executed on a game without a host?';
-            error_log($error);
+            TelegramLog::error($error);
             Debug::log($error);
             Debug::dump($this->manager->getId());
             return $this->answerCallbackQuery();

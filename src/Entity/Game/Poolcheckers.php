@@ -1011,7 +1011,7 @@ class Poolcheckers extends Game
             }
         } else {
             $error = 'Someone else executed forfeit action?';
-            error_log($error);
+            TelegramLog::error($error);
             Debug::log($error);
             Debug::dump($this->manager->getId());
             return $this->answerCallbackQuery();
