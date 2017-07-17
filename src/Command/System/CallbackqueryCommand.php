@@ -22,13 +22,22 @@ use Longman\TelegramBot\Request;
  */
 class CallbackqueryCommand extends SystemCommand
 {
+    private $aliases = [
+        'stats' => 'stats'
+    ];
+
     public function execute()
     {
         $callback_query = $this->getUpdate()->getCallbackQuery();
-
-        Debug::log('Data: ' . $callback_query->getData());
-
         $data = $callback_query->getData();
+
+        Debug::log('Data: ' . $data);
+
+        $command = explode(';', $data)[0];
+
+        if (isset($this->aliases[$command]) && $this->getTelegram()->getCommandObject($this->aliases[$command])) {
+            return $this->getTelegram()->executeCommand($this->aliases[$command]);
+        }
 
         if ($this->isDataValid($data)) {
             $game = new Game($callback_query->getInlineMessageId(), explode(';', $data)[0], $this);

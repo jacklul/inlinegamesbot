@@ -164,15 +164,21 @@ class File
      */
     public static function listFromStorage($time = 0)
     {
-        if ($time < 0) {
-            throw new BotException('Time cannot be a negative number!');
+        if (!is_numeric($time)) {
+            throw new BotException('Time must be a number!');
         }
 
         $ids = [];
         foreach (new \DirectoryIterator(STORAGE_PATH) as $file) {
             if (!$file->isDir() && !$file->isDot()) {
-                if ($file->getMTime() < strtotime('-' . $time . ' seconds')) {
-                    $ids[] = $file->getFilename();
+                if ($time >= 0) {
+                    if ($file->getMTime() <= strtotime('-' . abs($time) . ' seconds')) {
+                        $ids[] = $file->getFilename();
+                    }
+                } else {
+                    if ($file->getMTime() > strtotime('-' . abs($time) . ' seconds')) {
+                        $ids[] = $file->getFilename();
+                    }
                 }
             }
         }

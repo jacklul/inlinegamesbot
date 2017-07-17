@@ -274,17 +274,27 @@ class MySQL
      */
     public static function listFromStorage($time = 0)
     {
-        if ($time < 0) {
-            throw new BotException('Time cannot be a negative number!');
+        if (!self::isDbConnected()) {
+            return false;
+        }
+
+        if (!is_numeric($time)) {
+            throw new BotException('Time must be a number!');
+        }
+
+        if ($time >= 0) {
+            $compare_sign = '<=';
+        } else {
+            $compare_sign = '>';
         }
 
         try {
             $sth = self::$pdo->prepare('
                 SELECT * FROM `' . TB_STORAGE . '`
-                WHERE `updated_at` <= :date
+                WHERE `updated_at` ' . $compare_sign . ' :date
             ');
 
-            $date = self::getTimestamp(strtotime('-' . $time . ' seconds'));
+            $date = date('Y-m-d H:i:s', strtotime('-' . abs($time) . ' seconds'));
 
             $sth->bindParam(':date', $date, PDO::PARAM_STR);
 

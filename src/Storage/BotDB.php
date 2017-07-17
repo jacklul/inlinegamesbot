@@ -162,7 +162,7 @@ class BotDB extends DB
      * @return array|bool|mixed
      * @throws BotException
      */
-    private static function deleteFromStorage($id)
+    public static function deleteFromStorage($id)
     {
         if (!self::isDbConnected()) {
             return false;
@@ -195,6 +195,7 @@ class BotDB extends DB
      * @param $id
      *
      * @return bool
+     * @throws BotException
      */
     public static function lockStorage($id)
     {
@@ -218,6 +219,7 @@ class BotDB extends DB
      * @param $id
      *
      * @return bool
+     * @throws BotException
      */
     public static function unlockStorage($id)
     {
@@ -238,17 +240,23 @@ class BotDB extends DB
      */
     public static function listFromStorage($time = 0)
     {
-        if ($time < 0) {
-            throw new BotException('Time cannot be a negative number!');
+        if (!is_numeric($time)) {
+            throw new BotException('Time must be a number!');
+        }
+
+        if ($time >= 0) {
+            $compare_sign = '<=';
+        } else {
+            $compare_sign = '>';
         }
 
         try {
             $sth = self::$pdo->prepare('
                 SELECT * FROM `' . TB_STORAGE . '`
-                WHERE `updated_at` <= :date
+                WHERE `updated_at` ' . $compare_sign . ' :date
             ');
 
-            $date = self::getTimestamp(strtotime('-' . $time . ' seconds'));
+            $date = self::getTimestamp(strtotime('-' . abs($time) . ' seconds'));
 
             $sth->bindParam(':date', $date, PDO::PARAM_STR);
 
