@@ -12,7 +12,7 @@ namespace Bot\Storage\Driver;
 
 use AD7six\Dsn\Dsn;
 use Bot\Exception\BotException;
-use Bot\Helper\DebugLog;
+use Bot\Helper\Debug;
 use Longman\TelegramBot\Exception\TelegramException;
 use PDO;
 use PDOException;
@@ -29,55 +29,26 @@ class MySQL
      *
      * @var PDO
      */
-    private static $external_pdo;
+    private static $pdo;
 
     /**
-     * This is 'proxy' function to server actions
+     * SQL to create database structure
      *
-     * @param $action
-     * @param $id
-     * @param array  $data
-     *
-     * @return array|bool|mixed
-     * @throws BotException
+     * @var string
      */
-    public static function action($action, $id, $data = [])
-    {
-        if (empty($action)) {
-            throw new BotException('Action is empty!');
-        }
+    private static $structure = 'CREATE TABLE IF NOT EXISTS `storage` (
+        `id` CHAR(100) COMMENT "Unique identifier for this entry",
+        `data` TEXT NOT NULL) COMMENT "Stored data",
+        `created_at` timestamp NULL DEFAULT NULL) COMMENT "Entry creation date",
+        `updated_at` timestamp NULL DEFAULT NULL) COMMENT "Entry update date",
 
-        if (empty($id)) {
-            throw new BotException('Id is empty!');
-        }
-
-        self::initializeStorage();
-
-        switch ($action) {
-            default:
-            case 'read':
-                return self::selectFromStorage($id);
-            case 'save':
-                if (empty($data)) {
-                    throw new BotException('Data is empty!');
-                }
-
-                return self::insertToStorage($id, $data);
-            case 'lock':
-                return self::lockStorage($id);
-            case 'unlock':
-                return self::unlockStorage($id);
-            case 'list':
-                return self::listFromStorage($id);
-            case 'remove':
-                return self::deleteFromStorage($id);
-        }
-    }
+        PRIMARY KEY (`id`)
+    );';
 
     /**
      * Initialize PDO connection and 'storage' table
      */
-    private static function initializeStorage()
+    public static function initializeStorage()
     {
         if (!defined('TB_STORAGE')) {
             define('TB_STORAGE', 'storage');
@@ -86,22 +57,22 @@ class MySQL
             $dsn = $dsn->toArray();
 
             try {
-                self::$external_pdo = new PDO('mysql:' . ':host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
-                self::$external_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+                self::$pdo = new PDO('mysql:' . 'host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
+                self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
             } catch (PDOException $e) {
                 error_log($e->getMessage());
-                DebugLog::log('Connection to the database failed');
-                //throw new TelegramException($e->getMessage());
+                Debug::log('Connection to the database failed!');
+                return false;
             }
 
             if (self::isDbConnected()) {
-                DebugLog::log('Connected to database');
+                Debug::log('Connected to the database');
 
-                if (!file_exists($structure_check = VAR_PATH . '/db_structure_created') && file_exists($structure = ROOT_PATH . '/structure.sql')) {
-                    DebugLog::log('Creating database structure...');
+                if (!file_exists($structure_check = VAR_PATH . '/db_structure_created')) {
+                    Debug::log('Creating database structure...');
 
                     try {
-                        if ($result = self::$external_pdo->query(file_get_contents($structure))) {
+                        if ($result = self::$pdo->query(self::$structure)) {
                             if (!is_dir(VAR_PATH)) {
                                 mkdir(VAR_PATH, 0755, true);
                             }
@@ -118,6 +89,8 @@ class MySQL
                 }
             }
         }
+
+        return true;
     }
 
     /**
@@ -127,7 +100,7 @@ class MySQL
      */
     public static function isDbConnected()
     {
-        return self::$external_pdo !== null;
+        return self::$pdo !== null;
     }
 
     /**
@@ -138,14 +111,18 @@ class MySQL
      * @return array|bool|mixed
      * @throws BotException
      */
-    private static function selectFromStorage($id)
+    public static function selectFromStorage($id)
     {
         if (!self::isDbConnected()) {
             return false;
         }
 
+        if (empty($id)) {
+            throw new BotException('Id is empty!');
+        }
+
         try {
-            $sth = self::$external_pdo->prepare('
+            $sth = self::$pdo->prepare('
                 SELECT * FROM `' . TB_STORAGE . '`
                 WHERE `id` = :id
             ');
@@ -172,14 +149,22 @@ class MySQL
      * @return bool
      * @throws BotException
      */
-    private static function insertToStorage($id, $data)
+    public static function insertToStorage($id, $data)
     {
         if (!self::isDbConnected()) {
             return false;
         }
 
+        if (empty($id)) {
+            throw new BotException('Id is empty!');
+        }
+
+        if (empty($data)) {
+            throw new BotException('Data is empty!');
+        }
+
         try {
-            $sth = self::$external_pdo->prepare('
+            $sth = self::$pdo->prepare('
                 INSERT INTO `' . TB_STORAGE . '`
                 (`id`, `data`, `created_at`, `updated_at`)
                 VALUES
@@ -190,87 +175,13 @@ class MySQL
             ');
 
             $data = json_encode($data);
-            $date = date('Y-m-d H:i:s', time());
+            $date = self::getTimestamp();
 
             $sth->bindParam(':id', $id, PDO::PARAM_STR);
             $sth->bindParam(':data', $data, PDO::PARAM_STR);
             $sth->bindParam(':date', $date, PDO::PARAM_STR);
 
             return $sth->execute();
-        } catch (PDOException $e) {
-            throw new BotException($e->getMessage());
-        }
-    }
-
-    /**
-     * Lock the row to prevent another process modifying it
-
-     * @param $id
-     *
-     * @return bool
-     */
-    private static function lockStorage($id)
-    {
-        if (!self::isDbConnected()) {
-            return false;
-        }
-
-        if (!is_dir(VAR_PATH . '/tmp')) {
-            mkdir(VAR_PATH . '/tmp', 0755, true);
-        }
-
-        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.json', "a+"), LOCK_EX);
-    }
-
-    /**
-     * Unlock the row after
-
-     * @param $id
-     *
-     * @return bool
-     */
-    private static function unlockStorage($id)
-    {
-        if (!self::isDbConnected()) {
-            return false;
-        }
-
-        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.json', "a+"), LOCK_UN) && unlink(VAR_PATH . '/tmp/' . $id .  '.json');
-    }
-
-    /**
-     * Select multiple data from the database
-     *
-     * @param int $time
-     *
-     * @return array|bool
-     * @throws BotException
-     */
-    private static function listFromStorage($time = 0)
-    {
-        if (!self::isDbConnected()) {
-            return false;
-        }
-
-        if ($time < 0) {
-            throw new BotException('Time cannot be a negative number!');
-        }
-
-        try {
-            $sth = self::$external_pdo->prepare('
-                SELECT * FROM `' . TB_STORAGE . '`
-                WHERE `updated_at` < :date
-            ');
-
-            $date = date('Y-m-d H:i:s', strtotime('-' . $time . ' seconds'));
-
-            $sth->bindParam(':date', $date, PDO::PARAM_STR);
-
-            if ($result = $sth->execute()) {
-                return $sth->fetchAll(PDO::FETCH_ASSOC);
-            } else {
-                return $result;
-            }
         } catch (PDOException $e) {
             throw new BotException($e->getMessage());
         }
@@ -284,14 +195,18 @@ class MySQL
      * @return array|bool|mixed
      * @throws BotException
      */
-    private static function deleteFromStorage($id)
+    public static function deleteFromStorage($id)
     {
         if (!self::isDbConnected()) {
             return false;
         }
 
+        if (empty($id)) {
+            throw new BotException('Id is empty!');
+        }
+
         try {
-            $sth = self::$external_pdo->prepare('
+            $sth = self::$pdo->prepare('
                 DELETE FROM `' . TB_STORAGE . '`
                 WHERE `id` = :id
             ');
@@ -299,6 +214,84 @@ class MySQL
             $sth->bindParam(':id', $id, PDO::PARAM_STR);
 
             return $sth->execute();
+        } catch (PDOException $e) {
+            throw new BotException($e->getMessage());
+        }
+    }
+
+    /**
+     * Lock the row to prevent another process modifying it
+     *
+     * @TODO this is really bad way of doing it currently, forces running this project just on one dyno... (they do not share filesystem)
+     * @TODO maybe `self::$pdo->beginTransaction();` could be somehow used here?
+     *
+     * @param $id
+     *
+     * @return bool
+     * @throws BotException
+     */
+    public static function lockStorage($id)
+    {
+        if (empty($id)) {
+            throw new BotException('Id is empty!');
+        }
+
+        if (!is_dir(VAR_PATH . '/tmp')) {
+            mkdir(VAR_PATH . '/tmp', 0755, true);
+        }
+
+        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.json', "a+"), LOCK_EX);
+    }
+
+    /**
+     * Unlock the row after
+     *
+     * @TODO this is really bad way of doing it currently, forces running this project just on one dyno... (they do not share filesystem)
+     * @TODO maybe `self::$pdo->commit();` could be somehow used here?
+     *
+     * @param $id
+     *
+     * @return bool
+     * @throws BotException
+     */
+    public static function unlockStorage($id)
+    {
+        if (empty($id)) {
+            throw new BotException('Id is empty!');
+        }
+
+        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.json', "a+"), LOCK_UN) && unlink(VAR_PATH . '/tmp/' . $id .  '.json');
+    }
+
+    /**
+     * Select multiple data from the database
+     *
+     * @param int $time
+     *
+     * @return array|bool
+     * @throws BotException
+     */
+    public static function listFromStorage($time = 0)
+    {
+        if ($time < 0) {
+            throw new BotException('Time cannot be a negative number!');
+        }
+
+        try {
+            $sth = self::$pdo->prepare('
+                SELECT * FROM `' . TB_STORAGE . '`
+                WHERE `updated_at` <= :date
+            ');
+
+            $date = self::getTimestamp(strtotime('-' . $time . ' seconds'));
+
+            $sth->bindParam(':date', $date, PDO::PARAM_STR);
+
+            if ($result = $sth->execute()) {
+                return $sth->fetchAll(PDO::FETCH_ASSOC);
+            } else {
+                return $result;
+            }
         } catch (PDOException $e) {
             throw new BotException($e->getMessage());
         }

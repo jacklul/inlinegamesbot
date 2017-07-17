@@ -12,7 +12,7 @@ namespace Bot\Storage\Driver;
 
 use AD7six\Dsn\Dsn;
 use Bot\Exception\BotException;
-use Bot\Helper\DebugLog;
+use Bot\Helper\Debug;
 use Longman\TelegramBot\Exception\TelegramException;
 use PDO;
 use PDOException;
@@ -29,55 +29,26 @@ class PostgreSQL
      *
      * @var PDO
      */
-    private static $external_pdo;
+    private static $pdo;
 
     /**
-     * This is 'proxy' function to server actions
+     * SQL to create database structure
      *
-     * @param $action
-     * @param $id
-     * @param array  $data
-     *
-     * @return array|bool|mixed
-     * @throws BotException
+     * @var string
      */
-    public static function action($action, $id, $data = [])
-    {
-        if (empty($action)) {
-            throw new BotException('Action is empty!');
-        }
+    private static $structure = 'CREATE TABLE IF NOT EXISTS storage (
+        id CHAR(100),
+        data TEXT NOT NULL,
+        created_at timestamp NULL DEFAULT NULL,
+        updated_at timestamp NULL DEFAULT NULL,
 
-        if (empty($id)) {
-            throw new BotException('Id is empty!');
-        }
-
-        self::initializeStorage();
-
-        switch ($action) {
-            default:
-            case 'read':
-                return self::selectFromStorage($id);
-            case 'save':
-                if (empty($data)) {
-                    throw new BotException('Data is empty!');
-                }
-
-                return self::insertToStorage($id, $data);
-            case 'lock':
-                return self::lockStorage($id);
-            case 'unlock':
-                return self::unlockStorage($id);
-            case 'list':
-                return self::listFromStorage($id);
-            case 'remove':
-                return self::deleteFromStorage($id);
-        }
-    }
+        PRIMARY KEY (id)
+    );';
 
     /**
      * Initialize PDO connection and 'storage' table
      */
-    private static function initializeStorage()
+    public static function initializeStorage()
     {
         if (!defined('TB_STORAGE')) {
             define('TB_STORAGE', 'storage');
@@ -85,27 +56,23 @@ class PostgreSQL
             $dsn = Dsn::parse(getenv('DATABASE_URL'));
             $dsn = $dsn->toArray();
 
-            if ($dsn['engine'] === 'postgres') {
-                $dsn['engine'] = 'pgsql';
-            }
-
             try {
-                self::$external_pdo = new PDO($dsn['engine'] . ':host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
-                self::$external_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+                self::$pdo = new PDO('pgsql:' . 'host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
+                self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
             } catch (PDOException $e) {
                 error_log($e->getMessage());
-                DebugLog::log('Connection to the database failed');
-                //throw new TelegramException($e->getMessage());
+                Debug::log('Connection to the database failed!');
+                return false;
             }
 
             if (self::isDbConnected()) {
-                DebugLog::log('Connected to database');
+                Debug::log('Connected to the database');
 
-                if (!file_exists($structure_check = VAR_PATH . '/db_structure_created') && file_exists($structure = ROOT_PATH . '/structure.sql')) {
-                    DebugLog::log('Creating database structure...');
+                if (!file_exists($structure_check = VAR_PATH . '/db_structure_created')) {
+                    Debug::log('Creating database structure...');
 
                     try {
-                        if ($result = self::$external_pdo->query(file_get_contents($structure))) {
+                        if ($result = self::$pdo->query(self::$structure)) {
                             if (!is_dir(VAR_PATH)) {
                                 mkdir(VAR_PATH, 0755, true);
                             }
@@ -122,6 +89,8 @@ class PostgreSQL
                 }
             }
         }
+
+        return true;
     }
 
     /**
@@ -131,7 +100,7 @@ class PostgreSQL
      */
     public static function isDbConnected()
     {
-        return self::$external_pdo !== null;
+        return self::$pdo !== null;
     }
 
     /**
@@ -142,14 +111,18 @@ class PostgreSQL
      * @return array|bool|mixed
      * @throws BotException
      */
-    private static function selectFromStorage($id)
+    public static function selectFromStorage($id)
     {
         if (!self::isDbConnected()) {
             return false;
         }
 
+        if (empty($id)) {
+            throw new BotException('Id is empty!');
+        }
+
         try {
-            $sth = self::$external_pdo->prepare('
+            $sth = self::$pdo->prepare('
                 SELECT * FROM ' . TB_STORAGE . '
                 WHERE id = :id
             ');
@@ -176,19 +149,27 @@ class PostgreSQL
      * @return bool
      * @throws BotException
      */
-    private static function insertToStorage($id, $data)
+    public static function insertToStorage($id, $data)
     {
         if (!self::isDbConnected()) {
             return false;
         }
 
+        if (empty($id)) {
+            throw new BotException('Id is empty!');
+        }
+
+        if (empty($data)) {
+            throw new BotException('Data is empty!');
+        }
+
         try {
-            $sth = self::$external_pdo->prepare('
+            $sth = self::$pdo->prepare('
                 INSERT INTO ' . TB_STORAGE . '
                 (id, data, created_at, updated_at)
                 VALUES
                 (:id, :data, :date, :date)
-                ON CONFLICT (id) DO UPDATE 
+                ON CONFLICT (id) DO UPDATE
                   SET   data       = :data,
                         updated_at = :date
             ');
@@ -207,16 +188,53 @@ class PostgreSQL
     }
 
     /**
+     * Delete data from storage
+     *
+     * @param $id
+     *
+     * @return array|bool|mixed
+     * @throws BotException
+     */
+    public static function deleteFromStorage($id)
+    {
+        if (!self::isDbConnected()) {
+            return false;
+        }
+
+        if (empty($id)) {
+            throw new BotException('Id is empty!');
+        }
+
+        try {
+            $sth = self::$pdo->prepare('
+                DELETE FROM ' . TB_STORAGE . '
+                WHERE id = :id
+            ');
+
+            $sth->bindParam(':id', $id, PDO::PARAM_STR);
+
+            return $sth->execute();
+        } catch (PDOException $e) {
+            throw new BotException($e->getMessage());
+        }
+    }
+
+    /**
      * Lock the row to prevent another process modifying it
      *
      * @param $id
      *
      * @return bool
+     * @throws BotException
      */
-    private static function lockStorage($id)
+    public static function lockStorage($id)
     {
         if (!self::isDbConnected()) {
             return false;
+        }
+
+        if (empty($id)) {
+            throw new BotException('Id is empty!');
         }
 
         if (!is_dir(VAR_PATH . '/tmp')) {
@@ -232,11 +250,16 @@ class PostgreSQL
      * @param $id
      *
      * @return bool
+     * @throws BotException
      */
-    private static function unlockStorage($id)
+    public static function unlockStorage($id)
     {
         if (!self::isDbConnected()) {
             return false;
+        }
+
+        if (empty($id)) {
+            throw new BotException('Id is empty!');
         }
 
         return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.json', "a+"), LOCK_UN) && unlink(VAR_PATH . '/tmp/' . $id .  '.json');
@@ -250,7 +273,7 @@ class PostgreSQL
      * @return array|bool
      * @throws BotException
      */
-    private static function listFromStorage($time = 0)
+    public static function listFromStorage($time = 0)
     {
         if (!self::isDbConnected()) {
             return false;
@@ -261,7 +284,7 @@ class PostgreSQL
         }
 
         try {
-            $sth = self::$external_pdo->prepare('
+            $sth = self::$pdo->prepare('
                 SELECT * FROM ' . TB_STORAGE . '
                 WHERE updated_at < :date
             ');
@@ -275,34 +298,6 @@ class PostgreSQL
             } else {
                 return $result;
             }
-        } catch (PDOException $e) {
-            throw new BotException($e->getMessage());
-        }
-    }
-
-    /**
-     * Delete data from storage
-     *
-     * @param $id
-     *
-     * @return array|bool|mixed
-     * @throws BotException
-     */
-    private static function deleteFromStorage($id)
-    {
-        if (!self::isDbConnected()) {
-            return false;
-        }
-
-        try {
-            $sth = self::$external_pdo->prepare('
-                DELETE FROM ' . TB_STORAGE . '
-                WHERE id = :id
-            ');
-
-            $sth->bindParam(':id', $id, PDO::PARAM_STR);
-
-            return $sth->execute();
         } catch (PDOException $e) {
             throw new BotException($e->getMessage());
         }
