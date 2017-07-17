@@ -171,14 +171,8 @@ class File
         $ids = [];
         foreach (new \DirectoryIterator(STORAGE_PATH) as $file) {
             if (!$file->isDir() && !$file->isDot()) {
-                if ($time >= 0) {
-                    if ($file->getMTime() <= strtotime('-' . abs($time) . ' seconds')) {
-                        $ids[] = $file->getFilename();
-                    }
-                } else {
-                    if ($file->getMTime() > strtotime('-' . abs($time) . ' seconds')) {
-                        $ids[] = $file->getFilename();
-                    }
+                if (($file->getMTime() > strtotime('-' . abs($time) . ' seconds')) || ($file->getMTime() <= strtotime('-' . abs($time) . ' seconds'))) {
+                    $ids[] = ['id' => trim(basename($file->getFilename(), '.json'))];
                 }
             }
         }

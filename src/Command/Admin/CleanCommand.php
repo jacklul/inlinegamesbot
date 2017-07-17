@@ -41,10 +41,13 @@ class CleanCommand extends AdminCommand
         }
 
         if ($message) {
+            $chat_id = $message->getFrom()->getId();
             $text = trim($message->getText(true));
+
+            $data = [];
+            $data['chat_id'] = $chat_id;
         }
 
-        $chat_id = $message->getFrom()->getId();
         $cleanInterval = $this->getConfig('clean_interval');
 
         if (isset($text) && is_numeric($text) && $text > 0) {
@@ -67,11 +70,21 @@ class CleanCommand extends AdminCommand
 
         $chat_action_start = 0;
         $last_request_time = 0;
+        $timelimit = ini_get('max_execution_time') - 1;
+        $start_time = time();
+
+        $data['text'] = 'Executing... (time limit: ' . $timelimit . ' seconds)';
+        Request::sendMessage($data);
 
         $cleaned = 0;
         $edited = 0;
         $error = 0;
         foreach ($inactive as $inactive_game) {
+            if (time() >= $start_time + $timelimit) {
+                Debug::log('Time limit reached!');
+                break;
+            }
+
             if ($chat_action_start < strtotime('-5 seconds')) {
                 Request::sendChatAction(['chat_id' => $chat_id, 'action' => 'typing']);
                 $chat_action_start = time();
@@ -79,21 +92,22 @@ class CleanCommand extends AdminCommand
 
             Debug::log('Cleaning: ' . $inactive_game['id']);
 
-            $data = $storage::selectFromStorage($inactive_game['id']);
+            $game_data = $storage::selectFromStorage($inactive_game['id']);
 
-            if (isset($data['game_code'])) {
-                $game = new Game($inactive_game['id'], $data['game_code'], $this);
+            if (isset($game_data['game_code'])) {
+                $game = new Game($inactive_game['id'], $game_data['game_code'], $this);
 
                 if ($game->canRun()) {
-                    while(time() <= $last_request_time) {
+                    while (time() <= $last_request_time + 10) {
+                        Debug::log('Delaying next request');
                         sleep(1);
                     }
 
                     $result = Request::editMessageText(
                         [
-                            'inline_message_id' => trim($inactive_game['id']),
+                            'inline_message_id' => $inactive_game['id'],
                             'text' => '<b>' . $game->getGame()::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __("This game session is empty.") . '</i>',
-                            'reply_markup' => $this->createInlineKeyboard($data['game_code']),
+                            'reply_markup' => $this->createInlineKeyboard($game_data['game_code']),
                             'parse_mode' => 'HTML',
                             'disable_web_page_preview' => true,
                         ]
@@ -129,8 +143,6 @@ class CleanCommand extends AdminCommand
         }
 
         if ($message) {
-            $data = [];
-            $data['chat_id'] = $chat_id;
             $data['text'] = 'Cleaned ' . $cleaned . ' games, edited ' . $edited . ' messages, ' . $error . ' errored.' . PHP_EOL . 'Removed ' . $removed . ' temporary files.';
 
             return Request::sendMessage($data);
