@@ -223,9 +223,6 @@ class MySQL
     /**
      * Lock the row to prevent another process modifying it
      *
-     * @TODO this is really bad way of doing it currently, forces running this project just on one dyno... (they do not share filesystem)
-     * @TODO maybe `self::$pdo->beginTransaction();` could be somehow used here?
-     *
      * @param $id
      *
      * @return bool
@@ -241,14 +238,11 @@ class MySQL
             mkdir(VAR_PATH . '/tmp', 0755, true);
         }
 
-        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.json', "a+"), LOCK_EX);
+        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.lock', "a+"), LOCK_EX);
     }
 
     /**
      * Unlock the row after
-     *
-     * @TODO this is really bad way of doing it currently, forces running this project just on one dyno... (they do not share filesystem)
-     * @TODO maybe `self::$pdo->commit();` could be somehow used here?
      *
      * @param $id
      *
@@ -261,7 +255,7 @@ class MySQL
             throw new BotException('Id is empty!');
         }
 
-        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.json', "a+"), LOCK_UN) && unlink(VAR_PATH . '/tmp/' . $id .  '.json');
+        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.lock', "a+"), LOCK_UN) && unlink(VAR_PATH . '/tmp/' . $id .  '.lock');
     }
 
     /**

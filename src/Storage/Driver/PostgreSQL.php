@@ -242,7 +242,7 @@ class PostgreSQL
             mkdir(VAR_PATH . '/tmp', 0755, true);
         }
 
-        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.json', "a+"), LOCK_EX);
+        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.lock', "a+"), LOCK_EX);
     }
 
     /**
@@ -263,7 +263,7 @@ class PostgreSQL
             throw new BotException('Id is empty!');
         }
 
-        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.json', "a+"), LOCK_UN) && unlink(VAR_PATH . '/tmp/' . $id .  '.json');
+        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.lock', "a+"), LOCK_UN) && unlink(VAR_PATH . '/tmp/' . $id .  '.lock');
     }
 
     /**
