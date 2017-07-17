@@ -8,5 +8,5 @@ compoer.phar
 # Project
 .env
 var/
-app/config.php
+app/config/config.php
 app/language/*.mo

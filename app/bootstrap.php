@@ -116,10 +116,10 @@ if (!empty(getenv('DB_HOST'))) {
 /**
  * Load user configuration and merge it with the default one
  */
-if (file_exists(APP_PATH . '/config.php')) {
+if (file_exists(APP_PATH . '/config/config.php')) {
     $default_config = $config;
 
-    include_once APP_PATH . '/config.php';
+    include_once APP_PATH . '/config/config.php';
 
     if (isset($config) && is_array($config)) {
         $config = array_merge($default_config, $config);
