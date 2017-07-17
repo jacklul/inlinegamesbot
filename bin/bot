@@ -49,6 +49,8 @@ function runBot($config)
     } catch (Throwable $e) {
         TelegramLog::error($e);
     }
+
+    unset($bot);
 }
 
 /**
@@ -70,6 +72,7 @@ if ($_GET['a'] === 'worker') {
         runBot($config);
 
         sendToStderr('Finished!');
+        sendToStderr('Peak memory usage: ' . round(memory_get_peak_usage() / 1024 / 1024, 2) . ' MB');
 
         $last_run = time();
     }
