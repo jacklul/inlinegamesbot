@@ -33,9 +33,9 @@ class BotDB extends DB
      */
     private static $structure = 'CREATE TABLE IF NOT EXISTS `storage` (
         `id` CHAR(100) COMMENT "Unique identifier for this entry",
-        `data` TEXT NOT NULL) COMMENT "Stored data",
-        `created_at` timestamp NULL DEFAULT NULL) COMMENT "Entry creation date",
-        `updated_at` timestamp NULL DEFAULT NULL) COMMENT "Entry update date",
+        `data` TEXT NOT NULL COMMENT "Stored data",
+        `created_at` timestamp NULL DEFAULT NULL COMMENT "Entry creation date",
+        `updated_at` timestamp NULL DEFAULT NULL COMMENT "Entry update date",
 
         PRIMARY KEY (`id`)
     );';
