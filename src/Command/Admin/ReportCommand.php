@@ -10,7 +10,7 @@
 
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
-use Bot\Helper\DebugLog;
+use Bot\Helper\Debug;
 use Bot\Exception\BotException;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Request;
@@ -154,7 +154,7 @@ class ReportCommand extends AdminCommand
         $files = glob($dirPath . '*', GLOB_MARK);
 
         foreach ($files as $file) {
-            DebugLog::log('Removing \'' . $file . '\'');
+            Debug::log('Removing \'' . $file . '\'');
 
             if (is_dir($file)) {
                 self::deleteDir($file);
@@ -173,7 +173,7 @@ class ReportCommand extends AdminCommand
                 mkdir(VAR_PATH . '/', 0755, true);
             }
 
-            DebugLog::log('Zipping \'' . $dir . '\'...');
+            Debug::log('Zipping \'' . $dir . '\'...');
 
             $zipFile = VAR_PATH . '/' . basename($dir) . '.zip';
 
@@ -195,7 +195,7 @@ class ReportCommand extends AdminCommand
             }
 
             if ($zip->close()) {
-                DebugLog::log('Saved as \'' . $zipFile . '\'');
+                Debug::log('Saved as \'' . $zipFile . '\'');
 
                 return $zipFile;
             }

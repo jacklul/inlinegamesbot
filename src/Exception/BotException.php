@@ -10,10 +10,12 @@
 
 namespace Bot\Exception;
 
+use Exception;
+
 /**
  * Main exception class used for exception handling
  */
-class BotException extends \Exception
+class BotException extends Exception
 {
 
 }

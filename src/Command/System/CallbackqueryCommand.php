@@ -10,7 +10,7 @@
 
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
-use Bot\Helper\DebugLog;
+use Bot\Helper\Debug;
 use Bot\Manager\Game;
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Request;
@@ -26,7 +26,7 @@ class CallbackqueryCommand extends SystemCommand
     {
         $callback_query = $this->getUpdate()->getCallbackQuery();
 
-        DebugLog::log('Data: ' . $callback_query->getData());
+        Debug::log('Data: ' . $callback_query->getData());
 
         $data = $callback_query->getData();
 

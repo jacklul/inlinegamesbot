@@ -11,7 +11,7 @@
 namespace Bot\Entity\Game;
 
 use Bot\Entity\Game;
-use Bot\Helper\DebugLog;
+use Bot\Helper\Debug;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Spatie\Emoji\Emoji;
@@ -148,9 +148,9 @@ class Rockpaperscissors extends Game
             $data['round'] = 1;
             $data['current_turn'] = '';
 
-            DebugLog::log('Game initialization');
+            Debug::log('Game initialization');
         } elseif (!isset($arg)) {
-            DebugLog::log('No move data received!');
+            Debug::log('No move data received!');
         }
 
         if (empty($data)) {
@@ -161,7 +161,7 @@ class Rockpaperscissors extends Game
             return $this->answerCallbackQuery(__("This game has ended!"), true);
         }
 
-        DebugLog::log('Argument: ' . $arg);
+        Debug::log('Argument: ' . $arg);
 
         if (isset($arg)) {
             if (in_array($arg, ['R', 'P', 'S'])) {
@@ -171,17 +171,17 @@ class Rockpaperscissors extends Game
                     $data['guest_pick'] = $arg;
                 }
 
-                if ($this->manager->setData($this->data)) {
-                    DebugLog::log($this->getCurrentUserMention() . ' picked ' . $arg);
+                if ($this->manager->saveData($this->data)) {
+                    Debug::log($this->getCurrentUserMention() . ' picked ' . $arg);
 
                     if ($data['host_pick'] == '' || $data['guest_pick'] == '') {
                         return $this->answerCallbackQuery();
                     }
                 } else {
-                    return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
+                    return $this->returnStorageFailure();
                 }
             } else {
-                DebugLog::log('Invalid move data: ' . $arg);
+                Debug::log('Invalid move data: ' . $arg);
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
         }
@@ -233,13 +233,13 @@ class Rockpaperscissors extends Game
             $isOver = false;
         }
 
-        if ($this->manager->setData($this->data)) {
+        if ($this->manager->saveData($this->data)) {
             return $this->editMessage(
                 $this->getUserMention('host') . $hostPick . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . $guestPick . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($isOver)
             );
         } else {
-            return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
+            return $this->returnStorageFailure();
         }
     }
 
@@ -285,11 +285,11 @@ class Rockpaperscissors extends Game
             ];
         }
 
-        if (getenv('DEBUG')) {
+        if (getenv('Debug')) {
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => 'DEBUG: ' . 'Restart',
+                        'text' => 'Debug: ' . 'Restart',
                         'callback_data' => $this->manager->getGame()::getCode() . ';start'
                     ]
                 )

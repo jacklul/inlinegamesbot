@@ -11,7 +11,7 @@
 namespace Bot\Entity\Game;
 
 use Bot\Entity\Game;
-use Bot\Helper\DebugLog;
+use Bot\Helper\Debug;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Spatie\Emoji\Emoji;
@@ -153,9 +153,9 @@ class Russianroulette extends Game
             $data['cylinder'] = ['', '', '', '', '', ''];
             $data['cylinder'][mt_rand(0, 5)] = 'X';
 
-            DebugLog::log('Game initialization');
+            Debug::log('Game initialization');
         } elseif (!isset($arg)) {
-            DebugLog::log('No move data received!');
+            Debug::log('No move data received!');
         }
 
         if (empty($data)) {
@@ -179,14 +179,14 @@ class Russianroulette extends Game
             }
 
             if (!isset($data['cylinder'][$arg - 1])) {
-                DebugLog::log('Bad move data received: ' . $arg);
+                Debug::log('Bad move data received: ' . $arg);
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
 
-            DebugLog::log('Chamber selected: ' . $arg);
+            Debug::log('Chamber selected: ' . $arg);
 
             if ($data['cylinder'][$arg - 1] === 'X') {
-                DebugLog::log('Chamber contains bullet, player is dead');
+                Debug::log('Chamber contains bullet, player is dead');
 
                 if ($data['current_turn'] == 'X') {
                     $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['O']) . '<b>']) . '</b>' . PHP_EOL;
@@ -197,6 +197,8 @@ class Russianroulette extends Game
                     } else {
                         $this->data['players']['guest'] = null;
                     }
+
+                    $data['current_turn'] = 'E';
                 } elseif ($data['current_turn'] == 'O') {
                     $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['X']) . '<b>']) . '</b>' . PHP_EOL;
                     $gameOutput .= '<b>' . __("{PLAYER} died! (kicked from the game)", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['O']) . '<b>']) . '</b>';
@@ -207,14 +209,16 @@ class Russianroulette extends Game
                     } else {
                         $this->data['players']['guest'] = null;
                     }
+
+                    $data['current_turn'] = 'E';
                 }
 
                 $hit = $arg;
 
-                if ($this->manager->setData($this->data)) {
+                if ($this->manager->saveData($this->data)) {
                     return $this->editMessage($gameOutput . PHP_EOL . PHP_EOL . __('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->gameKeyboard($hit));
                 } else {
-                    return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
+                    return $this->returnStorageFailure();
                 }
             } else {
                 $gameOutput = '<b>' . __("{PLAYER} survived!", ['{PLAYER}' => '</b>' . $this->getCurrentUserMention() . '<b>']) . '</b>' . PHP_EOL;
@@ -232,15 +236,15 @@ class Russianroulette extends Game
 
         $gameOutput .= __("Current turn:") . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]);
 
-        DebugLog::log('Cylinder: |' . implode('|', $data['cylinder']) . '|');
+        Debug::log('Cylinder: |' . implode('|', $data['cylinder']) . '|');
 
-        if ($this->manager->setData($this->data)) {
+        if ($this->manager->saveData($this->data)) {
             return $this->editMessage(
                 $this->getUserMention('host') . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($hit)
             );
         } else {
-            return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
+            return $this->returnStorageFailure();
         }
     }
 
@@ -329,17 +333,6 @@ class Russianroulette extends Game
             )
         ];
 
-        if (getenv('DEBUG')) {
-            $inline_keyboard[] = [
-                new InlineKeyboardButton(
-                    [
-                        'text' => 'DEBUG: ' . 'Restart',
-                        'callback_data' => $this->manager->getGame()::getCode() . ';start'
-                    ]
-                )
-            ];
-        }
-
         if (!is_numeric($hit)) {
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
@@ -367,6 +360,17 @@ class Russianroulette extends Game
                     [
                         'text'          => __('Join'),
                         'callback_data' => $this->manager->getGame()::getCode() . ';join'
+                    ]
+                )
+            ];
+        }
+
+        if (getenv('Debug')) {
+            $inline_keyboard[] = [
+                new InlineKeyboardButton(
+                    [
+                        'text' => 'Debug: ' . 'Restart',
+                        'callback_data' => $this->manager->getGame()::getCode() . ';start'
                     ]
                 )
             ];

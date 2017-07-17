@@ -10,7 +10,7 @@
 
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
-use Bot\Helper\DebugLog;
+use Bot\Helper\Debug;
 use Bot\Manager\Game;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
@@ -51,7 +51,7 @@ class CleanCommand extends AdminCommand
         $game = new Game('_', '_', $this);
         $storage = $game->getStorage();
 
-        $inactive = $storage::action('list', $cleanInterval);
+        $inactive = $storage::listFromStorage($cleanInterval);
 
         $chat_action_start = 0;
 
@@ -64,9 +64,9 @@ class CleanCommand extends AdminCommand
                 $chat_action_start = time();
             }
 
-            DebugLog::log('Cleaning: ' . $inactive_game['id']);
+            Debug::log('Cleaning: ' . $inactive_game['id']);
 
-            $data = $storage::action('get', $inactive_game['id']);
+            $data = $storage::selectFromStorage($inactive_game['id']);
 
             if (isset($data['game_code'])) {
                 $game = new Game($inactive_game['id'], $data['game_code'], $this);
@@ -84,17 +84,17 @@ class CleanCommand extends AdminCommand
 
                     if ($result->isOk()) {
                         $edited++;
-                        DebugLog::log('Message edited successfully');
+                        Debug::log('Message edited successfully');
                     } else {
                         $error++;
-                        DebugLog::log('Failed to edit message: ' . $result->getDescription());
+                        Debug::log('Failed to edit message: ' . $result->getDescription());
                     }
                 }
             }
 
-            if ($storage::action('remove', $inactive_game['id'])) {
+            if ($storage::deleteFromStorage($inactive_game['id'])) {
                 $cleaned++;
-                DebugLog::log('Removed from database');
+                Debug::log('Removed from the database');
             }
         }
 

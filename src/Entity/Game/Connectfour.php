@@ -11,7 +11,7 @@
 namespace Bot\Entity\Game;
 
 use Bot\Entity\Game;
-use Bot\Helper\DebugLog;
+use Bot\Helper\Debug;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -163,9 +163,9 @@ class Connectfour extends Game
                 ['', '', '', '', '', '', '']
             ];
 
-            DebugLog::log('Game initialization');
+            Debug::log('Game initialization');
         } elseif (!isset($args)) {
-            DebugLog::log('No move data received!');
+            Debug::log('No move data received!');
         }
 
         if (empty($data)) {
@@ -183,7 +183,7 @@ class Connectfour extends Game
         $this->max_y = count($data['board']);
         $this->max_x = count($data['board'][0]);
 
-        DebugLog::log('BOARD: ' . $this->max_x . ' - ' . $this->max_y);
+        Debug::log('BOARD: ' . $this->max_x . ' - ' . $this->max_y);
 
         if (isset($args)) {
             for ($y = $this->max_y - 1; $y >= 0; $y--) {
@@ -202,12 +202,12 @@ class Connectfour extends Game
                         return $this->answerCallbackQuery(__("Invalid move!"), true);
                     }
                 } else {
-                    DebugLog::log('Invalid move data: ' . ($args[0]) . ' - ' . ($y));
+                    Debug::log('Invalid move data: ' . ($args[0]) . ' - ' . ($y));
                     return $this->answerCallbackQuery(__("Invalid move!"), true);
                 }
             }
 
-            DebugLog::log($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($y));
+            Debug::log($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($y));
         }
 
         $isOver = $this->isGameOver($data['board']);
@@ -225,13 +225,13 @@ class Connectfour extends Game
             $gameOutput = __("Current turn:") . ' ' . $this->symbols[$data['current_turn']];
         }
 
-        if ($this->manager->setData($this->data)) {
+        if ($this->manager->saveData($this->data)) {
             return $this->editMessage(
                 $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($data['board'], $isOver)
             );
         } else {
-            return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
+            return $this->returnStorageFailure();
         }
     }
 

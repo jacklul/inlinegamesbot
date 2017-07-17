@@ -11,7 +11,7 @@
 namespace Bot\Entity\Game;
 
 use Bot\Entity\Game;
-use Bot\Helper\DebugLog;
+use Bot\Helper\Debug;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\TelegramLog;
@@ -189,9 +189,9 @@ class Poolcheckers extends Game
                 ['X', '', 'X', '', '', '', 'O', ''],
             ];
 
-            DebugLog::log('Game initialization');
+            Debug::log('Game initialization');
         } elseif (!isset($args) && $command === 'game') {
-            DebugLog::log('No move data received!');
+            Debug::log('No move data received!');
         }
 
         if (empty($data)) {
@@ -210,10 +210,10 @@ class Poolcheckers extends Game
         $moveLimit = 25;
         $moveLimitReached = false;
 
-        if ($command !== 'forfeit' && $command !== 'draw') {
+        if ($command === 'game') {
             if ($this->getCurrentUserId() === $this->getUserId($data['settings'][$data['current_turn']])) {
                 if ($data['current_selection'] != '') {
-                    DebugLog::log('Current selection: ' . $data['current_selection']);
+                    Debug::log('Current selection: ' . $data['current_selection']);
 
                     if ($data['current_selection'] == $args[0] . $args[1]) {
                         if ($data['current_selection_lock'] == false) {
@@ -222,7 +222,7 @@ class Poolcheckers extends Game
                             return $this->answerCallbackQuery(__("You must make a jump when possible!"), true);
                         }
                     } else {
-                        DebugLog::log('Listing possible moves');
+                        Debug::log('Listing possible moves');
 
                         $possibleMoves = $this->possibleMoves($data['board'], $data['current_selection']);
 
@@ -309,16 +309,16 @@ class Poolcheckers extends Game
                         $data['current_selection'] = $args[0] . $args[1];
                     } elseif ($command === 'game') {
                         return $this->answerCallbackQuery(__("Invalid selection!"), true);
+                    } else {
+                        return $this->answerCallbackQuery(__("Invalid move!"), true);
                     }
-
-                    $this->answerCallbackQuery();
                 }
             } else {
                 return $this->answerCallbackQuery(__("It's not your turn!"), true);
             }
         }
 
-        DebugLog::log('Checking if game is over');
+        Debug::log('Checking if game is over');
 
         $isOver = $this->isGameOver($data['board']);
 
@@ -339,7 +339,7 @@ class Poolcheckers extends Game
             $data['current_turn'] = 'E';
             $data['current_selection'] = '';
 
-            DebugLog::log('Game ended');
+            Debug::log('Game ended');
         } else {
             $this->selection = $data['current_selection'];
 
@@ -363,16 +363,16 @@ class Poolcheckers extends Game
                 }
             }
 
-            DebugLog::log('Game is still in progress');
+            Debug::log('Game is still in progress');
         }
-        
-        if ($this->manager->setData($this->data)) {
+
+        if ($this->manager->saveData($this->data)) {
             return $this->editMessage(
                 $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($data['board'], $isOver, $data['move_counter'])
             );
         } else {
-            return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
+            return $this->returnStorageFailure();
         }
     }
 
@@ -453,15 +453,30 @@ class Poolcheckers extends Game
                 ];
             };
         }
-        
-        if (getenv('DEBUG')) {
+
+        $inline_keyboard[] = [
+            new InlineKeyboardButton(
+                [
+                    'text' => __('Quit'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ';quit'
+                ]
+            ),
+            new InlineKeyboardButton(
+                [
+                    'text' => __('Kick'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ';kick'
+                ]
+            )
+        ];
+
+        if (getenv('Debug')) {
             if (class_exists('\Symfony\Component\Console\Helper\Table')) {
                 $output = new \Symfony\Component\Console\Output\BufferedOutput();
                 $table = new \Symfony\Component\Console\Helper\Table($output);
                 $table->setRows($board);
                 $table->render();
 
-                DebugLog::log('CURRENT BOARD:' . PHP_EOL . $output->fetch());
+                Debug::log('CURRENT BOARD:' . PHP_EOL . $output->fetch());
             }
 
             $inline_keyboard[] = [
@@ -485,21 +500,6 @@ class Poolcheckers extends Game
                 )
             ];
         }
-
-        $inline_keyboard[] = [
-            new InlineKeyboardButton(
-                [
-                    'text' => __('Quit'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ';quit'
-                ]
-            ),
-            new InlineKeyboardButton(
-                [
-                    'text' => __('Kick'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ';kick'
-                ]
-            )
-        ];
 
         $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
 
@@ -957,60 +957,63 @@ class Poolcheckers extends Game
 
         if ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host')) {
             if ($this->data['data']['vote']['host']['surrender']) {
-                DebugLog::log($this->getCurrentUserMention() . ' surrendered');
+                Debug::log($this->getCurrentUserMention() . ' surrendered');
 
                 $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
                 $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
 
                 $this->data['data']['current_turn'] = 'E';
 
-                if ($this->manager->setData($this->data)) {
+                if ($this->manager->saveData($this->data)) {
                     return $this->editMessage(
                         $this->getUserMention('host') . ' (' . (($this->data['data']['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($this->data['data']['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                         $this->gameKeyboard($this->data['data']['board'], 'surrender')
                     );
                 } else {
-                    return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
+                    return $this->returnStorageFailure();
                 }
             }
 
-            DebugLog::log($this->getCurrentUserMention() . ' voted to surrender');
+            Debug::log($this->getCurrentUserMention() . ' voted to surrender');
             $this->data['data']['vote']['host']['surrender'] = true;
 
-            if ($this->manager->setData($this->data)) {
+            if ($this->manager->saveData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
             } else {
-                return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
+                return $this->returnStorageFailure();
             }
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
             if ($this->data['data']['vote']['guest']['surrender']) {
-                DebugLog::log($this->getCurrentUserMention() . ' surrendered');
+                Debug::log($this->getCurrentUserMention() . ' surrendered');
 
                 $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
                 $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
 
                 $this->data['data']['current_turn'] = 'E';
 
-                if ($this->manager->setData($this->data)) {
+                if ($this->manager->saveData($this->data)) {
                     return $this->editMessage(
                         $this->getUserMention('host') . ' (' . (($this->data['data']['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($this->data['data']['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                         $this->gameKeyboard($this->data['data']['board'], 'surrender')
                     );
                 } else {
-                    return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
+                    return $this->returnStorageFailure();
                 }
             }
 
-            DebugLog::log($this->getCurrentUserMention() . ' voted to surrender');
+            Debug::log($this->getCurrentUserMention() . ' voted to surrender');
             $this->data['data']['vote']['guest']['surrender'] = true;
 
-            if ($this->manager->setData($this->data)) {
+            if ($this->manager->saveData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
             } else {
-                return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
+                return $this->returnStorageFailure();
             }
         } else {
-            DebugLog::log('Someone else executed forfeit action?');
+            $error = 'Someone else executed forfeit action?';
+            error_log($error);
+            Debug::log($error);
+            Debug::dump($this->manager->getId());
             return $this->answerCallbackQuery();
         }
     }
@@ -1034,22 +1037,22 @@ class Poolcheckers extends Game
         if ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host') && !$this->data['data']['vote']['host']['draw']) {
             $this->data['data']['vote']['host']['draw'] = true;
 
-            if ($this->manager->setData($this->data)) {
-                DebugLog::log($this->getCurrentUserMention() . ' voted to draw');
+            if ($this->manager->saveData($this->data)) {
+                Debug::log($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
             } else {
-                return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
+                return $this->returnStorageFailure();
             }
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest') && !$this->data['data']['vote']['guest']['draw']) {
             $this->data['data']['vote']['guest']['draw'] = true;
 
-            if ($this->manager->setData($this->data)) {
-                DebugLog::log($this->getCurrentUserMention() . ' voted to draw');
+            if ($this->manager->saveData($this->data)) {
+                Debug::log($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
             } else {
-                return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
+                return $this->returnStorageFailure();
             }
         } elseif ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host') || $this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You already voted!"), true);

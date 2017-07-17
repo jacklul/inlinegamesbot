@@ -8,7 +8,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use Bot\Helper\DebugLog;
+use Bot\Helper\Debug;
 use Dotenv\Dotenv;
 use Gettext\Translator;
 
@@ -60,7 +60,7 @@ $config = [
                 ]
             ],
             'clean' => [
-                'clean_interval' => 3600,
+                'clean_interval' => 86400,
             ],
         ],
     ],
@@ -130,6 +130,7 @@ if (file_exists(APP_PATH . '/config/config.php')) {
  * Enable PHP error logging to file
  */
 ini_set('log_errors', 1);
+ini_set('display_errors', 1);
 ini_set('error_log', (isset($config['logging']['error']) ? $config['logging']['error'] : ROOT_PATH . '/error.log'));
 
 /**
@@ -138,6 +139,6 @@ ini_set('error_log', (isset($config['logging']['error']) ? $config['logging']['e
 (new Translator())->register();
 
 /**
- * Print notice about being in debug mode
+ * Print notice about being in Debug mode
  */
-DebugLog::log('RUNNING IN DEBUG MODE');
+Debug::log('RUNNING IN DEBUG MODE');

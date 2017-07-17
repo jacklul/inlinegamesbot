@@ -92,7 +92,7 @@ class Botan
         $responseData = json_decode($result, true);
 
         if (!$responseData || $responseData['status'] !== 'accepted') {
-            DebugLog::log('Botan.io stats report failed: ' . $result ?: 'empty response');
+            Debug::log('Botan.io stats report failed: ' . $result ?: 'empty response');
 
             return false;
         }

@@ -54,18 +54,15 @@ class InlinequeryCommand extends SystemCommand
 
         return Request::answerInlineQuery(
             [
-            'inline_query_id' => $this->getUpdate()->getInlineQuery()->getId(),
-            'cache_time' => 300,
-            'results' => '[' . implode(',', $array_article) . ']',
+                'inline_query_id' => $this->getUpdate()->getInlineQuery()->getId(),
+                'cache_time' => 60,
+                'results' => '[' . implode(',', $array_article) . ']',
+                'switch_pm_text' => 'Help',
+                'switch_pm_parameter' => 'start'
             ]
         );
     }
 
-    /**
-     * Get list of Games (classes)
-     *
-     * @return array
-     */
     private function getGamesList()
     {
         $games = [];
@@ -77,7 +74,7 @@ class InlinequeryCommand extends SystemCommand
                     $games[] = [
                         'class' => $game_class,
                         'order' => $game_class::getOrder()
-                      ];
+                    ];
                 }
             }
         }
@@ -92,13 +89,6 @@ class InlinequeryCommand extends SystemCommand
         return $games;
     }
 
-    /**
-     * Create inline keyboard with prefixed game code
-     *
-     * @param $game_code
-     *
-     * @return InlineKeyboard
-     */
     private function createInlineKeyboard($game_code)
     {
         $inline_keyboard = [

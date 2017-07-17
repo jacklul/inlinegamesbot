@@ -11,7 +11,7 @@
 namespace Bot\Entity\Game;
 
 use Bot\Entity\Game;
-use Bot\Helper\DebugLog;
+use Bot\Helper\Debug;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -160,9 +160,9 @@ class Tictactoe extends Game
                 ['', '', '']
             ];
 
-            DebugLog::log('Game initialization');
+            Debug::log('Game initialization');
         } elseif (!isset($args)) {
-            DebugLog::log('No move data received!');
+            Debug::log('No move data received!');
         }
 
         if (empty($data)) {
@@ -192,11 +192,11 @@ class Tictactoe extends Game
                 $data['board'][$args[0]][$args[1]] = 'O';
                 $data['current_turn'] = 'X';
             } else {
-                DebugLog::log('Invalid move data: ' . ($args[0]) . ' - ' . ($args[1]));
+                Debug::log('Invalid move data: ' . ($args[0]) . ' - ' . ($args[1]));
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
 
-            DebugLog::log($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($args[0]));
+            Debug::log($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($args[0]));
         }
 
         $isOver = $this->isGameOver($data['board']);
@@ -214,13 +214,13 @@ class Tictactoe extends Game
             $gameOutput = __("Current turn:") . ' ' . $this->symbols[$data['current_turn']];
         }
 
-        if ($this->manager->setData($this->data)) {
+        if ($this->manager->saveData($this->data)) {
             return $this->editMessage(
                 $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($data['board'], $isOver)
             );
         } else {
-            return $this->answerCallbackQuery(__("Error while saving!") . PHP_EOL . __("Try again?"), true);
+            return $this->returnStorageFailure();
         }
     }
 
