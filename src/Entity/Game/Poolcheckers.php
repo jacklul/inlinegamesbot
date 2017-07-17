@@ -395,6 +395,10 @@ class Poolcheckers extends Game
                     if ($board[$x][$y] == 'X' || $board[$x][$y] == 'O' || $board[$x][$y] == 'XK' || $board[$x][$y] == 'OK') {
                         $field = $this->symbols[$board[$x][$y]];
                     } else {
+                        $field = '';
+                    }
+
+                    if (!isset($field) || $field === '') {
                         $field = ($this->symbols['empty']) ?: ' ';
                     }
 
