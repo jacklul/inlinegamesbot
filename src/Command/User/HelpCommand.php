@@ -23,6 +23,9 @@ use Spatie\Emoji\Emoji;
  */
 class HelpCommand extends UserCommand
 {
+    /**
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     */
     public function execute()
     {
         $message = $this->getUpdate()->getMessage();

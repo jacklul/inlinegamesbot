@@ -19,8 +19,11 @@ use Longman\TelegramBot\Commands\SystemCommand;
  */
 class StartCommand extends SystemCommand
 {
+    /**
+     * @return mixed
+     */
     public function execute()
     {
-        return $this->getTelegram()->executeCommand("help");
+        return $this->getTelegram()->executeCommand("help");    //redirect to /help
     }
 }

@@ -16,12 +16,20 @@ use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Request;
 
+/**
+ * Class StatsCommand
+ *
+ * @package Longman\TelegramBot\Commands\AdminCommands
+ */
 class StatsCommand extends AdminCommand
 {
     protected $name = 'stats';
     protected $description = 'Display stats';
     protected $usage = '/stats';
 
+    /**
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     */
     public function execute()
     {
         $message = $this->getMessage();
@@ -62,6 +70,11 @@ class StatsCommand extends AdminCommand
         return Request::emptyResponse();
     }
 
+    /**
+     * Create inline keyboard that will refresh this message
+     * 
+     * @return InlineKeyboard
+     */
     private function createInlineKeyboard()
     {
         $inline_keyboard = [

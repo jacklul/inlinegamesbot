@@ -22,10 +22,18 @@ use Longman\TelegramBot\Request;
  */
 class CallbackqueryCommand extends SystemCommand
 {
+    /**
+     * Callback data before first ';' symbol -> command bind
+     *
+     * @var array
+     */
     private $aliases = [
         'stats' => 'stats'
     ];
 
+    /**
+     * @return bool|\Longman\TelegramBot\Entities\ServerResponse|mixed
+     */
     public function execute()
     {
         $callback_query = $this->getUpdate()->getCallbackQuery();
@@ -56,6 +64,13 @@ class CallbackqueryCommand extends SystemCommand
         );
     }
 
+    /**
+     * Validate callback data
+     *
+     * @param $data
+     *
+     * @return bool
+     */
     private function isDataValid($data)
     {
         $data = explode(';', $data);

@@ -24,6 +24,9 @@ use Longman\TelegramBot\Request;
  */
 class InlinequeryCommand extends SystemCommand
 {
+    /**
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     */
     public function execute()
     {
         $articles = [];
@@ -63,6 +66,11 @@ class InlinequeryCommand extends SystemCommand
         );
     }
 
+    /**
+     * Get games list
+     *
+     * @return array
+     */
     private function getGamesList()
     {
         $games = [];
@@ -89,6 +97,13 @@ class InlinequeryCommand extends SystemCommand
         return $games;
     }
 
+    /**
+     * Create inline keyboard with button that creates the game session
+     *
+     * @param $game_code
+     *
+     * @return InlineKeyboard
+     */
     private function createInlineKeyboard($game_code)
     {
         $inline_keyboard = [

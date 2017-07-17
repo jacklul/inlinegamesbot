@@ -21,6 +21,9 @@ use Longman\TelegramBot\Request;
  */
 class GenericmessageCommand extends SystemCommand
 {
+    /**
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     */
     public function executeNoDb()
     {
         $this->leaveGroupChat();
@@ -28,6 +31,9 @@ class GenericmessageCommand extends SystemCommand
         return Request::emptyResponse();
     }
 
+    /**
+     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     */
     public function execute()
     {
         $this->leaveGroupChat();
@@ -44,6 +50,11 @@ class GenericmessageCommand extends SystemCommand
         return Request::emptyResponse();
     }
 
+    /**
+     * Leave group chats
+     *
+     * @return bool|\Longman\TelegramBot\Entities\ServerResponse
+     */
     private function leaveGroupChat()
     {
         if (!$this->getMessage()->getChat()->isPrivateChat()) {

@@ -17,12 +17,20 @@ use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Request;
 
+/**
+ * Class CleanCommand
+ *
+ * @package Longman\TelegramBot\Commands\AdminCommands
+ */
 class CleanCommand extends AdminCommand
 {
     protected $name = 'clean';
     protected $description = 'Clean old game messages and set them as empty';
     protected $usage = '/clean';
 
+    /**
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     */
     public function execute()
     {
         $message = $this->getMessage();
@@ -119,6 +127,13 @@ class CleanCommand extends AdminCommand
         return Request::emptyResponse();
     }
 
+    /**
+     * Create inline keyboard with button that creates the game session
+     *
+     * @param $game_code
+     *
+     * @return InlineKeyboard
+     */
     private function createInlineKeyboard($game_code)
     {
         $inline_keyboard = [

@@ -29,6 +29,10 @@ class ReportCommand extends AdminCommand
     protected $description = 'Send error reports and logs to admins';
     protected $usage = '/report';
 
+    /**
+     * @return \Longman\TelegramBot\Entities\ServerResponse
+     * @throws BotException
+     */
     public function execute()
     {
         $message = $this->getMessage();
@@ -132,6 +136,13 @@ class ReportCommand extends AdminCommand
         return Request::emptyResponse();
     }
 
+    /**
+     * Check if directory is empty
+     *
+     * @param $dir
+     *
+     * @return bool|null
+     */
     private function isDirEmpty($dir)
     {
         if (!is_readable($dir)) {
@@ -141,6 +152,13 @@ class ReportCommand extends AdminCommand
         return (count(scandir($dir)) == 2);
     }
 
+    /**
+     * Delete directory recursively
+     *
+     * @param $dirPath
+     *
+     * @throws BotException
+     */
     private function deleteDir($dirPath)
     {
         if (!is_dir($dirPath)) {
@@ -166,6 +184,13 @@ class ReportCommand extends AdminCommand
         @rmdir($dirPath);
     }
 
+    /**
+     * Create a zip from a directory
+     *
+     * @param $dir
+     *
+     * @return bool|string
+     */
     private function zipDir($dir)
     {
         if (is_dir($pathToZip = $dir) && !$this->isDirEmpty($dir)) {

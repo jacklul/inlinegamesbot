@@ -21,6 +21,9 @@ use Longman\TelegramBot\Commands\SystemCommand;
  */
 class ChoseninlineresultCommand extends SystemCommand
 {
+    /**
+     * @return bool|\Longman\TelegramBot\Entities\ServerResponse
+     */
     public function execute()
     {
         $chosen_inline_result = $this->getUpdate()->getChosenInlineResult();
