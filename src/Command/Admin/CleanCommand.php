@@ -61,6 +61,7 @@ class CleanCommand extends AdminCommand
         $inactive = $storage::listFromStorage($cleanInterval);
 
         $chat_action_start = 0;
+        $last_request_time = 0;
 
         $cleaned = 0;
         $edited = 0;
@@ -79,6 +80,10 @@ class CleanCommand extends AdminCommand
                 $game = new Game($inactive_game['id'], $data['game_code'], $this);
 
                 if ($game->canRun()) {
+                    while(time() <= $last_request_time) {
+                        sleep(1);
+                    }
+
                     $result = Request::editMessageText(
                         [
                             'inline_message_id' => trim($inactive_game['id']),
@@ -88,6 +93,8 @@ class CleanCommand extends AdminCommand
                             'disable_web_page_preview' => true,
                         ]
                     );
+
+                    $last_request_time = time();
 
                     if ($result->isOk()) {
                         $edited++;
