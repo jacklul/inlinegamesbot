@@ -58,7 +58,11 @@ class CleanCommand extends AdminCommand
             $cleanInterval = 86400;  // 86400 seconds = 1 day
         }
 
-        set_time_limit(90);
+        if (defined("STDIN")) {
+            set_time_limit(90);
+        } else {
+            set_time_limit(10);
+        }
 
         $game = new Game('_', '_', $this);
         $storage = $game->getStorage();
@@ -70,7 +74,7 @@ class CleanCommand extends AdminCommand
 
         $chat_action_start = 0;
         $last_request_time = 0;
-        $timelimit = ini_get('max_execution_time') - 1;
+        $timelimit = ini_get('max_execution_time');
         $start_time = time();
 
         $data['text'] = 'Executing... (time limit: ' . $timelimit . ' seconds)';
@@ -80,7 +84,7 @@ class CleanCommand extends AdminCommand
         $edited = 0;
         $error = 0;
         foreach ($inactive as $inactive_game) {
-            if (time() >= $start_time + $timelimit) {
+            if (time() >= $start_time + $timelimit - 1) {
                 Debug::log('Time limit reached!');
                 break;
             }

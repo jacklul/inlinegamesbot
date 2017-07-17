@@ -9,6 +9,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use Bot\Helper\Debug;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Exception\TelegramLogException;
 use Longman\TelegramBot\TelegramLog;
@@ -25,17 +26,57 @@ define("ROOT_PATH", realpath(__DIR__ . '/../'));
 require_once ROOT_PATH . '/app/bootstrap.php';
 
 /**
+ * Bot run function
+ *
+ * @param $config
+ * @throws Exception
+ */
+function runBot($config)
+{
+    if (empty($config) || !is_array($config)) {
+        throw new Exception('No configuration provided!');
+    }
+
+    try {
+        $bot = new BotManager($config);
+        $bot->run();
+    } catch (TelegramLogException $e) {
+        error_log($e->getMessage() . PHP_EOL);
+    } catch (TelegramException $e) {
+        TelegramLog::error($e);
+    } catch (Exception $e) {
+        TelegramLog::error($e);
+    } catch (Throwable $e) {
+        TelegramLog::error($e);
+    }
+}
+
+/**
+ * Handle worker argument
+ */
+if ($argv[1] === 'worker') {
+    $_GET['a'] = 'cron';
+    $last_run = null;
+
+    while (true) {
+        if (time() < $last_run + 300) {
+            sendToStderr('Sleeping for 10 seconds before next check...');
+            sleep(10);
+            continue;
+        }
+
+        sendToStderr('Running as per schedule!');
+
+        runBot($config);
+
+        sendToStderr('Finished!');
+
+        $last_run = time();
+    }
+}
+
+/**
  * Run the bot
  */
-try {
-    $bot = new BotManager((isset($config) ? $config:[]));
-    $bot->run();
-} catch (TelegramLogException $e) {
-    error_log($e->getMessage() . PHP_EOL);
-} catch (TelegramException $e) {
-    TelegramLog::error($e);
-} catch (Exception $e) {
-    TelegramLog::error($e);
-} catch (Throwable $e) {
-    TelegramLog::error($e);
-}
+Debug::log('INIT');
+runBot($config);

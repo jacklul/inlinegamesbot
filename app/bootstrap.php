@@ -139,6 +139,13 @@ ini_set('error_log', (isset($config['logging']['error']) ? $config['logging']['e
 (new Translator())->register();
 
 /**
+ * Function allowing sending text to stderr stream
+ */
+function sendToStderr($text) {
+    file_put_contents('php://stderr', $text . PHP_EOL);
+}
+
+/**
  * Print notice about being in Debug mode
  */
 Debug::log('RUNNING IN DEBUG MODE');
