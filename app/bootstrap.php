@@ -146,6 +146,14 @@ function sendToStderr($text) {
 }
 
 /**
+ * Resolve script command to script a=command
+ */
+if (isset($argv[1])) {
+    $_GET['a'] = $argv[1];
+    $argv[1] = 'a=' . $argv[1];
+}
+
+/**
  * Print notice about being in Debug mode
  */
 Debug::log('RUNNING IN DEBUG MODE');

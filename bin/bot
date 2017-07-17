@@ -54,7 +54,7 @@ function runBot($config)
 /**
  * Handle worker argument
  */
-if ($argv[1] === 'worker') {
+if ($_GET['a'] === 'worker') {
     $_GET['a'] = 'cron';
     $last_run = null;
 
