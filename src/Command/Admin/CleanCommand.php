@@ -60,7 +60,10 @@ class CleanCommand extends AdminCommand
         $game = new Game('_', '_', $this);
         $storage = $game->getStorage();
 
-        $inactive = $storage::listFromStorage($cleanInterval);
+        $inactive = [];
+        if (class_exists($storage)) {
+            $inactive = $storage::listFromStorage($cleanInterval);
+        }
 
         $chat_action_start = 0;
         $last_request_time = 0;
