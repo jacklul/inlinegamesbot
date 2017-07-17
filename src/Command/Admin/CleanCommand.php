@@ -15,7 +15,6 @@ use Bot\Manager\Game;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
-use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Request;
 
 class CleanCommand extends AdminCommand
