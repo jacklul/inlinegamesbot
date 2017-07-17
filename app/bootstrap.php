@@ -148,7 +148,7 @@ function sendToStderr($text) {
 /**
  * Resolve script command to script a=command
  */
-if (isset($argv[1])) {
+if (isset($argv[1]) && !strpos($argv[1], '=')) {
     $_GET['a'] = $argv[1];
     $argv[1] = 'a=' . $argv[1];
 }
