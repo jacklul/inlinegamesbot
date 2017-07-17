@@ -88,15 +88,13 @@ class Game
         $this->update = $command->getUpdate();
         $this->telegram = $command->getTelegram();
 
-        if (DB::isDbConnected()) {
+        if (DB::isDbConnected() && !getenv('DEBUG_NO_BOTDB')) {
             $this->storage = 'Bot\Storage\BotDB';
         } elseif (getenv('DATABASE_URL')) {
             $this->storage = Driver::getDriver();
         } else {
             $this->storage = 'Bot\Storage\File';
         }
-
-        $this->storage = Driver::getDriver();
 
         if ($env_storage = getenv('DEBUG_STORAGE')) {
             $this->storage = $env_storage;
