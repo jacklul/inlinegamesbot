@@ -61,7 +61,7 @@ class PostgreSQL
                 self::$pdo = new PDO('pgsql:' . 'host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
                 self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
             } catch (PDOException $e) {
-                TelegramLog::error($e->getMessage());
+                TelegramLog::error($e->getCode() . ':' . $e->getMessage());
                 Debug::log('Connection to the database failed!');
                 return false;
             }
