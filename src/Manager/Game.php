@@ -220,6 +220,8 @@ class Game
 
         Debug::log('GAME HANDLED');
 
+        $this->runScheduledCommands();
+
         return $result;
     }
 
@@ -273,5 +275,27 @@ class Game
     {
         $data['game_code'] = $this->game::getCode();    // make sure we have the game code in the data array for /clean command!
         return $this->storage::insertToStorage($this->id, $data);
+    }
+
+    /**
+     * Build-in scheduler
+     *
+     * @TODO redesign this for multi-dyno setup or move to heroku-scheduler
+     *
+     * @return mixed
+     */
+    private function runScheduledCommands(): void
+    {
+        $cron_check_file = VAR_PATH . '/cron';
+
+        if (!file_exists($cron_check_file) || filemtime($cron_check_file) < strtotime('-5 minutes')) {
+            if (flock(fopen($cron_check_file, "a+"), LOCK_EX)) {
+                touch($cron_check_file);
+
+                Debug::log('Running scheduled commands!');
+
+                $this->telegram->runCommands(['/report', '/clean']);
+            }
+        }
     }
 }
