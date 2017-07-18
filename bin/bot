@@ -14,5 +14,9 @@
  */
 $loader = require __DIR__ . ' /../vendor/autoload.php';
 
-$app = new Bot();
-$app->run();
+try {
+    $app = new Bot();
+    $app->run();
+} catch (Exception $e) {
+    print $e->getMessage() . PHP_EOL;
+}
