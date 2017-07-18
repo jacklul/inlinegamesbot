@@ -8,7 +8,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Storage;
+namespace Bot\Storage\Driver;
 
 use Bot\Exception\BotException;
 use Bot\Helper\Debug;
@@ -22,7 +22,7 @@ use PDOException;
  *
  * Uses database from Longman\TelegramBot\DB
  *
- * @package Bot\Storage
+ * @package Bot\Storage\Driver
  */
 class BotDB extends DB
 {

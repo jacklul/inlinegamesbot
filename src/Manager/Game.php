@@ -16,7 +16,6 @@ use Bot\Helper\Botan;
 use Bot\Helper\Debug;
 use Bot\Storage\Driver;
 use Longman\TelegramBot\Commands\Command;
-use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
@@ -83,38 +82,30 @@ class Game
         }
 
         Debug::log('ID: ' .  $id);
+        Debug::memoryUsage();
 
         $this->id = $id;
         $this->update = $command->getUpdate();
         $this->telegram = $command->getTelegram();
-
-        if (DB::isDbConnected() && !getenv('DEBUG_NO_BOTDB')) {
-            $this->storage = 'Bot\Storage\BotDB';
-        } elseif (getenv('DATABASE_URL')) {
-            $this->storage = Driver::getDriver();
-        } else {
-            $this->storage = 'Bot\Storage\File';
-        }
-
-        if ($env_storage = getenv('DEBUG_STORAGE')) {
-            $this->storage = $env_storage;
-        }
-
-        if (!class_exists($this->storage)) {
-            throw new BotException('Storage class doesn\'t exist: ' . $this->storage);
-        }
-
-        Debug::log('Storage: \'' . $this->storage . '\'');
+        $this->storage = Driver::getStorageClass();
 
         if (!$this->storage::initializeStorage()) {
+            Debug::log('Storage initialization failed: \'' . $this->storage . '\'');
+
             $this->storage = null;
         }
+
+        Debug::memoryUsage();
 
         if ($game = $this->findGame($game_code)) {
             $this->game = $game;
             $class = get_class($this->game);
             Debug::log('Game: ' . $class::getTitle());
+        } else {
+            Debug::log('Game not found!');
         }
+
+        Debug::memoryUsage();
 
         return $this;
     }
@@ -160,7 +151,7 @@ class Game
     /**
      * Run the game class
      *
-     * @return bool|ServerResponse
+     * @return ServerResponse
      * @throws BotException
      */
     public function run()
@@ -201,6 +192,7 @@ class Game
         }
 
         Debug::log('BEGIN HANDLING THE GAME');
+        Debug::memoryUsage();
 
         if ($callback_query) {
             $result = $this->game->handleAction(explode(';', $callback_query->getData())[1]);
@@ -219,8 +211,9 @@ class Game
         }
 
         Debug::log('GAME HANDLED');
+        Debug::memoryUsage();
 
-        $this->reportIssues();
+        $this->runScheduledTask();
 
         return $result;
     }
@@ -228,7 +221,7 @@ class Game
     /**
      * Get game id
      *
-     * @return mixed
+     * @return string
      */
     public function getId()
     {
@@ -260,7 +253,7 @@ class Game
      *
      * @return Update
      */
-    public function getUpdate()
+    public function getUpdate(): Update
     {
         return $this->update;
     }
@@ -269,20 +262,20 @@ class Game
      * Save game data
      *
      * @param  $data
-     * @return mixed
+     * @return bool
      */
-    public function saveData($data)
+    public function saveData($data): bool
     {
         $data['game_code'] = $this->game::getCode();    // make sure we have the game code in the data array for /clean command!
         return $this->storage::insertToStorage($this->id, $data);
     }
 
     /**
-     * Scheduled logs/crashdumps reporter
+     * Scheduled logs/crashdumps reporter + temp file cleaner
      *
      * @return mixed
      */
-    private function reportIssues(): void
+    private function runScheduledTask(): void
     {
         $cron_check_file = VAR_PATH . '/reporter';
 
@@ -293,6 +286,17 @@ class Game
                 Debug::log('Running /report command!');
 
                 $this->telegram->runCommands(['/report']);
+
+                // Remove temporary files (any leftovers...)
+                if (is_dir($dir = VAR_PATH . '/tmp')) {
+                    foreach (new \DirectoryIterator($dir) as $file) {
+                        if (!$file->isDir() && !$file->isDot() && $file->getMTime() < strtotime('-1 minute')) {
+                            @unlink($dir . '/' . $file->getFilename());
+                        }
+                    }
+                }
+
+                Debug::memoryUsage();
             }
         }
     }

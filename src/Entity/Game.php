@@ -76,22 +76,26 @@ class Game
         }
 
         Debug::log('Executing: ' . $action);
+        Debug::memoryUsage();
 
         $result = $this->$action();
 
         if ($result instanceof ServerResponse) {
             if ($result->isOk() || strpos($result->getDescription(), 'message is not modified') !== false) {
                 Debug::log('Server response is ok');
+                Debug::memoryUsage();
                 $this->answerCallbackQuery();
                 return $result;
             }
 
             Debug::log('Server response is not ok');
             Debug::log($result->getErrorCode() . ': ' . $result->getDescription());
+            Debug::memoryUsage();
             return $this->answerCallbackQuery(__('Telegram API error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."), true);
         }
 
         Debug::log('CRASHED');
+        Debug::memoryUsage();
 
         Debug::dump(
             $this->manager->getId(),
@@ -162,7 +166,7 @@ class Game
     {
         return $this->answerCallbackQuery(__('Database failure!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."), true);
     }
-    
+
     /**
      * Get player user object
      *

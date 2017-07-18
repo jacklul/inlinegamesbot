@@ -45,6 +45,11 @@ class ReportCommand extends AdminCommand
         $chat_id = $message->getFrom()->getId();
         $dirsToSend = $this->getConfig('dirs_to_report');
 
+        if (empty(getenv('BOT_ADMIN'))) {
+            Debug::log('No admin is set, aborting this command.');
+            return Request::emptyResponse();
+        }
+
         if (empty($dirsToSend) || !is_array($dirsToSend)) {
             throw new BotException('Config variable \'dirs_to_report\' must be an array!');
         }
@@ -60,13 +65,13 @@ class ReportCommand extends AdminCommand
             }
 
             if (file_exists($thisZip = VAR_PATH . '/' . basename($dirToSend) . '_previous.zip')) {
-                $filesToSend[] = $thisZip;
+                $filesToSend[] = realpath($thisZip);
             }
 
             $thisZip = $this->zipDir($dirToSend);
 
             if ($thisZip) {
-                $filesToSend[] = $thisZip;
+                $filesToSend[] = realpath($thisZip);
                 $this->deleteDir($dirToSend);
             }
         }
@@ -79,6 +84,8 @@ class ReportCommand extends AdminCommand
             foreach ($this->getTelegram()->getAdminList() as $admin) {
                 if ($admin != $bot_id) {
                     foreach ($filesToSend as $file) {
+                        Debug::log('Sending to ' . $admin);
+
                         if (!empty($alreadySent[$file])) {
                             $data_admin = [
                                 'chat_id' => $admin,

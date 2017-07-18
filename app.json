@@ -40,6 +40,6 @@
         }
     },
     "scripts": {
-        "postdeploy": "php bin/bot a=set"
+        "postdeploy": "php bin/bot set"
     }
 }

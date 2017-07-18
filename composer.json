@@ -17,8 +17,8 @@
         "ext-mbstring": "*",
         "ext-zip": "*",
         "ext-pgsql": "*",
-        "longman/telegram-bot": "dev-master as 0.45.0",
-        "php-telegram-bot/telegram-bot-manager": "^1.2.1",
+        "longman/telegram-bot": "^0.46.0",
+        "longman/ip-tools": "^1.2",
         "vlucas/phpdotenv": "^2.4.0",
         "gettext/gettext": "^4.3.0",
         "spatie/emoji": "^1.0.5",
@@ -32,7 +32,10 @@
     "autoload": {
         "psr-4": {
             "Bot\\": "src/"
-        }
+        },
+        "classmap": [
+            "src/Bot.php"
+        ]
     },
     "scripts": {
         "check-code": [

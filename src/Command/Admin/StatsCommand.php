@@ -10,11 +10,12 @@
 
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
-use Bot\Manager\Game;
+use Bot\Storage\Driver;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Request;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * Class StatsCommand
@@ -49,8 +50,8 @@ class StatsCommand extends AdminCommand
             $data_query['callback_query_id'] = $callback_query->getId();
         }
 
-        $game = new Game('_', '_', $this);
-        $storage = $game->getStorage();
+        $storage = Driver::getStorageClass();
+        $storage::initializeStorage();
 
         $active = $storage::listFromStorage((time() - strtotime('-5 minutes')) * -1);
 

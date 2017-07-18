@@ -8,7 +8,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Storage;
+namespace Bot\Storage\Driver;
 
 use Bot\Exception\BotException;
 
@@ -17,7 +17,7 @@ use Bot\Exception\BotException;
  *
  * Stores data in json formatted text files
  *
- * @package Bot\Storage
+ * @package Bot\Storage\Driver
  */
 class File
 {

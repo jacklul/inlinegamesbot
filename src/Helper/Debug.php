@@ -33,10 +33,10 @@ class Debug
             throw new BotException('Text cannot be empty!');
         }
 
-        if (TelegramLog::isDebugLogActive() || getenv('Debug')) {
+        if (TelegramLog::isDebugLogActive() || getenv('DEBUG')) {
             if (!is_null($prefix)) {
                 $prefix = $prefix . ': ';
-            } else {
+            } elseif (!getenv('DEBUG_NO_BACKTRACE')) {
                 $backtrace = debug_backtrace();
 
                 if (isset($backtrace[1]['class'])) {
@@ -51,8 +51,8 @@ class Debug
                 TelegramLog::Debug($message);
             }
 
-            if (getenv('Debug')) {
-                print($message . PHP_EOL);
+            if (getenv('DEBUG')) {
+                print $message . PHP_EOL;
             }
         }
     }
@@ -83,6 +83,20 @@ class Debug
             $output .= $var . ':' . PHP_EOL . (is_array($val) ? print_r($val, true) : (is_bool($val) ? ($val ? 'true' : 'false') : $val)) . PHP_EOL . PHP_EOL;
         }
 
-        file_put_contents(VAR_PATH . '/crashdumps/' . $file_name . '_' . date('y-m-d_H-i-s') . '.txt', $output);
+        $crashdump_file = VAR_PATH . '/crashdumps/' . $file_name . '_' . date('y-m-d_H-i-s') . '.txt';
+        print 'Creating crash dump: ' . $crashdump_file;
+        file_put_contents($crashdump_file, $output);
+    }
+
+    /**
+     * Memory usage checker
+     *
+     * @throws BotException
+     */
+    public static function memoryUsage(): void
+    {
+        if (getenv('DEBUG') && getenv('DEBUG_MEM_USAGE')) {
+            print 'MEMORY USAGE - ' . round(memory_get_usage() / 1024 / 1024, 2) . 'M / PEAK - ' . round(memory_get_peak_usage() / 1024 / 1024, 2) . 'M' . PHP_EOL;
+        }
     }
 }

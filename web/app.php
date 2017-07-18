@@ -8,11 +8,13 @@
  * file that was distributed with this source code.
  */
 
-//We do not want to unnecessarily run the bot when this is not a web hook request
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    define("APP_BINARY", realpath(__DIR__ . '/../bin/bot'));
+/**
+ * @var Composer\Autoload\ClassLoader
+ */
+$loader = require __DIR__ . ' /../vendor/autoload.php';
 
-    if (file_exists(APP_BINARY)) {
-        require_once APP_BINARY;
-    }
+//We do not want to unnecessarily run the bot when this is not a web hook request
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    $app = new Bot();
+    $app->run();
 }

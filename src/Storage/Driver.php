@@ -12,6 +12,8 @@ namespace Bot\Storage;
 
 use AD7six\Dsn\Dsn;
 use Bot\Exception\BotException;
+use Bot\Helper\Debug;
+use Longman\TelegramBot\DB;
 
 /**
  * Class DB
@@ -37,17 +39,29 @@ class Driver
      * @return string
      * @throws BotException
      */
-    public static function getDriver()
+    public static function getStorageClass()
     {
-        $dsn = Dsn::parse(getenv('DATABASE_URL'));
-        $dsn = $dsn->toArray();
+        if (DB::isDbConnected() && !getenv('DEBUG_NO_BOTDB')) {
+            $storage = 'Bot\Storage\Driver\BotDB';
+        } elseif (getenv('DATABASE_URL')) {
+            $dsn = Dsn::parse(getenv('DATABASE_URL'));
+            $dsn = $dsn->toArray();
 
-        $engine = 'Bot\Storage\Driver\\' . (self::$drivers[$dsn['engine']]) ?: '';
-
-        if (!class_exists($engine)) {
-            throw new BotException('Database engine class \'' . $engine . ' doesn\'t exist!');
+            $storage = 'Bot\Storage\Driver\\' . (self::$drivers[$dsn['engine']]) ?: '';
+        } else {
+            $storage = 'Bot\Storage\Driver\File';
         }
 
-        return $engine;
+        if ($env_storage = getenv('DEBUG_STORAGE')) {
+            $storage = $env_storage;
+        }
+
+        if (!class_exists($storage)) {
+            throw new BotException('Storage class doesn\'t exist: ' . $storage);
+        }
+
+        Debug::log('Using storage: \'' . $storage . '\'');
+
+        return $storage;
     }
 }
