@@ -302,7 +302,7 @@ class Bot
                 $query_string_char = '&';
             }
 
-            $url = $url . $query_string_char . 's=' . $this->config['secret'];
+            $url = $url . $query_string_char . 'a=handle&s=' . $this->config['secret'];
         }
 
         $result = $this->telegram->setWebhook($url, $options);
