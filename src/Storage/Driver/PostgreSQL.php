@@ -263,7 +263,7 @@ class PostgreSQL
             throw new BotException('Id is empty!');
         }
 
-        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.lock', "a+"), LOCK_UN) && unlink(VAR_PATH . '/tmp/' . $id .  '.lock');
+        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.lock', "a+"), LOCK_UN) && @unlink(VAR_PATH . '/tmp/' . $id .  '.lock');
     }
 
     /**
