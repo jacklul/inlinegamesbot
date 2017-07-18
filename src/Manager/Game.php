@@ -220,7 +220,7 @@ class Game
 
         Debug::log('GAME HANDLED');
 
-        $this->runScheduledCommands();
+        $this->reportIssues();
 
         return $result;
     }
@@ -278,23 +278,21 @@ class Game
     }
 
     /**
-     * Build-in scheduler
-     *
-     * @TODO redesign this for multi-dyno setup or move to heroku-scheduler
+     * Scheduled logs/crashdumps reporter
      *
      * @return mixed
      */
-    private function runScheduledCommands(): void
+    private function reportIssues(): void
     {
-        $cron_check_file = VAR_PATH . '/cron';
+        $cron_check_file = VAR_PATH . '/reporter';
 
         if (!file_exists($cron_check_file) || filemtime($cron_check_file) < strtotime('-5 minutes')) {
             if (flock(fopen($cron_check_file, "a+"), LOCK_EX)) {
                 touch($cron_check_file);
 
-                Debug::log('Running scheduled commands!');
+                Debug::log('Running /report command!');
 
-                $this->telegram->runCommands(['/report', '/clean']);
+                $this->telegram->runCommands(['/report']);
             }
         }
     }
