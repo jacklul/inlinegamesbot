@@ -30,7 +30,7 @@ class CleanCommand extends AdminCommand
     protected $usage = '/clean';
 
     /**
-     * @return \Longman\TelegramBot\Entities\ServerResponse
+     * @return ServerResponse
      */
     public function execute()
     {
@@ -124,12 +124,12 @@ class CleanCommand extends AdminCommand
 
                         $last_request_time = time();
 
-                        if ($result->isOk()) {
+                        if (isset($result) && $result->isOk()) {
                             $edited++;
                             Debug::log('Message edited successfully');
                         } else {
                             $error++;
-                            Debug::log('Failed to edit message: ' . $result->getDescription());
+                            Debug::log('Failed to edit message: ' . (isset($result) ? $result->getDescription() : '...'));
                         }
                     }
                 }
