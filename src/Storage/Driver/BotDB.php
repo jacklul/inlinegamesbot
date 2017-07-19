@@ -254,6 +254,7 @@ class BotDB extends DB
             $sth = self::$pdo->prepare('
                 SELECT * FROM `' . TB_STORAGE . '`
                 WHERE `updated_at` ' . $compare_sign . ' :date
+                ORDER BY `updated_at` ASC
             ');
 
             $date = self::getTimestamp(strtotime('-' . abs($time) . ' seconds'));

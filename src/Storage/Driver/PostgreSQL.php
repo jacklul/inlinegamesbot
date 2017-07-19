@@ -297,6 +297,7 @@ class PostgreSQL
             $sth = self::$pdo->prepare('
                 SELECT * FROM ' . TB_STORAGE . '
                 WHERE updated_at ' . $compare_sign . ' :date
+                ORDER BY updated_at ASC
             ');
 
             $date = date('Y-m-d H:i:s', strtotime('-' . abs($time) . ' seconds'));
