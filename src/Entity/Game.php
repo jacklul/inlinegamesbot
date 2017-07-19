@@ -45,8 +45,6 @@ class Game
      * Game constructor.
      *
      * @param GameManager $manager
-     *
-     * @throws BotException
      */
     public function __construct(GameManager $manager)
     {
@@ -63,7 +61,6 @@ class Game
      * @param $action
      *
      * @return ServerResponse|mixed|string
-     * @throws BotException
      */
     public function handleAction($action)
     {
@@ -489,7 +486,6 @@ class Game
      * @param string $keyboard
      *
      * @return InlineKeyboard
-     * @throws BotException
      */
     protected function getReplyMarkup($keyboard = '')
     {
@@ -503,7 +499,8 @@ class Game
         Debug::log($keyboard);
 
         if (!method_exists($this, $keyboard)) {
-            throw new BotException('Method \'' . $keyboard . '\ doesn\'t exist!');
+            Debug::log('Method \'' . $keyboard . '\ doesn\'t exist!');
+            $keyboard = 'emptyKeyboard';
         }
 
         $keyboard = $this->$keyboard();

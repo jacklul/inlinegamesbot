@@ -30,7 +30,7 @@ class CleanCommand extends AdminCommand
     protected $usage = '/clean';
 
     /**
-     * @return ServerResponse
+     * @return \Longman\TelegramBot\Entities\ServerResponse
      */
     public function execute()
     {
@@ -41,13 +41,12 @@ class CleanCommand extends AdminCommand
             $message = $edited_message;
         }
 
-        if ($message) {
-            $chat_id = $message->getFrom()->getId();
-            $text = trim($message->getText(true));
+        $chat_id = $message->getFrom()->getId();
+        $bot_id = $this->getTelegram()->getBotId();
+        $text = trim($message->getText(true));
 
-            $data = [];
-            $data['chat_id'] = $chat_id;
-        }
+        $data = [];
+        $data['chat_id'] = $chat_id;
 
         $cleanInterval = $this->getConfig('clean_interval');
 
@@ -59,6 +58,7 @@ class CleanCommand extends AdminCommand
             $cleanInterval = 86400;  // 86400 seconds = 1 day
         }
 
+        // Bug workaround: When run from the webhook and script just keeps going for too long Bot API will resend the update triggering the command again... and again...
         if (!defined("STDIN")) {
             set_time_limit(10);
         }
@@ -77,8 +77,10 @@ class CleanCommand extends AdminCommand
             $timelimit = ini_get('max_execution_time') > 0 ?: 60;
             $start_time = time();
 
-            $data['text'] = 'Executing... (time limit: ' . $timelimit . ' seconds)';
-            Request::sendMessage($data);
+            if ($chat_id !== $bot_id) {
+                $data['text'] = 'Executing... (time limit: ' . $timelimit . ' seconds)';
+                Request::sendMessage($data);
+            }
 
             $cleaned = 0;
             $edited = 0;
@@ -90,7 +92,7 @@ class CleanCommand extends AdminCommand
                     break;
                 }
 
-                if ($chat_action_start < strtotime('-5 seconds')) {
+                if ($chat_id !== $bot_id && $chat_action_start < strtotime('-5 seconds')) {
                     Request::sendChatAction(['chat_id' => $chat_id, 'action' => 'typing']);
                     $chat_action_start = time();
                 }
@@ -115,7 +117,7 @@ class CleanCommand extends AdminCommand
                         $result = Request::editMessageText(
                             [
                                 'inline_message_id' => $inactive_game['id'],
-                                'text' => '<b>' . $game->getGame()::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __("This game session is empty.") . '</i>',
+                                'text' => '<b>' . $game->getGame()::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __("This game session has expired.") . '</i>',
                                 'reply_markup' => $this->createInlineKeyboard($game_data['game_code']),
                                 'parse_mode' => 'HTML',
                                 'disable_web_page_preview' => true,
@@ -136,24 +138,21 @@ class CleanCommand extends AdminCommand
 
                 if ($storage::deleteFromStorage($inactive_game['id'])) {
                     $cleaned++;
-                    Debug::log('Removed from the database');
+                    Debug::log('Removed record from the database');
                 }
             }
 
-            if ($message) {
-                $data['text'] = 'Cleaned ' . $cleaned . ' games, edited ' . $edited . ' messages, ' . $error . ' errored.';
-
-                return Request::sendMessage($data);
-            }
+            $data['text'] = 'Cleaned ' . $cleaned . ' games (edited ' . $edited . ' messages, ' . $error . ' errored).';
         } else {
-            if ($message) {
-                $data['text'] = 'Error!';
-
-                return Request::sendMessage($data);
-            }
+            $data['text'] = 'Database error!';
         }
 
-        return Request::emptyResponse();
+        if ($chat_id !== $bot_id) {
+            return Request::sendMessage($data);
+        } else {
+            print $data['text'] . PHP_EOL;
+            return Request::emptyResponse();
+        }
     }
 
     /**

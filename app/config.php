@@ -11,7 +11,8 @@
 /**
  * Default configuration
  *
- * This configuration array is compatible with Telegam Bot Manager's format
+ * This configuration array is compatible with Telegam Bot Manager even though this library is not used
+ * (https://github.com/php-telegram-bot/telegram-bot-manager)
  */
 $config = [
     'api_key'      => getenv('BOT_TOKEN'),
@@ -30,7 +31,7 @@ $config = [
                 ]
             ],
             'clean' => [
-                'clean_interval' => 86400,
+                'clean_interval' => 21600,
             ],
         ],
     ],
@@ -54,6 +55,9 @@ $config = [
         'error'  => VAR_PATH . '/logs/Error.log',
     ],
     'validate_request' => true,
+    'valid_ips' => [
+        '149.154.167.197-149.154.167.233',
+    ],
     'botan' => [
         'token'   => getenv('BOTAN_TOKEN'),
         'options' => [

@@ -8,31 +8,31 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use Bot\Helper\Debug;
+namespace Bot;
+
 use Bot\Exception\BotException;
+use Bot\Helper\Debug;
 use Dotenv\Dotenv;
 use Gettext\Translator;
 use Longman\IPTools\Ip;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Exception\TelegramLogException;
-use Longman\TelegramBot\TelegramLog;
 use Longman\TelegramBot\Telegram;
+use Longman\TelegramBot\TelegramLog;
 use Longman\TelegramBot\Request;
 
 /**
- * Define app paths
+ * Class Kernel
  */
-define("ROOT_PATH", realpath(__DIR__ . '/../'));
-define("BIN_PATH", ROOT_PATH . '/bin');
-define("APP_PATH", ROOT_PATH . '/app');
-define("SRC_PATH", ROOT_PATH . '/src');
-define("VAR_PATH", ROOT_PATH . '/var');
-
-/**
- * Class Bot
- */
-class Bot
+class Kernel
 {
+    /**
+     * Argument passed
+     *
+     * @var string
+     */
+    private $arg = '';
+
     /**
      * Config array
      *
@@ -43,7 +43,7 @@ class Bot
     /**
      * Telegram object
      *
-     * @var Longman\TelegramBot\Telegram
+     * @var Telegram
      */
     private $telegram;
 
@@ -54,6 +54,15 @@ class Bot
      */
     public function __construct()
     {
+        if (!defined('ROOT_PATH')) {
+            throw new BotException('Root path not defined!');
+        }
+
+        define("BIN_PATH", ROOT_PATH . '/bin');
+        define("APP_PATH", ROOT_PATH . '/app');
+        define("SRC_PATH", ROOT_PATH . '/src');
+        define("VAR_PATH", ROOT_PATH . '/var');
+
         if (file_exists(ROOT_PATH . '/.env')) {
             $env = new Dotenv(ROOT_PATH);
             $env->load();
@@ -61,11 +70,12 @@ class Bot
 
         (new Translator())->register();
 
-        if (!file_exists(APP_PATH . '/config.php')) {
+        $bot_config_file = APP_PATH . '/config.php';
+        if (!file_exists($bot_config_file)) {
             throw new BotException('Configuration file doesn\'t exist!');
         }
 
-        include_once APP_PATH . '/config.php';
+        require_once $bot_config_file;
 
         if (isset($config) && is_array($config)) {
             $this->config = $config;
@@ -73,9 +83,26 @@ class Bot
             throw new BotException('Couldn\'t load configuration!');
         }
 
-        if (isset($config['logging']['error'])) {
-            ini_set('log_errors', 1);
-            ini_set('error_log', $config['logging']['error']);
+        try {
+            if (isset($config['logging']['error'])) {
+                TelegramLog::initErrorLog($this->config['logging']['error']);
+            }
+
+            if (isset($this->config['logging']['debug'])) {
+                TelegramLog::initDebugLog($this->config['logging']['debug']);
+            }
+
+            if (isset($this->config['logging']['update'])) {
+                TelegramLog::initUpdateLog($this->config['logging']['update']);
+            }
+        } catch (TelegramLogException $e) {
+            throw new BotException($e->getMessage());
+        }
+
+        if (isset($_SERVER['argv'][1])) {
+            $this->arg = strtolower(trim($_SERVER['argv'][1]));
+        } elseif (isset($_GET['a']) && $_GET['a'] === 'handle') {   // from webspace allow only handling webhook
+            $this->arg = 'handle';
         }
 
         return $this;
@@ -86,19 +113,12 @@ class Bot
      */
     public function run()
     {
-        $arg = '';
-        if (isset($_SERVER['argv'][1])) {
-            $arg = strtolower(trim($_SERVER['argv'][1]));
-        }
-
-        Debug::log('DEBUG MODE');
-
         try {
             if (!$this->telegram instanceof Telegram) {
                 $this->initialize();
             }
 
-            switch($arg) {
+            switch($this->arg) {
                 default:
                 case 'handle':
                     $this->handleWebhook();
@@ -121,51 +141,21 @@ class Bot
                 case 'worker':
                     $this->handleWorker();
                     break;
-                case 'manager':
-                    if (count($_SERVER['argv']) > 2) {
-                        for ($i = 1; $i < count($_SERVER['argv']); $i++) {
-                            if (isset($_SERVER['argv'][$i]) && isset($_SERVER['argv'][$i + 1])) {
-                                $_SERVER['argv'][$i] = $_SERVER['argv'][$i + 1];
-                            }
-                        }
-                    }
-
-                    $this->runWithManager();
-                    break;
             }
-        } catch (TelegramLogException $e) {
-            print $e->getMessage() . PHP_EOL;
         } catch (TelegramException $e) {
             TelegramLog::error($e);
-        } catch (Exception $e) {
+        } catch (BotException $e) {
             TelegramLog::error($e);
-        } catch (Throwable $e) {
+        } catch (\Exception $e) {
             TelegramLog::error($e);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Run the bot using Telegram Bot Manager
-     */
-    public function runWithManager()
-    {
-        if (!class_exists('TelegramBot\TelegramBotManager\BotManager')) {
-            throw new BotException('PLibrary is not installed! \'composer require php-telegram-bot/telegram-bot-manager\'');
-        }
-
-        try {
-            $bot = new TelegramBot\TelegramBotManager\BotManager($this->config);
-            $bot->run();
-        } catch (TelegramLogException $e) {
-            print $e->getMessage() . PHP_EOL;
-        } catch (TelegramException $e) {
+        } catch (\Throwable $e) {
             TelegramLog::error($e);
-        } catch (Exception $e) {
+        } catch (\Error $e) {
             TelegramLog::error($e);
-        } catch (Throwable $e) {
-            TelegramLog::error($e);
+        } finally {
+            if (isset($e)) {
+                throw new BotException($e->getMessage());
+            }
         }
     }
 
@@ -174,31 +164,20 @@ class Bot
      */
     private function initialize(): void
     {
+        Debug::log('DEBUG MODE');
+
         $this->telegram = new Telegram($this->config['api_key'], $this->config['bot_username']);
 
         if (isset($this->config['commands']['paths'])) {
             $this->telegram->addCommandsPaths($this->config['commands']['paths']);
         }
 
-        if (isset($this->config['admins'])) {
+        if (isset($this->config['admins']) && !empty($this->config['admins'][0])) {
             $this->telegram->enableAdmins($this->config['admins']);
-            $this->telegram->enableAdmin(getenv('BOT_ADMIN'));
         }
 
         if (isset($this->config['mysql']['host'])) {
             $this->telegram->enableMySql($this->config['mysql']);
-        }
-
-        if (isset($this->config['logging']['error'])) {
-            Longman\TelegramBot\TelegramLog::initErrorLog($this->config['logging']['error']);
-        }
-
-        if (isset($this->config['logging']['debug'])) {
-            Longman\TelegramBot\TelegramLog::initDebugLog($this->config['logging']['debug']);
-        }
-
-        if (isset($this->config['logging']['update'])) {
-            Longman\TelegramBot\TelegramLog::initUpdateLog($this->config['logging']['update']);
         }
 
         if (isset($this->config['paths']['download'])) {
@@ -234,26 +213,30 @@ class Bot
 
     /**
      * Validate request to check if it comes from the Telegram servers
-     * and also does it contains a secret string
+     * and also does it contain a secret string
      *
      * @return bool
      */
     private function validateRequest(): bool
     {
-        if ($this->config['validate_request'] && !defined('STDIN')) {
-            $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-            foreach (['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR'] as $key) {
-                if (filter_var($_SERVER[$key] ?? null, FILTER_VALIDATE_IP)) {
-                    $ip = $_SERVER[$key];
-                    break;
-                }
-            }
-
+        if (!defined('STDIN')) {
             if (!empty($this->config['secret']) && isset($_GET['s']) && $_GET['s'] !== $this->config['secret']) {
                 return false;
             }
 
-            return Ip::match($ip, '149.154.167.197-149.154.167.233');
+            if (!empty($this->config['valid_ip'] && is_array($this->config['valid_ip']))) {
+                if ($this->config['validate_request'] && !defined('STDIN')) {
+                    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+                    foreach (['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR'] as $key) {
+                        if (filter_var($_SERVER[$key] ?? null, FILTER_VALIDATE_IP)) {
+                            $ip = $_SERVER[$key];
+                            break;
+                        }
+                    }
+
+                    return Ip::match($ip, $this->config['valid_ips']);
+                }
+            }
         }
 
         return true;
@@ -267,6 +250,8 @@ class Bot
         if ($this->validateRequest()) {
             $this->telegram->handle();
         }
+
+        $this->runAfterWebhook();
     }
 
     /**
@@ -376,14 +361,17 @@ class Bot
             if ($server_response->isOk()) {
                 $update_count = count($server_response->getResult());
                 echo ($update_count === 0) ? "\r" : '';
-                echo date('Y-m-d H:i:s', time()) . ' - Processed ' . $update_count . ' updates';
+                echo date('Y-m-d H:i:s', time()) . ' - Processed ' . $update_count . ' updates!';
                 echo ($update_count > 0) ? PHP_EOL : '';
             } else {
-                echo date('Y-m-d H:i:s', time()) . ' - Failed to fetch updates' . PHP_EOL;
+                echo date('Y-m-d H:i:s', time()) . ' - Failed to process updates!' . PHP_EOL;
                 echo $server_response->printError() . PHP_EOL;
             }
 
-            gc_collect_cycles();
+            if (function_exists('gc_collect_cycles')) {
+                gc_collect_cycles();
+            }
+
             usleep(333333);
         }
     }
@@ -414,19 +402,53 @@ class Bot
 
                 print 'Next scheduled run in ' . $next_run . ' seconds, sleeping for ' . $sleep_time_this . ' seconds... ' . PHP_EOL;
 
-                gc_collect_cycles();
+                if (function_exists('gc_collect_cycles')) {
+                    gc_collect_cycles();
+                }
+
                 sleep($sleep_time_this);
 
                 continue;
             }
 
-            print('Running scheduled commands...' . PHP_EOL);
+            print 'Running scheduled commands...' . PHP_EOL;
 
             $this->handleCron();
 
-            print 'Finished, memory used: ' . round(memory_get_usage() / 1024 / 1024, 2) . 'M, peak: ' . round(memory_get_peak_usage() / 1024 / 1024, 2) . 'M.' . PHP_EOL;
+            print 'Finished, memory usage: ' . round(memory_get_usage() / 1024 / 1024, 2) . 'M, peak: ' . round(memory_get_peak_usage() / 1024 / 1024, 2) . 'M.' . PHP_EOL;
 
             $last_run = time();
+        }
+    }
+
+    /**
+     * A task to run after handling webhook
+     */
+    private function runAfterWebhook()
+    {
+        $cron_check_file = VAR_PATH . '/reporter';
+
+        if (!file_exists($cron_check_file) || filemtime($cron_check_file) < strtotime('-1 minutes')) {
+            if (flock(fopen($cron_check_file, "a+"), LOCK_EX)) {
+                touch($cron_check_file);
+
+                $command = $this->config['cron']['groups']['default'][0];
+
+                Debug::log('Running ' . $command . ' command!');
+
+                $this->telegram->runCommands([$command]);
+
+                // Remove temporary files
+                if (is_dir($dir = VAR_PATH . '/tmp')) {
+                    foreach (new \DirectoryIterator($dir) as $file) {
+                        if (!$file->isDir() && !$file->isDot() && $file->getMTime() < strtotime('-1 minutes')) {
+                            @unlink($dir . '/' . $file->getFilename());
+                        }
+                    }
+                }
+
+                Debug::memoryUsage();
+            }
         }
     }
 }

@@ -23,7 +23,7 @@ use Longman\TelegramBot\Request;
 /**
  * Class Game
  *
- * @package Bot
+ * @package Bot\Manager
  */
 class Game
 {
@@ -213,8 +213,6 @@ class Game
         Debug::log('GAME HANDLED');
         Debug::memoryUsage();
 
-        $this->runScheduledTask();
-
         return $result;
     }
 
@@ -268,36 +266,5 @@ class Game
     {
         $data['game_code'] = $this->game::getCode();    // make sure we have the game code in the data array for /clean command!
         return $this->storage::insertToStorage($this->id, $data);
-    }
-
-    /**
-     * Scheduled logs/crashdumps reporter + temp file cleaner
-     *
-     * @return mixed
-     */
-    private function runScheduledTask(): void
-    {
-        $cron_check_file = VAR_PATH . '/reporter';
-
-        if (!file_exists($cron_check_file) || filemtime($cron_check_file) < strtotime('-5 minutes')) {
-            if (flock(fopen($cron_check_file, "a+"), LOCK_EX)) {
-                touch($cron_check_file);
-
-                Debug::log('Running /report command!');
-
-                $this->telegram->runCommands(['/report']);
-
-                // Remove temporary files (any leftovers...)
-                if (is_dir($dir = VAR_PATH . '/tmp')) {
-                    foreach (new \DirectoryIterator($dir) as $file) {
-                        if (!$file->isDir() && !$file->isDot() && $file->getMTime() < strtotime('-1 minute')) {
-                            @unlink($dir . '/' . $file->getFilename());
-                        }
-                    }
-                }
-
-                Debug::memoryUsage();
-            }
-        }
     }
 }

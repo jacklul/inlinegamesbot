@@ -48,7 +48,7 @@ class Debug
             $message = preg_replace('~[\r\n]+~', PHP_EOL . $prefix, $message);
 
             if (TelegramLog::isDebugLogActive()) {
-                TelegramLog::Debug($message);
+                TelegramLog::debug($message);
             }
 
             if (getenv('DEBUG')) {
@@ -95,8 +95,8 @@ class Debug
      */
     public static function memoryUsage(): void
     {
-        if (getenv('DEBUG') && getenv('DEBUG_MEM_USAGE')) {
-            print 'MEMORY USAGE - ' . round(memory_get_usage() / 1024 / 1024, 2) . 'M / PEAK - ' . round(memory_get_peak_usage() / 1024 / 1024, 2) . 'M' . PHP_EOL;
+        if (getenv('DEBUG')) {
+            print 'MEMORY USAGE = ' . round(memory_get_usage() / 1024 / 1024, 2) . 'M | PEAK = ' . round(memory_get_peak_usage() / 1024 / 1024, 2) . 'M' . PHP_EOL;
         }
     }
 }

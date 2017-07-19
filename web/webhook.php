@@ -9,12 +9,21 @@
  */
 
 /**
+ * Define root path
+*/
+define("ROOT_PATH", realpath(dirname(__DIR__)));
+
+/**
  * @var Composer\Autoload\ClassLoader
  */
 $loader = require __DIR__ . ' /../vendor/autoload.php';
 
 //We do not want to unnecessarily run the bot when this is not a web hook request
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
-    $app = new Bot();
-    $app->run();
+    try {
+        $app = new Bot\Kernel();
+        $app->run();
+    } catch (\Throwable $e) {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+    }
 }
