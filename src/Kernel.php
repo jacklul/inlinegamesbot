@@ -400,7 +400,7 @@ class Kernel
                     $sleep_time_this = $next_run;
                 }
 
-                print 'Next scheduled run in ' . $next_run . ' seconds, sleeping for ' . $sleep_time_this . ' seconds... ' . PHP_EOL;
+                print 'Next run in ' . $next_run . ' seconds, sleeping for ' . $sleep_time_this . ' seconds...' . PHP_EOL;
 
                 if (function_exists('gc_collect_cycles')) {
                     gc_collect_cycles();
@@ -411,7 +411,7 @@ class Kernel
                 continue;
             }
 
-            print 'Running scheduled commands...' . PHP_EOL;
+            print 'Running...' . PHP_EOL;
 
             $last_run = time();
 
