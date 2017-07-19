@@ -43,6 +43,7 @@ class ReportCommand extends AdminCommand
         }
 
         $chat_id = $message->getFrom()->getId();
+        $bot_id = $this->getTelegram()->getBotId();
         $dirsToSend = $this->getConfig('dirs_to_report');
 
         if (empty(getenv('BOT_ADMIN'))) {
@@ -54,7 +55,9 @@ class ReportCommand extends AdminCommand
             throw new BotException('Config variable \'dirs_to_report\' must be an array!');
         }
 
-        Request::sendChatAction(['chat_id' => $chat_id, 'action' => 'typing']);
+        if ($chat_id != $bot_id) {
+            Request::sendChatAction(['chat_id' => $chat_id, 'action' => 'typing']);
+        }
 
         $filesToSend = [];
 
@@ -81,18 +84,25 @@ class ReportCommand extends AdminCommand
         $bot_id = $this->getTelegram()->getBotId();
 
         if (!empty($filesToSend)) {
-            foreach ($this->getTelegram()->getAdminList() as $admin) {
-                if ($admin != $bot_id) {
-                    foreach ($filesToSend as $file) {
+            foreach ($filesToSend as $file) {
+                if (defined("STDIN")) {
+                    print 'Sending \'' . basename($file) . '\' to admins...' . PHP_EOL;
+                }
+
+                foreach ($this->getTelegram()->getAdminList() as $admin) {
+                    if ($admin != $bot_id) {
+
                         Debug::log('Sending to ' . $admin);
 
                         if (!empty($alreadySent[$file])) {
-                            $data_admin = [
-                                'chat_id' => $admin,
-                                'document' => $alreadySent[$file]
-                            ];
+                            if (!$alreadySent[$file]) {
+                                $data_admin = [
+                                    'chat_id' => $admin,
+                                    'document' => $alreadySent[$file]
+                                ];
 
-                            $log['result'] = Request::sendDocument($data_admin);
+                                $log['result'] = Request::sendDocument($data_admin);
+                            }
                         } else {
                             if (filesize($file) < 50000000) {
                                 $data_admin = [
@@ -108,9 +118,10 @@ class ReportCommand extends AdminCommand
                                 }
                             } else {
                                 $sendFailed = true;
+                                $alreadySent[$file] = false;
                                 $data_admin = [
                                     'chat_id' => $admin,
-                                    'text' => 'File \'' . $file . '\' cannot be sent because it exceeds 50MB size limit!'
+                                    'text' => 'File \'' . $file . '\' couldn\'t be sent because it exceeds 50MB size limit!'
                                 ];
 
                                 Request::sendMessage($data_admin);
@@ -137,7 +148,9 @@ class ReportCommand extends AdminCommand
                 $data['text'] = 'Nothing to report!';
             }
 
-            return Request::sendMessage($data);
+            if ($chat_id != $bot_id) {
+                return Request::sendMessage($data);
+            }
         }
 
         return Request::emptyResponse();

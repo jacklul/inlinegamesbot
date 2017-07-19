@@ -71,7 +71,7 @@ class CleanCommand extends AdminCommand
             $inactive = $storage::listFromStorage($cleanInterval);
         }
 
-        if (is_array($inactive)) {
+        if (is_array($inactive) && count($inactive) > 0) {
             $chat_action_start = 0;
             $last_request_time = 0;
             $timelimit = ini_get('max_execution_time') > 0 ?: 60;
@@ -80,7 +80,7 @@ class CleanCommand extends AdminCommand
             $data['text'] = 'Cleaning games older than ' . $cleanInterval . ' seconds... (time limit: ' . $timelimit . ' seconds)';
             if ($chat_id != $bot_id) {
                 Request::sendMessage($data);
-            } else {
+            } elseif (defined("STDIN")) {
                 print $data['text'] . PHP_EOL;
             }
 
@@ -94,14 +94,12 @@ class CleanCommand extends AdminCommand
                     break;
                 }
 
-                if ($chat_id !== $bot_id && $chat_action_start < strtotime('-5 seconds')) {
+                if ($chat_id != $bot_id && $chat_action_start < strtotime('-5 seconds')) {
                     Request::sendChatAction(['chat_id' => $chat_id, 'action' => 'typing']);
                     $chat_action_start = time();
                 }
 
-                Debug::log('Cleaning: ' . $inactive_game['id']);
-
-                if ($chat_id == $bot_id) {
+                if (defined("STDIN") && $chat_id == $bot_id) {
                     print 'Cleaning: ' . $inactive_game['id'] . PHP_EOL;
                 }
 
@@ -145,16 +143,19 @@ class CleanCommand extends AdminCommand
             }
 
             $data['text'] = 'Cleaned ' . $cleaned . ' games (edited ' . $edited . ' messages, ' . $error . ' errored).';
+
+            if (defined("STDIN")) {
+                print $data['text'] . PHP_EOL;
+            }
         } else {
-            $data['text'] = 'Database error!';
+            $data['text'] = 'Nothing to clean!';
         }
 
         if ($chat_id != $bot_id) {
             return Request::sendMessage($data);
-        } else {
-            print $data['text'] . PHP_EOL;
-            return Request::emptyResponse();
         }
+
+        return Request::emptyResponse();
     }
 
     /**
