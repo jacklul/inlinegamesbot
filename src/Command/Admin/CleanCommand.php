@@ -77,9 +77,11 @@ class CleanCommand extends AdminCommand
             $timelimit = ini_get('max_execution_time') > 0 ?: 60;
             $start_time = time();
 
-            if ($chat_id !== $bot_id) {
-                $data['text'] = 'Executing... (time limit: ' . $timelimit . ' seconds)';
+            $data['text'] = 'Cleaning games older than ' . $cleanInterval . ' seconds... (time limit: ' . $timelimit . ' seconds)';
+            if ($chat_id != $bot_id) {
                 Request::sendMessage($data);
+            } else {
+                print $data['text'] . PHP_EOL;
             }
 
             $cleaned = 0;
@@ -99,7 +101,7 @@ class CleanCommand extends AdminCommand
 
                 Debug::log('Cleaning: ' . $inactive_game['id']);
 
-                if (!getenv('DEBUG')) {
+                if ($chat_id == $bot_id) {
                     print 'Cleaning: ' . $inactive_game['id'] . PHP_EOL;
                 }
 
@@ -147,7 +149,7 @@ class CleanCommand extends AdminCommand
             $data['text'] = 'Database error!';
         }
 
-        if ($chat_id !== $bot_id) {
+        if ($chat_id != $bot_id) {
             return Request::sendMessage($data);
         } else {
             print $data['text'] . PHP_EOL;
