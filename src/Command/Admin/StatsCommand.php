@@ -54,11 +54,13 @@ class StatsCommand extends AdminCommand
         $storage::initializeStorage();
 
         $active = $storage::listFromStorage((time() - strtotime('-5 minutes')) * -1);
+        $all = $storage::listFromStorage(0);
 
         $data = [];
         $data['chat_id'] = $chat_id;
-        $data['text'] = 'Stats: (5 minutes)' . PHP_EOL . ' Active games: ' . count($active);
+        $data['text'] = '*Stats:*' . PHP_EOL . ' All games: ' . count($all) . PHP_EOL . ' Active (5 minutes): ' . count($active);
         $data['reply_markup'] = $this->createInlineKeyboard();
+        $data['parse_mode'] = 'Markdown';
 
         if ($message) {
             return Request::sendMessage($data);
