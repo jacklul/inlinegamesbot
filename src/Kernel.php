@@ -417,7 +417,9 @@ class Kernel
 
             $this->handleCron();
 
-            print 'Finished, memory usage: ' . round(memory_get_usage() / 1024 / 1024, 2) . 'M, peak: ' . round(memory_get_peak_usage() / 1024 / 1024, 2) . 'M.' . PHP_EOL;
+            print 'Finished!' . PHP_EOL;
+
+            Debug::memoryUsage();
         }
     }
 
