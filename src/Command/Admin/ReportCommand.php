@@ -91,7 +91,6 @@ class ReportCommand extends AdminCommand
 
                 foreach ($this->getTelegram()->getAdminList() as $admin) {
                     if ($admin != $bot_id) {
-
                         Debug::log('Sending to ' . $admin);
 
                         if (!empty($alreadySent[$file])) {

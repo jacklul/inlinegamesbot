@@ -118,7 +118,7 @@ class Kernel
                 $this->initialize();
             }
 
-            switch($this->arg) {
+            switch ($this->arg) {
                 default:
                 case 'handle':
                     $this->handleWebhook();
@@ -353,7 +353,7 @@ class Kernel
      */
     private function handleLongPolling(): void
     {
-        while(true) {
+        while (true) {
             set_time_limit(0);
 
             $server_response = $this->telegram->handleGetUpdates();
