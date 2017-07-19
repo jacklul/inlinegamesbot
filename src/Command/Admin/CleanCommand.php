@@ -71,13 +71,15 @@ class CleanCommand extends AdminCommand
             $inactive = $storage::listFromStorage($cleanInterval);
         }
 
+
         if (is_array($inactive) && count($inactive) > 0) {
             $chat_action_start = 0;
             $last_request_time = 0;
             $timelimit = ini_get('max_execution_time') > 0 ?: 60;
             $start_time = time();
 
-            $data['text'] = 'Cleaning games older than ' . $cleanInterval . ' seconds... (time limit: ' . $timelimit . ' seconds)';
+            $data['text'] = 'Cleaning games older than ' . gmdate("H\h i\m s\s", $cleanInterval) . '... (time limit: ' . $timelimit . ' seconds)';
+
             if ($chat_id != $bot_id) {
                 Request::sendMessage($data);
             } elseif (defined("STDIN")) {
