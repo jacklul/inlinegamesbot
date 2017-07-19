@@ -176,7 +176,7 @@ class Kernel
             $this->telegram->enableAdmins($this->config['admins']);
         }
 
-        if (isset($this->config['mysql']['host'])) {
+        if (isset($this->config['mysql']['host']) && !empty($this->config['mysql']['host'])) {
             $this->telegram->enableMySql($this->config['mysql']);
         }
 
