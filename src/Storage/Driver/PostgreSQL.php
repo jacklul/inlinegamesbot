@@ -126,10 +126,12 @@ class PostgreSQL
         }
 
         try {
-            $sth = self::$pdo->prepare('
+            $sth = self::$pdo->prepare(
+                '
                 SELECT * FROM ' . TB_STORAGE . '
                 WHERE id = :id
-            ');
+            '
+            );
 
             $sth->bindParam(':id', $id, PDO::PARAM_STR);
 
@@ -168,7 +170,8 @@ class PostgreSQL
         }
 
         try {
-            $sth = self::$pdo->prepare('
+            $sth = self::$pdo->prepare(
+                '
                 INSERT INTO ' . TB_STORAGE . '
                 (id, data, created_at, updated_at)
                 VALUES
@@ -176,7 +179,8 @@ class PostgreSQL
                 ON CONFLICT (id) DO UPDATE
                   SET   data       = :data,
                         updated_at = :date
-            ');
+            '
+            );
 
             $data = json_encode($data);
             $date = date('Y-m-d H:i:s', time());
@@ -210,10 +214,12 @@ class PostgreSQL
         }
 
         try {
-            $sth = self::$pdo->prepare('
+            $sth = self::$pdo->prepare(
+                '
                 DELETE FROM ' . TB_STORAGE . '
                 WHERE id = :id
-            ');
+            '
+            );
 
             $sth->bindParam(':id', $id, PDO::PARAM_STR);
 
@@ -294,11 +300,13 @@ class PostgreSQL
         }
 
         try {
-            $sth = self::$pdo->prepare('
+            $sth = self::$pdo->prepare(
+                '
                 SELECT * FROM ' . TB_STORAGE . '
                 WHERE updated_at ' . $compare_sign . ' :date
                 ORDER BY updated_at ASC
-            ');
+            '
+            );
 
             $date = date('Y-m-d H:i:s', strtotime('-' . abs($time) . ' seconds'));
 

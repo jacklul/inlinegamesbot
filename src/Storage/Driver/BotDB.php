@@ -89,10 +89,7 @@ class BotDB extends DB
         }
 
         try {
-            $sth = self::$pdo->prepare('
-                SELECT * FROM `' . TB_STORAGE . '`
-                WHERE `id` = :id
-            ');
+            $sth = self::$pdo->prepare('SELECT * FROM `' . TB_STORAGE . '` WHERE `id` = :id');
 
             $sth->bindParam(':id', $id, PDO::PARAM_STR);
 
@@ -131,15 +128,16 @@ class BotDB extends DB
         }
 
         try {
-            $sth = self::$pdo->prepare('
-                INSERT INTO `' . TB_STORAGE . '`
-                (`id`, `data`, `created_at`, `updated_at`)
+            $sth = self::$pdo->prepare(
+                '
+                INSERT INTO `' . TB_STORAGE . '` (`id`, `data`, `created_at`, `updated_at`)
                 VALUES
                 (:id, :data, :date, :date)
                 ON DUPLICATE KEY UPDATE
                     `data`       = VALUES(`data`),
                     `updated_at` = VALUES(`updated_at`)
-            ');
+            '
+            );
 
             $data = json_encode($data);
             $date = self::getTimestamp();
@@ -173,10 +171,12 @@ class BotDB extends DB
         }
 
         try {
-            $sth = self::$pdo->prepare('
+            $sth = self::$pdo->prepare(
+                '
                 DELETE FROM `' . TB_STORAGE . '`
                 WHERE `id` = :id
-            ');
+            '
+            );
 
             $sth->bindParam(':id', $id, PDO::PARAM_STR);
 
@@ -251,11 +251,13 @@ class BotDB extends DB
         }
 
         try {
-            $sth = self::$pdo->prepare('
+            $sth = self::$pdo->prepare(
+                '
                 SELECT * FROM `' . TB_STORAGE . '`
                 WHERE `updated_at` ' . $compare_sign . ' :date
                 ORDER BY `updated_at` ASC
-            ');
+            '
+            );
 
             $date = self::getTimestamp(strtotime('-' . abs($time) . ' seconds'));
 
