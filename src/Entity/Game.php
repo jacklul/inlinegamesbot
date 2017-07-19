@@ -439,9 +439,7 @@ class Game
             return $this->answerCallbackQuery();
         }
 
-        if (!isset($this->data['data'])) {
-            $this->data['data'] = [];
-        }
+        $this->data['data'] = [];
 
         Debug::log($this->getCurrentUserMention());
 
