@@ -53,8 +53,8 @@ class StatsCommand extends AdminCommand
         $storage = Driver::getStorageClass();
         $storage::initializeStorage();
 
-        $active = $storage::listFromStorage((time() - strtotime('-5 minutes')) * -1);
-        $all = $storage::listFromStorage(0);
+        $active = $storage::listFromGame((time() - strtotime('-5 minutes')) * -1);
+        $all = $storage::listFromGame(0);
 
         $data = [];
         $data['chat_id'] = $chat_id;
@@ -62,7 +62,7 @@ class StatsCommand extends AdminCommand
         $data['reply_markup'] = $this->createInlineKeyboard();
         $data['parse_mode'] = 'Markdown';
 
-        if ($message) {
+            if ($message) {
             return Request::sendMessage($data);
         } elseif ($callback_query) {
             $data['message_id'] = $callback_query->getMessage()->getMessageId();
