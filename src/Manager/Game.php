@@ -14,6 +14,7 @@ use Bot\Entity\Game as GameEntity;
 use Bot\Exception\BotException;
 use Bot\Helper\Botan;
 use Bot\Helper\Debug;
+use Bot\Helper\Language;
 use Bot\Storage\Driver;
 use Longman\TelegramBot\Commands\Command;
 use Longman\TelegramBot\Entities\ServerResponse;
@@ -205,6 +206,8 @@ class Game
         }
 
         Debug::print('GAME HANDLED');
+
+        Language::set(Language::getDefaultLanguage());      // fix for getUpdates
 
         return $result;
     }

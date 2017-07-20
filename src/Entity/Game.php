@@ -11,15 +11,15 @@
 namespace Bot\Entity;
 
 use Bot\Exception\BotException;
-use Longman\TelegramBot\TelegramLog;
+use Bot\Helper\Debug;
 use Bot\Helper\Language;
 use Bot\Manager\Game as GameManager;
-use Bot\Helper\Debug;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Entities\User;
 use Longman\TelegramBot\Request;
+use Longman\TelegramBot\TelegramLog;
 
 /**
  * Class Game

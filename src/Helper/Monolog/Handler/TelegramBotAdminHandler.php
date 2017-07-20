@@ -13,8 +13,8 @@ namespace Bot\Helper\Monolog\Handler;
 use Bot\Helper\Debug;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
-use Monolog\Logger;
 use Monolog\Handler\AbstractProcessingHandler;
+use Monolog\Logger;
 
 /**
  * Class TelegramBotAdminHandler

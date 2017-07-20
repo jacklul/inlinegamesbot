@@ -11,7 +11,7 @@
 
 use Bot\Bot;
 
- /**
+/**
  * Define root path
  */
 define("ROOT_PATH", realpath(dirname(__DIR__)));

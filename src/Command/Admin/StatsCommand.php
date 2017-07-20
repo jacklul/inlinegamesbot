@@ -15,7 +15,6 @@ use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Request;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
 /**
  * Class StatsCommand
