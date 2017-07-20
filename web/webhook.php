@@ -21,13 +21,11 @@ define("ROOT_PATH", realpath(dirname(__DIR__)));
 $loader = include __DIR__ . ' /../vendor/autoload.php';
 
 //We do not want to unnecessarily run the bot when this is not a web hook request
-if (!isset($_SERVER['REQUEST_METHOD']) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: /');
-}
-
-try {
-    $app = new Bot();
-    $app->run();
-} catch (\Throwable $e) {
-    header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $app = new Bot();
+        $app->run();
+    } catch (\Throwable $e) {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+    }
 }
