@@ -72,7 +72,7 @@ class Game
      */
     public function handleAction($action)
     {
-        if (!$this->data) {
+        if (!$this->data && !is_array($this->data)) {
             return $this->returnStorageFailure();
         }
 
