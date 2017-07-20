@@ -81,7 +81,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
         // Do not send already reported error messages for 1 day
         if (isset($previous_reports) && is_array($previous_reports)) {
             foreach ($previous_reports as $previous_report) {
-                if ($previous_report['message'] ===  $record['message'] && $previous_report['time'] + 86400 >= $record['datetime']->format('U')) {
+                if ($previous_report['message'] ===  $record['message'] && $previous_report['time'] + 86400 > $record['datetime']->format('U')) {
                     Debug::print('Log report prevented because the message is a duplicate of the previous report');
                     return false;
                 }
@@ -90,23 +90,30 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
             $previous_reports = [];
         }
 
+        $success = false;
         foreach ($this->telegram->getAdminList() as $admin) {
             if ($admin != $this->bot_id) {
-                Request::sendMessage([
+                $result = Request::sendMessage([
                     'chat_id' => $admin,
                     'text' => '<b>' . $record['level_name'] . ' (' . $record['datetime']->format('H:i:s d-m-Y') . ')</b>' . PHP_EOL . '<code>' . htmlentities($record['message']) . '</code>',
                     'parse_mode' => 'HTML',
                 ]);
+
+                if ($result->isOk()) {
+                    $success = true;
+                }
             }
         }
 
-        array_push($previous_reports, ['message' => $record['message'], 'time' => $record['datetime']->format('U')]);
+        if ($success) {
+            array_push($previous_reports, ['message' => $record['message'], 'time' => $record['datetime']->format('U')]);
 
-        while (count($previous_reports) > 10) {
-            array_shift($previous_reports);
+            while (count($previous_reports) > 100) {
+                array_shift($previous_reports);
+            }
+
+            file_put_contents($cached_error_file, json_encode($previous_reports));
         }
-
-        file_put_contents($cached_error_file, json_encode($previous_reports));
 
         $this->last_timestamp = time();
 
