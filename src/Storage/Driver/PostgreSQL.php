@@ -38,7 +38,7 @@ class PostgreSQL
      * @var string
      */
     private static $structure = 'CREATE TABLE IF NOT EXISTS storage (
-        id CHAR(100),
+        id CHAR(255),
         data TEXT NOT NULL,
         created_at timestamp NULL DEFAULT NULL,
         updated_at timestamp NULL DEFAULT NULL,

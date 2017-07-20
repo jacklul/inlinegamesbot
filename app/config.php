@@ -31,7 +31,7 @@ $config = [
                 ]
             ],
             'clean' => [
-                'clean_interval' => 21600,
+                'clean_interval' => 10800,
             ],
         ],
     ],
