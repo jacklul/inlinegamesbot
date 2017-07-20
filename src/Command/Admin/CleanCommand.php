@@ -100,6 +100,8 @@ class CleanCommand extends AdminCommand
                     $chat_action_start = time();
                 }
 
+                $inactive_game['id'] = trim($inactive_game['id']);
+
                 if (defined("STDIN") && $chat_id == $bot_id) {
                     print 'Cleaning: \'' . $inactive_game['id'] . '\'' . PHP_EOL;
                 }
@@ -117,7 +119,7 @@ class CleanCommand extends AdminCommand
 
                         $result = Request::editMessageText(
                             [
-                                'inline_message_id' => trim($game->getId()),
+                                'inline_message_id' => $inactive_game['id'],
                                 'text' => '<b>' . $game->getGame()::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __("This game session has expired.") . '</i>',
                                 'reply_markup' => $this->createInlineKeyboard($game_data['game_code']),
                                 'parse_mode' => 'HTML',
