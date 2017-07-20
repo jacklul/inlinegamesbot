@@ -19,6 +19,10 @@ use Longman\TelegramBot\Request;
 /**
  * Class StatsCommand
  *
+ * @TODO number of sessions per game
+ * @TODO fancy layout
+ * @TODO use only one query
+ *
  * @package Longman\TelegramBot\Commands\AdminCommands
  */
 class StatsCommand extends AdminCommand
