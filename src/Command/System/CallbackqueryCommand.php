@@ -39,7 +39,7 @@ class CallbackqueryCommand extends SystemCommand
         $callback_query = $this->getUpdate()->getCallbackQuery();
         $data = $callback_query->getData();
 
-        Debug::log('Data: ' . $data);
+        Debug::print('Data: ' . $data);
 
         $command = explode(';', $data)[0];
 

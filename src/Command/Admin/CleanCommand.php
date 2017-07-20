@@ -64,93 +64,93 @@ class CleanCommand extends AdminCommand
         }
 
         $storage = Driver::getStorageClass();
-        $storage::initializeStorage();
 
-        $inactive = [];
         if (class_exists($storage)) {
-            $inactive = $storage::listFromStorage($cleanInterval);
-        }
+            $storage::initializeStorage();
+            $inactive = $storage::listFromGame($cleanInterval);
 
+            if (is_array($inactive) && count($inactive) > 0) {
+                $chat_action_start = 0;
+                $last_request_time = 0;
+                $timelimit = ini_get('max_execution_time') > 0 ?: 60;
+                $start_time = time();
 
-        if (is_array($inactive) && count($inactive) > 0) {
-            $chat_action_start = 0;
-            $last_request_time = 0;
-            $timelimit = ini_get('max_execution_time') > 0 ?: 60;
-            $start_time = time();
+                $data['text'] = 'Cleaning games older than ' . gmdate("H\h i\m s\s", $cleanInterval) . '... (time limit: ' . $timelimit . ' seconds)';
 
-            $data['text'] = 'Cleaning games older than ' . gmdate("H\h i\m s\s", $cleanInterval) . '... (time limit: ' . $timelimit . ' seconds)';
-
-            if ($chat_id != $bot_id) {
-                Request::sendMessage($data);
-            } elseif (defined("STDIN")) {
-                print $data['text'] . PHP_EOL;
-            }
-
-            $cleaned = 0;
-            $edited = 0;
-
-            foreach ($inactive as $inactive_game) {
-                if (time() >= $start_time + $timelimit - 1) {
-                    Debug::log('Time limit reached!');
-                    break;
+                if ($chat_id != $bot_id) {
+                    Request::sendMessage($data);
+                } elseif (defined("STDIN")) {
+                    print $data['text'] . PHP_EOL;
                 }
 
-                if ($chat_id != $bot_id && $chat_action_start < strtotime('-5 seconds')) {
-                    Request::sendChatAction(['chat_id' => $chat_id, 'action' => 'typing']);
-                    $chat_action_start = time();
-                }
+                $cleaned = 0;
+                $edited = 0;
 
-                $inactive_game['id'] = trim($inactive_game['id']);
+                foreach ($inactive as $inactive_game) {
+                    if (time() >= $start_time + $timelimit - 1) {
+                        Debug::print('Time limit reached!');
+                        break;
+                    }
 
-                if (defined("STDIN") && $chat_id == $bot_id) {
-                    print 'Cleaning: \'' . $inactive_game['id'] . '\'' . PHP_EOL;
-                }
+                    if ($chat_id != $bot_id && $chat_action_start < strtotime('-5 seconds')) {
+                        Request::sendChatAction(['chat_id' => $chat_id, 'action' => 'typing']);
+                        $chat_action_start = time();
+                    }
 
-                $game_data = $storage::selectFromStorage($inactive_game['id']);
+                    $inactive_game['id'] = trim($inactive_game['id']);
 
-                if (isset($game_data['game_code'])) {
-                    $game = new Game($inactive_game['id'], $game_data['game_code'], $this);
+                    if (defined("STDIN") && $chat_id == $bot_id) {
+                        print 'Cleaning: \'' . $inactive_game['id'] . '\'' . PHP_EOL;
+                    }
 
-                    if ($game->canRun()) {
-                        while (time() <= $last_request_time) {
-                            Debug::log('Delaying next request');
-                            sleep(1);
+                    $game_data = $storage::selectFromGame($inactive_game['id']);
+
+                    if (isset($game_data['game_code'])) {
+                        $game = new Game($inactive_game['id'], $game_data['game_code'], $this);
+
+                        if ($game->canRun()) {
+                            while (time() <= $last_request_time) {
+                                Debug::print('Delaying next request');
+                                sleep(1);
+                            }
+
+                            $result = Request::editMessageText(
+                                [
+                                    'inline_message_id' => $inactive_game['id'],
+                                    'text' => '<b>' . $game->getGame()::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __("This game session has expired.") . '</i>',
+                                    'reply_markup' => $this->createInlineKeyboard($game_data['game_code']),
+                                    'parse_mode' => 'HTML',
+                                    'disable_web_page_preview' => true,
+                                ]
+                            );
+
+                            $last_request_time = time();
+
+                            if (isset($result) && $result->isOk()) {
+                                $edited++;
+                                Debug::print('Message edited successfully');
+                            } else {
+                                Debug::print('Failed to edit message: ' . (isset($result) ? $result->getDescription() : '...'));
+                            }
                         }
+                    }
 
-                        $result = Request::editMessageText(
-                            [
-                                'inline_message_id' => $inactive_game['id'],
-                                'text' => '<b>' . $game->getGame()::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __("This game session has expired.") . '</i>',
-                                'reply_markup' => $this->createInlineKeyboard($game_data['game_code']),
-                                'parse_mode' => 'HTML',
-                                'disable_web_page_preview' => true,
-                            ]
-                        );
-
-                        $last_request_time = time();
-
-                        if (isset($result) && $result->isOk()) {
-                            $edited++;
-                            Debug::log('Message edited successfully');
-                        } else {
-                            Debug::log('Failed to edit message: ' . (isset($result) ? $result->getDescription() : '...'));
-                        }
+                    if ($storage::deleteFromGame($inactive_game['id'])) {
+                        $cleaned++;
+                        Debug::print('Removed record from the database');
                     }
                 }
 
-                if ($storage::deleteFromStorage($inactive_game['id'])) {
-                    $cleaned++;
-                    Debug::log('Removed record from the database');
+                $data['text'] = 'Cleaned ' . $cleaned . ' games (edited ' . $edited . ' messages).';
+
+                if (defined("STDIN")) {
+                    print $data['text'] . PHP_EOL;
                 }
-            }
-
-            $data['text'] = 'Cleaned ' . $cleaned . ' games (edited ' . $edited . ' messages).';
-
-            if (defined("STDIN")) {
-                print $data['text'] . PHP_EOL;
+            } else {
+                $data['text'] = 'Nothing to clean!';
             }
         } else {
-            $data['text'] = 'Nothing to clean!';
+            $data['text'] = 'Error!';
         }
 
         if ($chat_id != $bot_id) {

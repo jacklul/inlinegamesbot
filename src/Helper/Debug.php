@@ -21,22 +21,32 @@ use Longman\TelegramBot\TelegramLog;
 class Debug
 {
     /**
-     * Debug logging to either to TelegramLog's Debug log or console or both
+     * Is this even enabled?
+     *
+     * @var bool
+     */
+    private static $enabled = false;
+
+    /**
+     * Show debug message and (if enabled) write to debug log
      *
      * @param $text
-     * @param null $prefix
+     *
      * @throws BotException
      */
-    public static function log($text, $prefix = null): void
+    public static function print($text): void
     {
-        if ($text === '') {
-            throw new BotException('Text cannot be empty!');
-        }
+        if (self::$enabled) {
+            if ($text === '') {
+                throw new BotException('Text cannot be empty!');
+            }
 
-        if (TelegramLog::isDebugLogActive() || getenv('DEBUG')) {
-            if (!is_null($prefix)) {
-                $prefix = $prefix . ': ';
-            } elseif (!getenv('DEBUG_NO_BACKTRACE')) {
+            if (TelegramLog::isDebugLogActive()) {
+                TelegramLog::debug($text);
+            }
+
+            $prefix = '';
+            if (!getenv('DEBUG_NO_BACKTRACE')) {
                 $backtrace = debug_backtrace();
 
                 if (isset($backtrace[1]['class'])) {
@@ -47,56 +57,17 @@ class Debug
             $message = $prefix . trim($text);
             $message = preg_replace('~[\r\n]+~', PHP_EOL . $prefix, $message);
 
-            if (TelegramLog::isDebugLogActive()) {
-                TelegramLog::debug($message);
-            }
-
-            if (getenv('DEBUG')) {
-                print $message . PHP_EOL;
-            }
+            print $message . PHP_EOL;
         }
     }
 
     /**
-     * Make a debug dump
+     * Enable/disable switch
      *
-     * @param $file_name
-     * @param array $data
-     *
-     * @throws BotException
+     * @param bool $enabled
      */
-    public static function dump($file_name, $data = []): void
+    public static function setEnabled(bool $enabled)
     {
-        if (empty($file_name)) {
-            throw new BotException('File name cannot be empty!');
-        }
-
-        if (!is_dir(VAR_PATH . '/crashdumps/')) {
-            mkdir(VAR_PATH . '/crashdumps/', 0755, true);
-        }
-
-        $output = '';
-
-        $data['Backtrace'] = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT);
-
-        foreach ($data as $var => $val) {
-            $output .= $var . ':' . PHP_EOL . (is_array($val) ? print_r($val, true) : (is_bool($val) ? ($val ? 'true' : 'false') : $val)) . PHP_EOL . PHP_EOL;
-        }
-
-        $crashdump_file = VAR_PATH . '/crashdumps/' . $file_name . '_' . date('y-m-d_H-i-s') . '.txt';
-        print 'Creating crash dump: ' . $crashdump_file;
-        file_put_contents($crashdump_file, $output);
-    }
-
-    /**
-     * Memory usage checker
-     *
-     * @throws BotException
-     */
-    public static function memoryUsage(): void
-    {
-        if (getenv('DEBUG')) {
-            print 'MEMORY USAGE = ' . round(memory_get_usage() / 1024 / 1024, 2) . 'M | PEAK = ' . round(memory_get_peak_usage() / 1024 / 1024, 2) . 'M' . PHP_EOL;
-        }
+        self::$enabled = $enabled;
     }
 }

@@ -28,7 +28,7 @@ class ChoseninlineresultCommand extends SystemCommand
     {
         $chosen_inline_result = $this->getUpdate()->getChosenInlineResult();
 
-        Debug::log('Data: ' . $chosen_inline_result->getResultId());
+        Debug::print('Data: ' . $chosen_inline_result->getResultId());
 
         $game = new Game($chosen_inline_result->getInlineMessageId(), $chosen_inline_result->getResultId(), $this);
 

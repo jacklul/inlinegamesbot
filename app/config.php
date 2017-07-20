@@ -24,14 +24,8 @@ $config = [
             SRC_PATH . '/Command',
         ],
         'configs' => [
-            'report' => [
-                'dirs_to_report' => [
-                    VAR_PATH . '/logs',
-                    VAR_PATH . '/crashdumps'
-                ]
-            ],
             'clean' => [
-                'clean_interval' => 10800,
+                'clean_interval' => 3600,
             ],
         ],
     ],
@@ -51,9 +45,6 @@ $config = [
         'password' => getenv('DB_PASS'),
         'database' => getenv('DB_NAME'),
     ],
-    'logging' => [
-        'error'  => VAR_PATH . '/logs/Error.log',
-    ],
     'validate_request' => true,
     'valid_ips' => [
         '149.154.167.197-149.154.167.233',
@@ -67,7 +58,6 @@ $config = [
     'cron' => [
         'groups' => [
             'default' => [
-                '/report',
                 '/clean',
             ],
         ],

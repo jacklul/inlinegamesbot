@@ -12,19 +12,20 @@ namespace Bot;
 
 use Bot\Exception\BotException;
 use Bot\Helper\Debug;
+use Bot\Helper\Monolog\Handler\TelegramBotAdminHandler;
+use Bot\Storage\Driver;
 use Dotenv\Dotenv;
 use Gettext\Translator;
+use Monolog\Logger;
 use Longman\IPTools\Ip;
-use Longman\TelegramBot\Exception\TelegramException;
-use Longman\TelegramBot\Exception\TelegramLogException;
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
 use Longman\TelegramBot\Request;
 
 /**
- * Class Kernel
+ * Class Bot
  */
-class Kernel
+class Bot
 {
     /**
      * Argument passed
@@ -83,22 +84,6 @@ class Kernel
             throw new BotException('Couldn\'t load configuration!');
         }
 
-        try {
-            if (isset($config['logging']['error'])) {
-                TelegramLog::initErrorLog($this->config['logging']['error']);
-            }
-
-            if (isset($this->config['logging']['debug'])) {
-                TelegramLog::initDebugLog($this->config['logging']['debug']);
-            }
-
-            if (isset($this->config['logging']['update'])) {
-                TelegramLog::initUpdateLog($this->config['logging']['update']);
-            }
-        } catch (TelegramLogException $e) {
-            throw new BotException($e->getMessage());
-        }
-
         if (isset($_SERVER['argv'][1])) {
             $this->arg = strtolower(trim($_SERVER['argv'][1]));
         } elseif (isset($_GET['a']) && $_GET['a'] === 'handle') {   // from webspace allow only handling webhook
@@ -141,21 +126,13 @@ class Kernel
                 case 'worker':
                     $this->handleWorker();
                     break;
+                case 'install':
+                    $this->handleInstall();
+                    break;
             }
-        } catch (TelegramException $e) {
-            TelegramLog::error($e);
-        } catch (BotException $e) {
-            TelegramLog::error($e);
-        } catch (\Exception $e) {
-            TelegramLog::error($e);
         } catch (\Throwable $e) {
             TelegramLog::error($e);
-        } catch (\Error $e) {
-            TelegramLog::error($e);
-        } finally {
-            if (isset($e)) {
-                throw new BotException($e->getMessage());
-            }
+            throw $e;
         }
     }
 
@@ -164,16 +141,37 @@ class Kernel
      */
     private function initialize(): void
     {
-        Debug::log('DEBUG MODE');
+        Debug::print('DEBUG MODE');
 
         $this->telegram = new Telegram($this->config['api_key'], $this->config['bot_username']);
 
-        if (isset($this->config['commands']['paths'])) {
-            $this->telegram->addCommandsPaths($this->config['commands']['paths']);
-        }
-
         if (isset($this->config['admins']) && !empty($this->config['admins'][0])) {
             $this->telegram->enableAdmins($this->config['admins']);
+
+            $monolog = new Logger($this->config['bot_username']);
+            $monolog->pushHandler(new TelegramBotAdminHandler($this->telegram, Logger::ERROR));
+
+            if (getenv('DEBUG')) {
+                Debug::setEnabled(true);
+            }
+
+            TelegramLog::initialize($monolog);
+        }
+
+        if (isset($config['logging']['error'])) {
+            TelegramLog::initErrorLog($this->config['logging']['error']);
+        }
+
+        if (isset($this->config['logging']['debug'])) {
+            TelegramLog::initDebugLog($this->config['logging']['debug']);
+        }
+
+        if (isset($this->config['logging']['update'])) {
+            TelegramLog::initUpdateLog($this->config['logging']['update']);
+        }
+
+        if (isset($this->config['commands']['paths'])) {
+            $this->telegram->addCommandsPaths($this->config['commands']['paths']);
         }
 
         if (isset($this->config['mysql']['host']) && !empty($this->config['mysql']['host'])) {
@@ -250,8 +248,6 @@ class Kernel
         if ($this->validateRequest()) {
             $this->telegram->handle();
         }
-
-        $this->runAfterWebhook();
     }
 
     /**
@@ -360,11 +356,12 @@ class Kernel
 
             if ($server_response->isOk()) {
                 $update_count = count($server_response->getResult());
-                echo ($update_count === 0) ? "\r" : '';
-                echo date('Y-m-d H:i:s', time()) . ' - Processed ' . $update_count . ' updates!';
-                echo ($update_count > 0) ? PHP_EOL : '';
+
+                if ($update_count > 0) {
+                    echo '[' . date('Y-m-d H:i:s', time()) . '] Processed ' . $update_count . ' updates!' . PHP_EOL;
+                }
             } else {
-                echo date('Y-m-d H:i:s', time()) . ' - Failed to process updates!' . PHP_EOL;
+                echo '[' . date('Y-m-d H:i:s', time()) . '] Failed to process updates!' . PHP_EOL;
                 echo $server_response->printError() . PHP_EOL;
             }
 
@@ -418,39 +415,20 @@ class Kernel
             $this->handleCron();
 
             print 'Finished!' . PHP_EOL;
-
-            Debug::memoryUsage();
         }
     }
 
     /**
-     * A task to run after handling webhook
+     * Handle installing database structure
      */
-    private function runAfterWebhook()
+    private function handleInstall()
     {
-        $cron_check_file = VAR_PATH . '/reporter';
+        print 'Installing database structure...' . PHP_EOL;
 
-        if (!file_exists($cron_check_file) || filemtime($cron_check_file) < strtotime('-1 minutes')) {
-            if (flock(fopen($cron_check_file, "a+"), LOCK_EX)) {
-                touch($cron_check_file);
-
-                $command = $this->config['cron']['groups']['default'][0];
-
-                Debug::log('Running ' . $command . ' command!');
-
-                $this->telegram->runCommands([$command]);
-
-                // Remove temporary files
-                if (is_dir($dir = VAR_PATH . '/tmp')) {
-                    foreach (new \DirectoryIterator($dir) as $file) {
-                        if (!$file->isDir() && !$file->isDot() && $file->getMTime() < strtotime('-1 minutes')) {
-                            @unlink($dir . '/' . $file->getFilename());
-                        }
-                    }
-                }
-
-                Debug::memoryUsage();
-            }
+        if (Driver::getStorageClass()::createStructure()) {
+            print 'Installed!' . PHP_EOL;
+        } else {
+            print 'Error!' . PHP_EOL;
         }
     }
 }

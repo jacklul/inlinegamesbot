@@ -63,7 +63,7 @@ class Game
     private $telegram;
 
     /**
-     * Game Manager constructor.
+     * Game Manager constructor
      *
      * @param $id
      * @param $game_code
@@ -81,8 +81,7 @@ class Game
             throw new BotException('Game code is empty!');
         }
 
-        Debug::log('ID: ' .  $id);
-        Debug::memoryUsage();
+        Debug::print('ID: ' .  $id);
 
         $this->id = $id;
         $this->update = $command->getUpdate();
@@ -90,22 +89,18 @@ class Game
         $this->storage = Driver::getStorageClass();
 
         if (!$this->storage::initializeStorage()) {
-            Debug::log('Storage initialization failed: \'' . $this->storage . '\'');
+            Debug::print('Storage initialization failed: \'' . $this->storage . '\'');
 
             $this->storage = null;
         }
 
-        Debug::memoryUsage();
-
         if ($game = $this->findGame($game_code)) {
             $this->game = $game;
             $class = get_class($this->game);
-            Debug::log('Game: ' . $class::getTitle());
+            Debug::print('Game: ' . $class::getTitle());
         } else {
-            Debug::log('Game not found!');
+            Debug::print('Game not found!');
         }
-
-        Debug::memoryUsage();
 
         return $this;
     }
@@ -160,7 +155,7 @@ class Game
         $chosen_inline_result = $this->getUpdate()->getChosenInlineResult();
 
         if (!$this->storage) {
-            Debug::log('Storage failure');
+            Debug::print('Storage failure');
 
             if ($callback_query = $this->update->getCallbackQuery()) {
                 return Request::answerCallbackQuery(
@@ -175,8 +170,8 @@ class Game
             return Request::emptyResponse();
         }
 
-        if (!$this->storage::lockStorage($this->id)) {
-            Debug::log('Storage for this game is locked');
+        if (!$this->storage::lockGame($this->id)) {
+            Debug::print('Storage for this game is locked');
 
             if ($callback_query = $this->update->getCallbackQuery()) {
                 return Request::answerCallbackQuery(
@@ -191,27 +186,25 @@ class Game
             return Request::emptyResponse();
         }
 
-        Debug::log('BEGIN HANDLING THE GAME');
-        Debug::memoryUsage();
+        Debug::print('BEGIN HANDLING THE GAME');
 
         if ($callback_query) {
             $result = $this->game->handleAction(explode(';', $callback_query->getData())[1]);
 
-            $this->storage::unlockStorage($this->id);
+            $this->storage::unlockGame($this->id);
 
             Botan::track($this->getUpdate(), $this->getGame()::getTitle());  // track game traffic
         } elseif ($chosen_inline_result) {
             $result =  $this->game->handleAction('new');
 
-            $this->storage::unlockStorage($this->id);
+            $this->storage::unlockGame($this->id);
 
             Botan::track($this->getUpdate(), $this->getGame()::getTitle() . ' (new session)');  // track new game initialized event
         } else {
             throw new BotException('Unknown update received!');
         }
 
-        Debug::log('GAME HANDLED');
-        Debug::memoryUsage();
+        Debug::print('GAME HANDLED');
 
         return $result;
     }
@@ -265,6 +258,6 @@ class Game
     public function saveData($data): bool
     {
         $data['game_code'] = $this->game::getCode();    // make sure we have the game code in the data array for /clean command!
-        return $this->storage::insertToStorage($this->id, $data);
+        return $this->storage::insertToGame($this->id, $data);
     }
 }

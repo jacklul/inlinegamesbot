@@ -14,7 +14,6 @@ use Bot\Entity\Game;
 use Bot\Helper\Debug;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
-use Longman\TelegramBot\TelegramLog;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -189,9 +188,9 @@ class Checkers extends Game
                 ['X', '', 'X', '', '', '', 'O', ''],
             ];
 
-            Debug::log('Game initialization');
+            Debug::print('Game initialization');
         } elseif (!isset($args) && $command === 'game') {
-            Debug::log('No move data received!');
+            Debug::print('No move data received!');
         }
 
         if (empty($data)) {
@@ -214,7 +213,7 @@ class Checkers extends Game
         if ($command === 'game') {
             if ($this->getCurrentUserId() === $this->getUserId($data['settings'][$data['current_turn']])) {
                 if ($data['current_selection'] != '') {
-                    Debug::log('Current selection: ' . $data['current_selection']);
+                    Debug::print('Current selection: ' . $data['current_selection']);
 
                     if ($data['current_selection'] == $args[0] . $args[1]) {
                         if ($data['current_selection_lock'] == false) {
@@ -223,7 +222,7 @@ class Checkers extends Game
                             return $this->answerCallbackQuery(__("You must make a jump when possible!"), true);
                         }
                     } else {
-                        Debug::log('Listing possible moves');
+                        Debug::print('Listing possible moves');
 
                         $possibleMoves = $this->possibleMoves($data['board'], $data['current_selection']);
 
@@ -316,7 +315,7 @@ class Checkers extends Game
             }
         }
 
-        Debug::log('Checking if game is over');
+        Debug::print('Checking if game is over');
 
         $isOver = $this->isGameOver($data['board']);
 
@@ -337,7 +336,7 @@ class Checkers extends Game
             $data['current_turn'] = 'E';
             $data['current_selection'] = '';
 
-            Debug::log('Game ended');
+            Debug::print('Game ended');
         } else {
             $this->selection = $data['current_selection'];
 
@@ -361,7 +360,7 @@ class Checkers extends Game
                 }
             }
 
-            Debug::log('Game is still in progress');
+            Debug::print('Game is still in progress');
         }
 
         if ($this->manager->saveData($this->data)) {
@@ -478,7 +477,7 @@ class Checkers extends Game
                 $table->setRows($board);
                 $table->render();
 
-                Debug::log('CURRENT BOARD:' . PHP_EOL . $output->fetch());
+                Debug::print('CURRENT BOARD:' . PHP_EOL . $output->fetch());
             }
 
             $inline_keyboard[] = [
@@ -802,7 +801,7 @@ class Checkers extends Game
 
         if ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host')) {
             if ($this->data['data']['vote']['host']['surrender']) {
-                Debug::log($this->getCurrentUserMention() . ' surrendered');
+                Debug::print($this->getCurrentUserMention() . ' surrendered');
 
                 $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
                 $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
@@ -819,7 +818,7 @@ class Checkers extends Game
                 }
             }
 
-            Debug::log($this->getCurrentUserMention() . ' voted to surrender');
+            Debug::print($this->getCurrentUserMention() . ' voted to surrender');
             $this->data['data']['vote']['host']['surrender'] = true;
 
             if ($this->manager->saveData($this->data)) {
@@ -829,7 +828,7 @@ class Checkers extends Game
             }
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
             if ($this->data['data']['vote']['guest']['surrender']) {
-                Debug::log($this->getCurrentUserMention() . ' surrendered');
+                Debug::print($this->getCurrentUserMention() . ' surrendered');
 
                 $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
                 $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
@@ -846,7 +845,7 @@ class Checkers extends Game
                 }
             }
 
-            Debug::log($this->getCurrentUserMention() . ' voted to surrender');
+            Debug::print($this->getCurrentUserMention() . ' voted to surrender');
             $this->data['data']['vote']['guest']['surrender'] = true;
 
             if ($this->manager->saveData($this->data)) {
@@ -855,10 +854,7 @@ class Checkers extends Game
                 return $this->returnStorageFailure();
             }
         } else {
-            $error = 'Someone else executed forfeit action?';
-            TelegramLog::error($error);
-            Debug::log($error);
-            Debug::dump($this->manager->getId());
+            Debug::print('Someone else executed forfeit action?');
             return $this->answerCallbackQuery();
         }
     }
@@ -883,7 +879,7 @@ class Checkers extends Game
             $this->data['data']['vote']['host']['draw'] = true;
 
             if ($this->manager->saveData($this->data)) {
-                Debug::log($this->getCurrentUserMention() . ' voted to draw');
+                Debug::print($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
             } else {
@@ -893,7 +889,7 @@ class Checkers extends Game
             $this->data['data']['vote']['guest']['draw'] = true;
 
             if ($this->manager->saveData($this->data)) {
-                Debug::log($this->getCurrentUserMention() . ' voted to draw');
+                Debug::print($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
             } else {

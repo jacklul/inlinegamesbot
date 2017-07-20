@@ -40,6 +40,9 @@
         }
     },
     "scripts": {
-        "postdeploy": "php bin/bot set"
+        "postdeploy": [
+            "php bin/bot install",
+            "php bin/bot set"
+        ]
     }
 }

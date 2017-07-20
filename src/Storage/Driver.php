@@ -11,7 +11,7 @@
 namespace Bot\Storage;
 
 use AD7six\Dsn\Dsn;
-use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
 use Bot\Helper\Debug;
 use Longman\TelegramBot\DB;
 
@@ -37,7 +37,7 @@ class Driver
      * Return which driver class to use
      *
      * @return string
-     * @throws BotException
+     * @throws StorageException
      */
     public static function getStorageClass()
     {
@@ -57,10 +57,10 @@ class Driver
         }
 
         if (!class_exists($storage)) {
-            throw new BotException('Storage class doesn\'t exist: ' . $storage);
+            throw new StorageException('Storage class doesn\'t exist: ' . $storage);
         }
 
-        Debug::log('Using storage: \'' . $storage . '\'');
+        Debug::print('Using storage: \'' . $storage . '\'');
 
         return $storage;
     }

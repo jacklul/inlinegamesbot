@@ -9,6 +9,8 @@
  * the LICENSE file that was distributed with this source code.
  */
 
+use Bot\Bot;
+
  /**
  * Define root path
  */
@@ -20,8 +22,8 @@ define("ROOT_PATH", realpath(dirname(__DIR__)));
 $loader = require __DIR__ . ' /../vendor/autoload.php';
 
 try {
-    $app = new Bot\Kernel();
+    $app = new Bot();
     $app->run();
 } catch (\Throwable $e) {
-    print $e->getMessage() . PHP_EOL;
+    print $e;
 }

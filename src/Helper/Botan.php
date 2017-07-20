@@ -1,4 +1,12 @@
 <?php
+/**
+ * Inline Games - Telegram Bot (@inlinegamesbot)
+ *
+ * (c) 2017 Jack'lul <jacklulcat@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
 
 namespace Bot\Helper;
 
@@ -92,7 +100,7 @@ class Botan
         $responseData = json_decode($result, true);
 
         if (!$responseData || $responseData['status'] !== 'accepted') {
-            Debug::log('Botan.io stats report failed: ' . $result ?: 'empty response');
+            Debug::print('Botan.io stats report failed: ' . $result ?: 'empty response');
 
             return false;
         }

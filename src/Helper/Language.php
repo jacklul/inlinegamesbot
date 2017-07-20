@@ -44,12 +44,15 @@ class Language
         $t = new Translator();
 
         if (file_exists(APP_PATH . '/language/messages.' . $language . '.po')) {
-            self::compileToArray($language);
+            if (!file_exists(VAR_PATH . '/language/messages.' . $language . '.cache') || md5_file(APP_PATH . '/language/messages.' . $language . '.po') != file_get_contents(VAR_PATH . '/language/messages.' . $language . '.cache')) {
+                self::compileToArray($language);
+            }
 
             $t->loadTranslations(VAR_PATH . '/language/messages.' . $language . '.php');
 
             self::$current_language = $language;
-            echo self::$current_language;
+        } else {
+            self::$current_language = self::$default_language;
         }
 
         $t->register();
@@ -66,10 +69,10 @@ class Language
 
         if (is_dir(APP_PATH . '/language')) {
             foreach (new \DirectoryIterator(APP_PATH . '/language') as $fileInfo) {
-                if ($fileInfo->isDir() && !$fileInfo->isDot()) {
+                if (!$fileInfo->isDir() && !$fileInfo->isDot()) {
                     $language = explode('.', $fileInfo->getFilename());
 
-                    if ($language[1] != self::getDefaultlanguage() && $language[2] == 'po') {
+                    if ($language[1] != self::getDefaultlanguage() && isset($language[2]) && $language[2] == 'po') {
                         $languages[] = $language[1];
                     }
                 }
@@ -94,6 +97,7 @@ class Language
             }
 
             $translation->toPhpArrayFile(VAR_PATH . '/language/messages.' . $language . '.php');
+            file_put_contents(VAR_PATH . '/language/messages.' . $language . '.cache', md5_file(APP_PATH . '/language/messages.' . $language . '.po'));
         }
     }
 

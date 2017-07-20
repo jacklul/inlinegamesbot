@@ -148,9 +148,9 @@ class Rockpaperscissors extends Game
             $data['round'] = 1;
             $data['current_turn'] = '';
 
-            Debug::log('Game initialization');
+            Debug::print('Game initialization');
         } elseif (!isset($arg)) {
-            Debug::log('No move data received!');
+            Debug::print('No move data received!');
         }
 
         if (empty($data)) {
@@ -161,7 +161,7 @@ class Rockpaperscissors extends Game
             return $this->answerCallbackQuery(__("This game has ended!"), true);
         }
 
-        Debug::log('Argument: ' . $arg);
+        Debug::print('Argument: ' . $arg);
 
         if (isset($arg)) {
             if (in_array($arg, ['R', 'P', 'S'])) {
@@ -172,7 +172,7 @@ class Rockpaperscissors extends Game
                 }
 
                 if ($this->manager->saveData($this->data)) {
-                    Debug::log($this->getCurrentUserMention() . ' picked ' . $arg);
+                    Debug::print($this->getCurrentUserMention() . ' picked ' . $arg);
 
                     if ($data['host_pick'] == '' || $data['guest_pick'] == '') {
                         return $this->answerCallbackQuery();
@@ -181,7 +181,7 @@ class Rockpaperscissors extends Game
                     return $this->returnStorageFailure();
                 }
             } else {
-                Debug::log('Invalid move data: ' . $arg);
+                Debug::print('Invalid move data: ' . $arg);
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
         }

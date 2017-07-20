@@ -160,9 +160,9 @@ class Tictactoe extends Game
                 ['', '', '']
             ];
 
-            Debug::log('Game initialization');
+            Debug::print('Game initialization');
         } elseif (!isset($args)) {
-            Debug::log('No move data received!');
+            Debug::print('No move data received!');
         }
 
         if (empty($data)) {
@@ -192,11 +192,11 @@ class Tictactoe extends Game
                 $data['board'][$args[0]][$args[1]] = 'O';
                 $data['current_turn'] = 'X';
             } else {
-                Debug::log('Invalid move data: ' . ($args[0]) . ' - ' . ($args[1]));
+                Debug::print('Invalid move data: ' . ($args[0]) . ' - ' . ($args[1]));
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
 
-            Debug::log($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($args[0]));
+            Debug::print($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($args[0]));
         }
 
         $isOver = $this->isGameOver($data['board']);

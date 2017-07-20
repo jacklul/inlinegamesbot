@@ -11,9 +11,9 @@
 namespace Bot\Storage\Driver;
 
 use AD7six\Dsn\Dsn;
-use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
 use Bot\Helper\Debug;
-use Longman\TelegramBot\Exception\TelegramException;
+use Bot\Helper\LockFile;
 use Longman\TelegramBot\TelegramLog;
 use PDO;
 use PDOException;
@@ -33,27 +33,40 @@ class MySQL
     private static $pdo;
 
     /**
+     * Lock file object
+     *
+     * @var LockFile
+     */
+    private static $lock;
+
+    /**
      * SQL to create database structure
      *
      * @var string
      */
-    private static $structure = 'CREATE TABLE IF NOT EXISTS `storage` (
+    private static $structure = 'CREATE TABLE IF NOT EXISTS `game` (
         `id` CHAR(255) COMMENT "Unique identifier for this entry",
-        `data` TEXT NOT NULL) COMMENT "Stored data",
-        `created_at` timestamp NULL DEFAULT NULL) COMMENT "Entry creation date",
-        `updated_at` timestamp NULL DEFAULT NULL) COMMENT "Entry update date",
+        `data` TEXT NOT NULL COMMENT "Stored data",
+        `created_at` timestamp NULL DEFAULT NULL COMMENT "Entry creation date",
+        `updated_at` timestamp NULL DEFAULT NULL COMMENT "Entry update date",
 
         PRIMARY KEY (`id`)
     );';
 
     /**
-     * Initialize PDO connection and 'storage' table
+     * Initialize PDO connection
      */
-    public static function initializeStorage()
+    public static function initializeStorage($pdo = null)
     {
-        if (!defined('TB_STORAGE')) {
-            define('TB_STORAGE', 'storage');
+        if (self::isDbConnected()) {
+            return true;
+        }
 
+        if (!defined('TB_GAME')) {
+            define('TB_GAME', 'game');
+        }
+
+        if ($pdo === null) {
             $dsn = Dsn::parse(getenv('DATABASE_URL'));
             $dsn = $dsn->toArray();
 
@@ -65,33 +78,30 @@ class MySQL
                     TelegramLog::error($e->getMessage());
                 }
 
-                Debug::log('Connection to the database failed!');
+                Debug::print('Connection to the database failed!');
                 return false;
             }
+        } else {
+           self::$pdo = $pdo;
+        }
 
-            if (self::isDbConnected()) {
-                Debug::log('Connected to the database');
+        return true;
+    }
 
-                if (!file_exists($structure_check = VAR_PATH . '/db_structure_created')) {
-                    Debug::log('Creating database structure...');
+    /**
+     * Create table structure
+     *
+     * @return bool
+     * @throws StorageException
+     */
+    public static function createStructure()
+    {
+        if (!self::isDbConnected()) {
+            self::initializeStorage();
+        }
 
-                    try {
-                        if ($result = self::$pdo->query(self::$structure)) {
-                            if (!is_dir(VAR_PATH)) {
-                                mkdir(VAR_PATH, 0755, true);
-                            }
-
-                            touch($structure_check);
-                        }
-
-                        if (!$result) {
-                            throw new BotException('Failed to create DB structure!');
-                        }
-                    } catch (BotException $e) {
-                        throw new TelegramException($e->getMessage());
-                    }
-                }
-            }
+        if (!self::$pdo->query(self::$structure)) {
+            throw new StorageException('Failed to create DB structure!');
         }
 
         return true;
@@ -112,23 +122,23 @@ class MySQL
      *
      * @param $id
      *
-     * @return array|bool|mixed
-     * @throws BotException
+     * @return array|bool
+     * @throws StorageException
      */
-    public static function selectFromStorage($id)
+    public static function selectFromGame($id)
     {
         if (!self::isDbConnected()) {
             return false;
         }
 
         if (empty($id)) {
-            throw new BotException('Id is empty!');
+            throw new StorageException('Id is empty!');
         }
 
         try {
             $sth = self::$pdo->prepare(
                 '
-                SELECT * FROM `' . TB_STORAGE . '`
+                SELECT * FROM `' . TB_GAME . '`
                 WHERE `id` = :id
             '
             );
@@ -142,7 +152,7 @@ class MySQL
                 return $result;
             }
         } catch (PDOException $e) {
-            throw new BotException($e->getMessage());
+            throw new StorageException($e->getMessage());
         }
     }
 
@@ -153,26 +163,26 @@ class MySQL
      * @param $data
      *
      * @return bool
-     * @throws BotException
+     * @throws StorageException
      */
-    public static function insertToStorage($id, $data)
+    public static function insertToGame($id, $data)
     {
         if (!self::isDbConnected()) {
             return false;
         }
 
         if (empty($id)) {
-            throw new BotException('Id is empty!');
+            throw new StorageException('Id is empty!');
         }
 
         if (empty($data)) {
-            throw new BotException('Data is empty!');
+            throw new StorageException('Data is empty!');
         }
 
         try {
             $sth = self::$pdo->prepare(
                 '
-                INSERT INTO `' . TB_STORAGE . '`
+                INSERT INTO `' . TB_GAME . '`
                 (`id`, `data`, `created_at`, `updated_at`)
                 VALUES
                 (:id, :data, :date, :date)
@@ -183,7 +193,7 @@ class MySQL
             );
 
             $data = json_encode($data);
-            $date = self::getTimestamp();
+            $date = date('Y-m-d H:i:s');
 
             $sth->bindParam(':id', $id, PDO::PARAM_STR);
             $sth->bindParam(':data', $data, PDO::PARAM_STR);
@@ -191,7 +201,7 @@ class MySQL
 
             return $sth->execute();
         } catch (PDOException $e) {
-            throw new BotException($e->getMessage());
+            throw new StorageException($e->getMessage());
         }
     }
 
@@ -200,23 +210,23 @@ class MySQL
      *
      * @param $id
      *
-     * @return array|bool|mixed
-     * @throws BotException
+     * @return bool
+     * @throws StorageException
      */
-    public static function deleteFromStorage($id)
+    public static function deleteFromGame($id)
     {
         if (!self::isDbConnected()) {
             return false;
         }
 
         if (empty($id)) {
-            throw new BotException('Id is empty!');
+            throw new StorageException('Id is empty!');
         }
 
         try {
             $sth = self::$pdo->prepare(
                 '
-                DELETE FROM `' . TB_STORAGE . '`
+                DELETE FROM `' . TB_GAME . '`
                 WHERE `id` = :id
             '
             );
@@ -225,46 +235,52 @@ class MySQL
 
             return $sth->execute();
         } catch (PDOException $e) {
-            throw new BotException($e->getMessage());
+            throw new StorageException($e->getMessage());
         }
     }
 
     /**
-     * Lock the row to prevent another process modifying it
+     * Basic file-power lock to prevent other process accessing same game
      *
      * @param $id
      *
      * @return bool
-     * @throws BotException
+     * @throws StorageException
      */
-    public static function lockStorage($id)
+    public static function lockGame($id)
     {
+        if (!self::isDbConnected()) {
+            return false;
+        }
+
         if (empty($id)) {
-            throw new BotException('Id is empty!');
+            throw new StorageException('Id is empty!');
         }
 
-        if (!is_dir(VAR_PATH . '/tmp')) {
-            mkdir(VAR_PATH . '/tmp', 0755, true);
-        }
+        self::$lock = new LockFile($id);
 
-        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.lock', "a+"), LOCK_EX);
+        return flock(fopen(self::$lock->getFile(), "a+"), LOCK_EX);
     }
 
     /**
-     * Unlock the row after
+     * Unlock the game to allow access from other processes
      *
      * @param $id
      *
      * @return bool
-     * @throws BotException
+     * @throws StorageException
      */
-    public static function unlockStorage($id)
+    public static function unlockGame($id)
     {
-        if (empty($id)) {
-            throw new BotException('Id is empty!');
+        if (!self::isDbConnected()) {
+            return false;
         }
 
-        return flock(fopen(VAR_PATH . '/tmp/' . $id .  '.lock', "a+"), LOCK_UN) && @unlink(VAR_PATH . '/tmp/' . $id .  '.lock');
+        if (empty($id)) {
+            throw new StorageException('Id is empty!');
+        }
+
+        return flock(fopen(self::$lock->getFile(), "a+"), LOCK_UN);
     }
 
     /**
@@ -273,16 +289,16 @@ class MySQL
      * @param int $time
      *
      * @return array|bool
-     * @throws BotException
+     * @throws StorageException
      */
-    public static function listFromStorage($time = 0)
+    public static function listFromGame($time = 0)
     {
         if (!self::isDbConnected()) {
             return false;
         }
 
         if (!is_numeric($time)) {
-            throw new BotException('Time must be a number!');
+            throw new StorageException('Time must be a number!');
         }
 
         if ($time >= 0) {
@@ -294,7 +310,7 @@ class MySQL
         try {
             $sth = self::$pdo->prepare(
                 '
-                SELECT * FROM `' . TB_STORAGE . '`
+                SELECT * FROM `' . TB_GAME . '`
                 WHERE `updated_at` ' . $compare_sign . ' :date
                 ORDER BY `updated_at` ASC
             '
@@ -310,7 +326,7 @@ class MySQL
                 return $result;
             }
         } catch (PDOException $e) {
-            throw new BotException($e->getMessage());
+            throw new StorageException($e->getMessage());
         }
     }
 }

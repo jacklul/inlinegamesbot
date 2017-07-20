@@ -163,9 +163,9 @@ class Connectfour extends Game
                 ['', '', '', '', '', '', '']
             ];
 
-            Debug::log('Game initialization');
+            Debug::print('Game initialization');
         } elseif (!isset($args)) {
-            Debug::log('No move data received!');
+            Debug::print('No move data received!');
         }
 
         if (empty($data)) {
@@ -183,7 +183,7 @@ class Connectfour extends Game
         $this->max_y = count($data['board']);
         $this->max_x = count($data['board'][0]);
 
-        Debug::log('BOARD: ' . $this->max_x . ' - ' . $this->max_y);
+        Debug::print('BOARD: ' . $this->max_x . ' - ' . $this->max_y);
 
         if (isset($args)) {
             for ($y = $this->max_y - 1; $y >= 0; $y--) {
@@ -202,12 +202,12 @@ class Connectfour extends Game
                         return $this->answerCallbackQuery(__("Invalid move!"), true);
                     }
                 } else {
-                    Debug::log('Invalid move data: ' . ($args[0]) . ' - ' . ($y));
+                    Debug::print('Invalid move data: ' . ($args[0]) . ' - ' . ($y));
                     return $this->answerCallbackQuery(__("Invalid move!"), true);
                 }
             }
 
-            Debug::log($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($y));
+            Debug::print($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($y));
         }
 
         $isOver = $this->isGameOver($data['board']);

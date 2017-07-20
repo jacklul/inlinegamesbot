@@ -11,14 +11,15 @@
 namespace Bot\Entity;
 
 use Bot\Exception\BotException;
-use Bot\Helper\Debug;
+use Longman\TelegramBot\TelegramLog;
+use Bot\Helper\Language;
 use Bot\Manager\Game as GameManager;
+use Bot\Helper\Debug;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Entities\User;
 use Longman\TelegramBot\Request;
-use Longman\TelegramBot\TelegramLog;
 
 /**
  * Class Game
@@ -33,6 +34,13 @@ class Game
      * @var mixed
      */
     protected $data;
+
+    /**
+     * List of languages
+     *
+     * @var mixed
+     */
+    protected $languages;
 
     /**
      * Game Manager object
@@ -51,7 +59,7 @@ class Game
         $this->manager = $manager;
 
         if (class_exists($storage = $manager->getStorage())) {
-            $this->data = $storage::selectFromStorage($manager->getId());
+            $this->data = $storage::selectFromGame($manager->getId());
         }
     }
 
@@ -64,44 +72,53 @@ class Game
      */
     public function handleAction($action)
     {
+        if (!$this->data) {
+            return $this->returnStorageFailure();
+        }
+
         $action = strtolower(preg_replace("/[^a-zA-Z]+/", "", $action));
         $action = $action . 'Action';
 
         if (!method_exists($this, $action)) {
-            Debug::log('Method \'' . $action . '\ doesn\'t exist!');
+            Debug::print('Method \'' . $action . '\ doesn\'t exist!');
             return $this->answerCallbackQuery();
         }
 
-        Debug::log('Executing: ' . $action);
-        Debug::memoryUsage();
+        $this->languages = Language::list();
+
+        if (isset($this->data['settings']['language']) && $language = $this->data['settings']['language']) {
+            Language::set($language);
+            Debug::print('Set language: ' . $language);
+        } else {
+            Language::set(Language::getDefaultLanguage());
+        }
+
+        Debug::print('Executing: ' . $action);
 
         $result = $this->$action();
 
         if ($result instanceof ServerResponse) {
             if ($result->isOk() || strpos($result->getDescription(), 'message is not modified') !== false) {
-                Debug::log('Server response is ok');
-                Debug::memoryUsage();
+                Debug::print('Server response is ok');
                 $this->answerCallbackQuery();
                 return $result;
             }
 
-            Debug::log('Server response is not ok');
-            Debug::log($result->getErrorCode() . ': ' . $result->getDescription());
-            Debug::memoryUsage();
+            Debug::print('Server response is not ok');
+            Debug::print($result->getErrorCode() . ': ' . $result->getDescription());
             return $this->answerCallbackQuery(__('Telegram API error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."), true);
         }
 
-        Debug::log('CRASHED');
-        Debug::memoryUsage();
+        Debug::print('CRASHED');
 
-        Debug::dump(
-            $this->manager->getId(),
-            [
-                'Result' => $result,
-                'Game' => $this->manager->getGame()::getTitle(),
-                'Data' => json_encode($this->data),
-            ]
-        );
+        TelegramLog::error($this->crashDump([
+            'Game' => $this->manager->getGame()::getTitle(),
+            'Game data' => json_encode($this->data),
+            'Callback data' => $this->manager->getUpdate()->getCallbackQuery() ? $this->manager->getUpdate()->getCallbackQuery()->getData() : '<not a callback query>',
+            'Result' => $result,
+        ]));
+
+        Debug::print(print_r(debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT), true));
 
         if ($this->manager->saveData([])) {
             $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
@@ -174,19 +191,19 @@ class Game
      */
     protected function getUser($user, $as_json = false)
     {
-        Debug::log($user . ' (as_json: ' . ($as_json ? 'true':'false') . ')');
+        Debug::print($user . ' (as_json: ' . ($as_json ? 'true':'false') . ')');
 
         if ($as_json) {
             $result = isset($this->data['players'][$user]['id']) ? $this->data['players'][$user] : false;
 
-            Debug::log('JSON: ' . json_encode($result));
+            Debug::print('JSON: ' . json_encode($result));
 
             return $result;
         }
 
         $result = isset($this->data['players'][$user]['id']) ? new User($this->data['players'][$user]) : false;
 
-        Debug::log((($result instanceof User) ? 'OBJ->JSON: ' . $result->toJson() : 'false'));
+        Debug::print((($result instanceof User) ? 'OBJ->JSON: ' . $result->toJson() : 'false'));
 
         return $result;
     }
@@ -201,7 +218,7 @@ class Game
      */
     protected function getCurrentUser($as_json = false)
     {
-        Debug::log('(as_json: ' . ($as_json ? 'true':'false') . ')');
+        Debug::print('(as_json: ' . ($as_json ? 'true':'false') . ')');
 
         if ($callback_query = $this->manager->getUpdate()->getCallbackQuery()) {
             $update_object = $callback_query;
@@ -214,14 +231,14 @@ class Game
         if ($as_json) {
             $json = $update_object->getFrom();
 
-            Debug::log('JSON: ' . $json);
+            Debug::print('JSON: ' . $json);
 
             return json_decode($json, true);
         }
 
         $result = $update_object->getFrom();
 
-        Debug::log((($result instanceof User) ? 'OBJ->JSON: ' . $result->toJson() : 'false'));
+        Debug::print((($result instanceof User) ? 'OBJ->JSON: ' . $result->toJson() : 'false'));
 
         return $result;
     }
@@ -279,7 +296,7 @@ class Game
      */
     protected function newAction()
     {
-        if ($this->getUser('host')) {
+        if ($this->getUser('host') && $this->getCurrentUserId() != $this->getCurrentUserId('host')) {
             return $this->answerCallbackQuery(__('This game is already created!'), true);
         }
 
@@ -302,7 +319,7 @@ class Game
     protected function joinAction()
     {
         if (!$this->getUser('host')) {
-            Debug::log('Host:' . $this->getCurrentUserMention());
+            Debug::print('Host:' . $this->getCurrentUserMention());
 
             $this->data['players']['host'] = $this->getCurrentUser(true);
 
@@ -313,7 +330,7 @@ class Game
             }
         } elseif (!$this->getUser('guest')) {
             if ($this->getCurrentUserId() != $this->getUserId('host') || (getenv('Debug') && $this->getCurrentUserId() == getenv('BOT_ADMIN'))) {
-                Debug::log('Guest:' . $this->getCurrentUserMention());
+                Debug::print('Guest:' . $this->getCurrentUserMention());
 
                 $this->data['players']['guest'] = $this->getCurrentUser(true);
 
@@ -343,7 +360,7 @@ class Game
 
         if ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host')) {
             if ($this->getUser('guest')) {
-                Debug::log('Quit, host migration: ' . $this->getCurrentUserMention() . ' => ' . $this->getUserMention('guest'));
+                Debug::print('Quit, host migration: ' . $this->getCurrentUserMention() . ' => ' . $this->getUserMention('guest'));
 
                 $this->data['players']['host'] = $this->data['players']['guest'];
                 $this->data['players']['guest'] = null;
@@ -354,7 +371,7 @@ class Game
                     return $this->returnStorageFailure();
                 }
             } else {
-                Debug::log('Quit (host): ' . $this->getCurrentUserMention());
+                Debug::print('Quit (host): ' . $this->getCurrentUserMention());
 
                 $this->data['players']['host'] = null;
 
@@ -365,7 +382,7 @@ class Game
                 }
             }
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
-            Debug::log('Quit (guest): ' . $this->getCurrentUserMention());
+            Debug::print('Quit (guest): ' . $this->getCurrentUserMention());
 
             $this->data['players']['guest'] = null;
 
@@ -375,10 +392,7 @@ class Game
                 return $this->returnStorageFailure();
             }
         } else {
-            $error = 'User quitting an empty game?';
-            TelegramLog::error($error);
-            Debug::log($error);
-            Debug::dump($this->manager->getId());
+            Debug::print('User quitting an empty game?');
             return $this->answerCallbackQuery();
         }
     }
@@ -390,12 +404,12 @@ class Game
      */
     protected function kickAction()
     {
-        if ($this->getCurrentUserId() != $this->getUserId('host')) {
+        if ($this->getCurrentUserId() !== $this->getUserId('host')) {
             return $this->answerCallbackQuery(__("You're not the host!"), true);
         }
 
         if ($this->getUserId('host')) {
-            Debug::log($this->getCurrentUserMention() . ' kicked ' . $this->getUserMention('guest'));
+            Debug::print($this->getCurrentUserMention() . ' kicked ' . $this->getUserMention('guest'));
 
             $user = $this->getUserMention('guest');
             $this->data['players']['guest'] = null;
@@ -406,10 +420,7 @@ class Game
                 return $this->returnStorageFailure();
             }
         } else {
-            $error = 'Kick executed on a game without a host?';
-            TelegramLog::error($error);
-            Debug::log($error);
-            Debug::dump($this->manager->getId());
+            Debug::print('Kick executed on a game without a host?');
             return $this->answerCallbackQuery();
         }
     }
@@ -430,18 +441,18 @@ class Game
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
         }
 
-        if ($this->getCurrentUserId() != $this->getUserId('host')) {
+        if ($this->getCurrentUserId() !== $this->getUserId('host')) {
             return $this->answerCallbackQuery(__("You're not the host!"), true);
         }
 
         if (!$this->getUser('host') || !$this->getUser('guest')) {
-            Debug::log('Received request to start the game but one of the players wasn\'t in');
+            Debug::print('Received request to start the game but one of the players wasn\'t in');
             return $this->answerCallbackQuery();
         }
 
         $this->data['data'] = [];
 
-        Debug::log($this->getCurrentUserMention());
+        Debug::print($this->getCurrentUserMention());
 
         $result = $this->gameAction();
 
@@ -459,6 +470,47 @@ class Game
     {
         if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
+        }
+
+        return $this->answerCallbackQuery();
+    }
+
+    /**
+     * Change language
+     *
+     * @return bool|ServerResponse|mixed
+     */
+    protected function languageAction()
+    {
+        $current_languge = Language::getCurrentLanguage();
+
+        $this->languages;
+
+        $selected_language = $this->languages[0];
+
+        $picknext = false;
+        foreach ($this->languages as $language) {
+            if ($picknext) {
+                $selected_language = $language;
+                break;
+            }
+
+            if ($language == $current_languge) {
+                $picknext = true;
+            }
+        }
+
+        $this->data['settings']['language'] = $selected_language;
+
+        if ($this->manager->saveData($this->data)) {
+            Debug::log('Set language: ' . $selected_language);
+            Language::set($selected_language);
+        }
+
+        if ($this->getUser('host') && !$this->getUser('guest')) {
+            $this->editMessage(__('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+        } elseif ($this->getUser('host') && $this->getUser('guest')) {
+            $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
         }
 
         return $this->answerCallbackQuery();
@@ -494,10 +546,10 @@ class Game
         $keyboard = strtolower(preg_replace("/[^a-zA-Z]+/", "", $keyboard));
         $keyboard = $keyboard . 'Keyboard';
 
-        Debug::log($keyboard);
+        Debug::print($keyboard);
 
         if (!method_exists($this, $keyboard)) {
-            Debug::log('Method \'' . $keyboard . '\ doesn\'t exist!');
+            Debug::print('Method \'' . $keyboard . '\ doesn\'t exist!');
             $keyboard = 'emptyKeyboard';
         }
 
@@ -545,22 +597,35 @@ class Game
      */
     protected function lobbyKeyboard()
     {
-        return [
-            [
+        $inline_keyboard = [];
+
+        if (count($this->languages) > 1) {
+            $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => __('Quit'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ";quit"
-                    ]
-                ),
-                new InlineKeyboardButton(
-                    [
-                        'text' => __('Join'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ";join"
+                        'text' => ucfirst(locale_get_display_language(Language::getCurrentLanguage(), Language::getCurrentLanguage())),
+                        'callback_data' => $this->manager->getGame()::getCode() . ";language"
                     ]
                 )
-            ]
+            ];
+        }
+
+        $inline_keyboard[] = [
+            new InlineKeyboardButton(
+                [
+                    'text' => __('Quit'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ";quit"
+                ]
+            ),
+            new InlineKeyboardButton(
+                [
+                    'text' => __('Join'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ";join"
+                ]
+            )
         ];
+
+        return $inline_keyboard;
     }
 
     /**
@@ -570,30 +635,44 @@ class Game
      */
     protected function pregameKeyboard()
     {
-        return [
-            [
-                new InlineKeyboardButton(
-                    [
-                        'text' => __('Play'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ";start"
-                    ]
-                )
-            ],
-            [
-                new InlineKeyboardButton(
-                    [
-                        'text' => __('Quit'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ";quit"
-                    ]
-                ),
-                new InlineKeyboardButton(
-                    [
-                        'text' => __('Kick'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ";kick"
-                    ]
-                )
-            ]
+        $inline_keyboard = [];
+
+        $inline_keyboard[] = [
+            new InlineKeyboardButton(
+                [
+                    'text' => __('Play'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ";start"
+                ]
+            )
         ];
+
+        if (count($this->languages) > 1) {
+            $inline_keyboard[] = [
+                new InlineKeyboardButton(
+                    [
+                        'text' => ucfirst(locale_get_display_language(Language::getCurrentLanguage(), Language::getCurrentLanguage())),
+                        'callback_data' => $this->manager->getGame()::getCode() . ";language"
+                    ]
+                )
+            ];
+        }
+
+        $inline_keyboard[] = [
+            new InlineKeyboardButton(
+                [
+                    'text' => __('Quit'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ";quit"
+                ]
+            ),
+            new InlineKeyboardButton(
+                [
+                    'text' => __('Kick'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ";kick"
+                ]
+            )
+        ];
+
+        return $inline_keyboard;
     }
 
     /**
@@ -673,7 +752,7 @@ class Game
                 $table->setRows($board);
                 $table->render();
 
-                Debug::log('CURRENT BOARD:' . PHP_EOL . $output->fetch());
+                Debug::print('CURRENT BOARD:' . PHP_EOL . $output->fetch());
             }
 
             $inline_keyboard[] = [
@@ -689,5 +768,23 @@ class Game
         $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
 
         return $inline_keyboard_markup;
+    }
+
+    /**
+     * Make a debug dump of crashed game session
+     *
+     * @param array $data
+     *
+     * @return string
+     * @throws BotException
+     */
+    private function crashDump($data = [])
+    {
+        $output = 'CRASH DETAILS:' . PHP_EOL;
+        foreach ($data as $var => $val) {
+            $output .= $var . ': ' . (is_array($val) ? print_r($val, true) : (is_bool($val) ? ($val ? 'true' : 'false') : $val)) . PHP_EOL;
+        }
+
+        return $output;
     }
 }

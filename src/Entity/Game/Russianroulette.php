@@ -153,9 +153,9 @@ class Russianroulette extends Game
             $data['cylinder'] = ['', '', '', '', '', ''];
             $data['cylinder'][mt_rand(0, 5)] = 'X';
 
-            Debug::log('Game initialization');
+            Debug::print('Game initialization');
         } elseif (!isset($arg)) {
-            Debug::log('No move data received!');
+            Debug::print('No move data received!');
         }
 
         if (empty($data)) {
@@ -179,14 +179,14 @@ class Russianroulette extends Game
             }
 
             if (!isset($data['cylinder'][$arg - 1])) {
-                Debug::log('Bad move data received: ' . $arg);
+                Debug::print('Bad move data received: ' . $arg);
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
 
-            Debug::log('Chamber selected: ' . $arg);
+            Debug::print('Chamber selected: ' . $arg);
 
             if ($data['cylinder'][$arg - 1] === 'X') {
-                Debug::log('Chamber contains bullet, player is dead');
+                Debug::print('Chamber contains bullet, player is dead');
 
                 if ($data['current_turn'] == 'X') {
                     $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['O']) . '<b>']) . '</b>' . PHP_EOL;
@@ -236,7 +236,7 @@ class Russianroulette extends Game
 
         $gameOutput .= __("Current turn:") . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]);
 
-        Debug::log('Cylinder: |' . implode('|', $data['cylinder']) . '|');
+        Debug::print('Cylinder: |' . implode('|', $data['cylinder']) . '|');
 
         if ($this->manager->saveData($this->data)) {
             return $this->editMessage(
