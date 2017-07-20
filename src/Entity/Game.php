@@ -560,7 +560,7 @@ class Game
             $keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => 'Debug: ' . 'CRASH',
+                        'text' => 'DEBUG: ' . 'CRASH',
                         'callback_data' => $this->manager->getGame()::getCode() . ';crash'
                     ]
                 )
@@ -759,7 +759,7 @@ class Game
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => 'Debug: ' . 'Restart',
+                        'text' => 'DEBUG: ' . 'Restart',
                         'callback_data' => $this->manager->getGame()::getCode() . ';start'
                     ]
                 )
