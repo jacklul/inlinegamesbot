@@ -190,7 +190,7 @@ class Poolcheckers extends Game
 
             Debug::print('Game initialization');
         } elseif (!isset($args) && $command === 'game') {
-            Debug::print('No move data received!');
+            Debug::print('No move data received');
         }
 
         if (empty($data)) {
@@ -1013,7 +1013,7 @@ class Poolcheckers extends Game
                 return $this->returnStorageFailure();
             }
         } else {
-            Debug::print('Someone else executed forfeit action?');
+            Debug::print('Someone else executed forfeit action');
             return $this->answerCallbackQuery();
         }
     }

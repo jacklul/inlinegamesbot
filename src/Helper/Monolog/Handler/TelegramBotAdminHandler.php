@@ -82,7 +82,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
         if (isset($previous_reports) && is_array($previous_reports)) {
             foreach ($previous_reports as $previous_report) {
                 if ($previous_report['message'] ===  $record['message'] && $previous_report['time'] + 86400 >= $record['datetime']->format('U')) {
-                    Debug::print('Log report prevented because the message is a duplicate of the previous report!');
+                    Debug::print('Log report prevented because the message is a duplicate of the previous report');
                     return false;
                 }
             }

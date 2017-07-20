@@ -74,11 +74,11 @@ class MySQL
                 self::$pdo = new PDO('mysql:' . 'host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
                 self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
             } catch (PDOException $e) {
-                if ($e->getCode() != 7) {
+                if ($e->getCode() != 7) {   // ignore connection failure
                     TelegramLog::error($e->getMessage());
                 }
 
-                Debug::print('Connection to the database failed!');
+                Debug::print('Connection to the database failed');
                 return false;
             }
         } else {

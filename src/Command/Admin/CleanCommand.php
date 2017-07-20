@@ -88,7 +88,7 @@ class CleanCommand extends AdminCommand
 
                 foreach ($inactive as $inactive_game) {
                     if (time() >= $start_time + $timelimit - 1) {
-                        Debug::print('Time limit reached!');
+                        Debug::print('Time limit reached');
                         break;
                     }
 
@@ -130,14 +130,14 @@ class CleanCommand extends AdminCommand
                                 $edited++;
                                 Debug::print('Message edited successfully');
                             } else {
-                                Debug::print('Failed to edit message: ' . (isset($result) ? $result->getDescription() : '...'));
+                                Debug::print('Failed to edit message: ' . (isset($result) ? $result->getDescription() : '<unknown error>'));
                             }
                         }
                     }
 
                     if ($storage::deleteFromGame($inactive_game['id'])) {
                         $cleaned++;
-                        Debug::print('Removed record from the database');
+                        Debug::print('Record removed from the database');
                     }
                 }
 

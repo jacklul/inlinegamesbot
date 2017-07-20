@@ -150,7 +150,7 @@ class Rockpaperscissors extends Game
 
             Debug::print('Game initialization');
         } elseif (!isset($arg)) {
-            Debug::print('No move data received!');
+            Debug::print('No move data received');
         }
 
         if (empty($data)) {

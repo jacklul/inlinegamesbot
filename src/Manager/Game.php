@@ -99,7 +99,7 @@ class Game
             $class = get_class($this->game);
             Debug::print('Game: ' . $class::getTitle());
         } else {
-            Debug::print('Game not found!');
+            Debug::print('Game not found');
         }
 
         return $this;

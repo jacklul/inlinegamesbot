@@ -165,7 +165,7 @@ class Connectfour extends Game
 
             Debug::print('Game initialization');
         } elseif (!isset($args)) {
-            Debug::print('No move data received!');
+            Debug::print('No move data received');
         }
 
         if (empty($data)) {

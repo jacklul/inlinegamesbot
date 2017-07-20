@@ -80,7 +80,7 @@ class Game
         $action = $action . 'Action';
 
         if (!method_exists($this, $action)) {
-            Debug::print('Method \'' . $action . '\ doesn\'t exist!');
+            Debug::print('Method \'' . $action . '\ doesn\'t exist');
             return $this->answerCallbackQuery();
         }
 
@@ -178,6 +178,7 @@ class Game
      */
     protected function returnStorageFailure()
     {
+        Debug::print('Storage failure');
         return $this->answerCallbackQuery(__('Database failure!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."), true);
     }
 
@@ -420,7 +421,7 @@ class Game
                 return $this->returnStorageFailure();
             }
         } else {
-            Debug::print('Kick executed on a game without a host?');
+            Debug::print('Kick executed on a game without a host');
             return $this->answerCallbackQuery();
         }
     }
@@ -446,7 +447,7 @@ class Game
         }
 
         if (!$this->getUser('host') || !$this->getUser('guest')) {
-            Debug::print('Received request to start the game but one of the players wasn\'t in');
+            Debug::print('Received request to start the game but one of the players wasn\'t in the game');
             return $this->answerCallbackQuery();
         }
 
@@ -549,7 +550,7 @@ class Game
         Debug::print($keyboard);
 
         if (!method_exists($this, $keyboard)) {
-            Debug::print('Method \'' . $keyboard . '\ doesn\'t exist!');
+            Debug::print('Method \'' . $keyboard . '\ doesn\'t exist');
             $keyboard = 'emptyKeyboard';
         }
 
