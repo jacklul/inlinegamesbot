@@ -62,7 +62,7 @@ class StatsCommand extends AdminCommand
         $data['reply_markup'] = $this->createInlineKeyboard();
         $data['parse_mode'] = 'Markdown';
 
-            if ($message) {
+        if ($message) {
             return Request::sendMessage($data);
         } elseif ($callback_query) {
             $data['message_id'] = $callback_query->getMessage()->getMessageId();

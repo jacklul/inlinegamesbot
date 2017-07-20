@@ -82,7 +82,7 @@ class MySQL
                 return false;
             }
         } else {
-           self::$pdo = $pdo;
+            self::$pdo = $pdo;
         }
 
         return true;

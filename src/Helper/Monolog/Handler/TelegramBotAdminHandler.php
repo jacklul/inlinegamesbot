@@ -49,7 +49,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
      *
      * @param Telegram $telegram
      * @param bool|int $level
-     * @param bool $bubble
+     * @param bool     $bubble
      */
     public function __construct(Telegram $telegram, $level = Logger::ERROR, $bubble = true)
     {
@@ -62,7 +62,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
     /**
      * Send log message to bot admins
      *
-     * @param array $record
+     * @param  array $record
      * @return bool
      */
     protected function write(array $record)

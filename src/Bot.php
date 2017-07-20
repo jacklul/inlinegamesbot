@@ -76,7 +76,7 @@ class Bot
             throw new BotException('Configuration file doesn\'t exist!');
         }
 
-        require_once $bot_config_file;
+        include_once $bot_config_file;
 
         if (isset($config) && is_array($config)) {
             $this->config = $config;
