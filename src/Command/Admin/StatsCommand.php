@@ -89,8 +89,10 @@ class StatsCommand extends AdminCommand
             }
         }
 
-        $output = '*Active sessions*: *' . $stats['5min'] . '* (*' . $stats['total'] . '* total)' . PHP_EOL;
-        $output .= PHP_EOL . '*Sessions depending on game:*' . PHP_EOL;
+        $stats['games']['Total'] = $stats['total'];
+        $stats['games_5min']['Total'] = $stats['5min'];
+
+        $output = '*Active sessions:*' . PHP_EOL;
 
         arsort($stats['games']);
 
