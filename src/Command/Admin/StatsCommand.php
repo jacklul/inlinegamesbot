@@ -89,8 +89,8 @@ class StatsCommand extends AdminCommand
             }
         }
 
-        $stats['games']['Total'] = $stats['total'];
-        $stats['games_5min']['Total'] = $stats['5min'];
+        $stats['games']['All'] = $stats['total'];
+        $stats['games_5min']['All'] = $stats['5min'];
 
         $output = '*Active sessions:*' . PHP_EOL;
 
