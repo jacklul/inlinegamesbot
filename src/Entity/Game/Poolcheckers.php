@@ -258,12 +258,12 @@ class Poolcheckers extends Game
                                 $killed = true;
                             }
 
-                            if ($killed == true && $this->possibleMoves($data['board'], $command[0].$command[1], true, null, $data['current_selection'][0].$data['current_selection'][1])) {
+                            if ($killed == true && $this->possibleMoves($data['board'], $args[0].$args[1], true, null, $data['current_selection'][0].$data['current_selection'][1])) {
                                 $data['current_selection_lock'] = true;
-                                $data['current_selection'] = $command[0].$command[1];
+                                $data['current_selection'] = $args[0].$args[1];
                             } else {
-                                if (strpos($data['board'][$command[0]][$command[1]], 'K') === false && (($data['current_turn'] == 'X' && $command[1] == 7) || ($data['current_turn'] == 'O' && $command[1] == 0))) {
-                                    $data['board'][$command[0]][$command[1]] .= 'K';
+                                if (strpos($data['board'][$args[0]][$args[1]], 'K') === false && (($data['current_turn'] == 'X' && $args[1] == 7) || ($data['current_turn'] == 'O' && $args[1] == 0))) {
+                                    $data['board'][$args[0]][$args[1]] .= 'K';
                                 }
 
                                 if ($data['current_turn'] == 'X') {
@@ -520,6 +520,7 @@ class Poolcheckers extends Game
      *
      * @return array|bool
      */
+
     private function possibleMoves($board, $selection, $onlykill = false, $char = '', $backmultijumpblock = null)
     {
         $valid_moves = [];
@@ -627,9 +628,6 @@ class Poolcheckers extends Game
                     }
                 }
 
-
-
-
                 for ($move = 1; $move <= 8; $move++) {
                     if (strpos($board[($sel_x + $move)][($sel_y - $move)], 'O') !== false) {
                         for ($move2 = 1; $move2 < $move; $move2++) {
@@ -643,9 +641,6 @@ class Poolcheckers extends Game
                         break;
                     }
                 }
-
-
-
 
                 for ($move = 1; $move <= 8; $move++) {
                     if (strpos($board[($sel_x - $move)][($sel_y - $move)], 'O') !== false) {
@@ -723,9 +718,6 @@ class Poolcheckers extends Game
                     }
                 }
 
-
-
-
                 for ($move = 1; $move <= 8; $move++) {
                     if (strpos($board[($sel_x - $move)][($sel_y + $move)], 'X') !== false) {
                         for ($move2 = 1; $move2 < $move; $move2++) {
@@ -740,9 +732,6 @@ class Poolcheckers extends Game
                         break;
                     }
                 }
-
-
-
 
                 for ($move = 1; $move <= 8; $move++) {
                     if (strpos($board[($sel_x + $move)][($sel_y + $move)], 'X') !== false) {
@@ -833,8 +822,8 @@ class Poolcheckers extends Game
         array_filter($kill, $c);
 
         return [
-           'valid_moves' => $valid_moves,
-           'kills' => $kill
+            'valid_moves' => $valid_moves,
+            'kills' => $kill
         ];
     }
 
@@ -891,6 +880,8 @@ class Poolcheckers extends Game
             return 'X';
         } elseif ($array['X'] == 0) {
             return 'O';
+        } elseif ($array['X'] == 1 && $array['O'] == 1 && $array['XK'] == 1 && $array['OK'] == 1) {
+            return 'T';
         }
 
         $availableMoves_X = [];
