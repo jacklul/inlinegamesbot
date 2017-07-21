@@ -57,12 +57,50 @@ class StatsCommand extends AdminCommand
         $storage = Driver::getStorageClass();
         $storage::initializeStorage();
 
-        $active = $storage::listFromGame((time() - strtotime('-5 minutes')) * -1);
-        $all = $storage::listFromGame(0);
+        $games = $storage::listFromGame(0);
+        $stats = [
+            'games' => [],
+            'games_5min' => [],
+            'total' => 0,
+            '5min' => 0,
+        ];
+
+        foreach ($games as $game) {
+            $data = json_decode($game['data'], true);
+            $game_obj = new GameManager($game['id'], $data['game_code'], $this);
+            $game_title = $game_obj->getGame()::getTitle();
+
+            if (isset($stats['games'][$game_title])) {
+                $stats['games'][$game_title] = $stats['games'][$game_title] + 1;
+            } else {
+                $stats['games'][$game_title] = 1;
+            }
+
+            $stats['total']++;
+
+            if (strtotime($game['updated_at']) >= strtotime('-5 minutes')) {
+                $stats['5min']++;
+
+                if (isset($stats['games_5min'][$game_title])) {
+                    $stats['games_5min'][$game_title] = $stats['games_5min'][$game_title] + 1;
+                } else {
+                    $stats['games_5min'][$game_title] = 1;
+                }
+            }
+        }
+
+        $output = '*Active sessions*: *' . $stats['5min'] . '* (*' . $stats['total'] . '* total)' . PHP_EOL;
+        $output .= PHP_EOL . '*Sessions depending on game:*' . PHP_EOL;
+
+        arsort($stats['games']);
+
+        foreach ($stats['games'] as $game => $count) {
+            $output .= ' ' . $game . ' - *' . (isset($stats['games_5min'][$game]) ? $stats['games_5min'][$game] : 0 ) . '* (*' . $count . '* total)' . PHP_EOL;
+        }
 
         $data = [];
         $data['chat_id'] = $chat_id;
-        $data['text'] = '*Stats:*' . PHP_EOL . ' All games: ' . count($all) . PHP_EOL . ' Active (5 minutes): ' . count($active);
+        $data['text'] = $output;
         $data['reply_markup'] = $this->createInlineKeyboard();
         $data['parse_mode'] = 'Markdown';
 
