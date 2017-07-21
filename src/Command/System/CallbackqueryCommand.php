@@ -11,7 +11,7 @@
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
 use Bot\Helper\Debug;
-use Bot\Manager\Game;
+use Bot\Manager\Game as GameManager;
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Request;
 
@@ -48,7 +48,7 @@ class CallbackqueryCommand extends SystemCommand
         }
 
         if ($this->isDataValid($data)) {
-            $game = new Game($callback_query->getInlineMessageId(), explode(';', $data)[0], $this);
+            $game = new GameManager($callback_query->getInlineMessageId(), explode(';', $data)[0], $this);
 
             if ($game->canRun()) {
                 return $game->run();

@@ -11,7 +11,7 @@
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
 use Bot\Helper\Debug;
-use Bot\Manager\Game;
+use Bot\Manager\Game as GameManager;
 use Bot\Storage\Driver;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
@@ -106,7 +106,7 @@ class CleanCommand extends AdminCommand
                     $game_data = $storage::selectFromGame($inactive_game['id']);
 
                     if (isset($game_data['game_code'])) {
-                        $game = new Game($inactive_game['id'], $game_data['game_code'], $this);
+                        $game = new GameManager($inactive_game['id'], $game_data['game_code'], $this);
 
                         if ($game->canRun()) {
                             while (time() <= $last_request_time) {

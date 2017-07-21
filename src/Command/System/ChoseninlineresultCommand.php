@@ -11,7 +11,7 @@
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
 use Bot\Helper\Debug;
-use Bot\Manager\Game;
+use Bot\Manager\Game as GameManager;
 use Longman\TelegramBot\Commands\SystemCommand;
 
 /**
@@ -30,7 +30,7 @@ class ChoseninlineresultCommand extends SystemCommand
 
         Debug::print('Data: ' . $chosen_inline_result->getResultId());
 
-        $game = new Game($chosen_inline_result->getInlineMessageId(), $chosen_inline_result->getResultId(), $this);
+        $game = new GameManager($chosen_inline_result->getInlineMessageId(), $chosen_inline_result->getResultId(), $this);
 
         if ($game->canRun()) {
             return $game->run();

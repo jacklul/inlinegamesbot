@@ -10,6 +10,7 @@
 
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
+use Bot\Manager\Game as GameManager;
 use Bot\Storage\Driver;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
