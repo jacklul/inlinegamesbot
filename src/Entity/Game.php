@@ -57,10 +57,6 @@ class Game
     public function __construct(GameManager $manager)
     {
         $this->manager = $manager;
-
-        if (class_exists($storage = $manager->getStorage())) {
-            $this->data = $storage::selectFromGame($manager->getId());
-        }
     }
 
     /**
@@ -72,6 +68,11 @@ class Game
      */
     public function handleAction($action)
     {
+        if (class_exists($storage = $this->manager->getStorage()) && empty($this->data)) {
+            Debug::print('Reading game data from database');
+            $this->data = $storage::selectFromGame($this->manager->getId());
+        }
+
         if (!$this->data && !is_array($this->data)) {
             return $this->returnStorageFailure();
         }
