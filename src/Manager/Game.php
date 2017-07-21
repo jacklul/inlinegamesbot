@@ -260,6 +260,7 @@ class Game
      */
     public function saveData($data): bool
     {
+        Debug::print('Saving game data to database');
         $data['game_code'] = $this->game::getCode();    // make sure we have the game code in the data array for /clean command!
         return $this->storage::insertToGame($this->id, $data);
     }
