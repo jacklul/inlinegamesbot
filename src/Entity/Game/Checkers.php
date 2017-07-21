@@ -130,9 +130,9 @@ class Checkers extends Game
         $this->symbols['empty'] = '.';
 
         $this->symbols['X'] = Emoji::mediumBlackCircle();
-        $this->symbols['XR'] = Emoji::blackMediumSquare();
+        $this->symbols['XK'] = Emoji::blackMediumSquare();
         $this->symbols['O'] = Emoji::mediumWhiteCircle();
-        $this->symbols['OR'] = Emoji::whiteMediumSquare();
+        $this->symbols['OK'] = Emoji::whiteMediumSquare();
     }
 
     /**
