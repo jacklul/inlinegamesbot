@@ -12,11 +12,6 @@
 use Bot\Bot;
 
 /**
- * Define root path
- */
-define("ROOT_PATH", realpath(dirname(__DIR__)));
-
-/**
  * @var Composer\Autoload\ClassLoader
  */
 $loader = require __DIR__ . ' /../vendor/autoload.php';

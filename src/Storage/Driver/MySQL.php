@@ -55,6 +55,9 @@ class MySQL
 
     /**
      * Initialize PDO connection
+     *
+     * @param null $pdo
+     * @return bool
      */
     public static function initializeStorage($pdo = null)
     {

@@ -21,6 +21,13 @@ use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
 use Monolog\Logger;
+use PHPUnit\Runner\Exception;
+
+define("ROOT_PATH", realpath(dirname(__DIR__)));
+define("BIN_PATH", ROOT_PATH . '/bin');
+define("APP_PATH", ROOT_PATH . '/app');
+define("SRC_PATH", ROOT_PATH . '/src');
+define("VAR_PATH", ROOT_PATH . '/var');
 
 /**
  * Class Bot
@@ -49,6 +56,23 @@ class Bot
     private $telegram;
 
     /**
+     * Commands
+     *
+     * @var array
+     */
+    private $commands = [
+        'help' => 'showHelp',
+        'set' => 'setWebhook',
+        'unset' => 'deleteWebhook',
+        'info' => 'webhookInfo',
+        'install' => 'handleInstall',
+        'handle' => 'handleWebhook',
+        'cron' => 'handleCron',
+        'loop' => 'handleLongPolling',
+        'worker' => 'handleWorker',
+    ];
+
+    /**
      * App constructor
      *
      * @throws BotException
@@ -58,11 +82,6 @@ class Bot
         if (!defined('ROOT_PATH')) {
             throw new BotException('Root path not defined!');
         }
-
-        define("BIN_PATH", ROOT_PATH . '/bin');
-        define("APP_PATH", ROOT_PATH . '/app');
-        define("SRC_PATH", ROOT_PATH . '/src');
-        define("VAR_PATH", ROOT_PATH . '/var');
 
         if (file_exists(ROOT_PATH . '/.env')) {
             $env = new Dotenv(ROOT_PATH);
@@ -76,7 +95,7 @@ class Bot
             throw new BotException('Configuration file doesn\'t exist!');
         }
 
-        include_once $bot_config_file;
+        include $bot_config_file;
 
         if (isset($config) && is_array($config)) {
             $this->config = $config;
@@ -103,32 +122,18 @@ class Bot
                 $this->initialize();
             }
 
-            switch ($this->arg) {
-                default:
-                case 'handle':
-                    $this->handleWebhook();
-                    break;
-                case 'loop':
-                    $this->handleLongPolling();
-                    break;
-                case 'cron':
-                    $this->handleCron();
-                    break;
-                case 'set':
-                    $this->setWebhook();
-                    break;
-                case 'unset':
-                    $this->deleteWebhook();
-                    break;
-                case 'info':
-                    $this->webhookInfo();
-                    break;
-                case 'worker':
-                    $this->handleWorker();
-                    break;
-                case 'install':
-                    $this->handleInstall();
-                    break;
+            throw new Exception('test');
+
+            if (!empty($this->arg) && isset($this->commands[$this->arg])) {
+                $function = $this->commands[$this->arg];
+                $this->$function();
+            } else {
+                $this->showHelp();
+                if (!empty($this->arg)) {
+                    print PHP_EOL . 'Invalid parameter specified!' . PHP_EOL;
+                } else {
+                    print PHP_EOL . 'No parameter specified!' . PHP_EOL;
+                }
             }
         } catch (\Throwable $e) {
             TelegramLog::error($e);
@@ -349,6 +354,8 @@ class Bot
      */
     private function handleLongPolling(): void
     {
+        print '[' . date('Y-m-d H:i:s', time()) . '] Running in loop...' . PHP_EOL;
+
         while (true) {
             set_time_limit(0);
 
@@ -358,11 +365,11 @@ class Bot
                 $update_count = count($server_response->getResult());
 
                 if ($update_count > 0) {
-                    echo '[' . date('Y-m-d H:i:s', time()) . '] Processed ' . $update_count . ' updates!' . PHP_EOL;
+                    print '[' . date('Y-m-d H:i:s', time()) . '] Processed ' . $update_count . ' updates!' . PHP_EOL;
                 }
             } else {
-                echo '[' . date('Y-m-d H:i:s', time()) . '] Failed to process updates!' . PHP_EOL;
-                echo $server_response->printError() . PHP_EOL;
+                print '[' . date('Y-m-d H:i:s', time()) . '] Failed to process updates!' . PHP_EOL;
+                print $server_response->printError() . PHP_EOL;
             }
 
             if (function_exists('gc_collect_cycles')) {
@@ -378,6 +385,8 @@ class Bot
      */
     private function handleWorker(): void
     {
+        print 'Initializing worker...' . PHP_EOL;
+
         $interval = 60;
         $sleep_time = 10;
         $last_run = time();
@@ -430,5 +439,25 @@ class Bot
         } else {
             print 'Error!' . PHP_EOL;
         }
+    }
+
+    /**
+     * Display usage help
+     */
+    private function showHelp()
+    {
+        print 'Bot CLI' . PHP_EOL . PHP_EOL;
+        print 'Available commands:' . PHP_EOL . ' ';
+
+        $commands = '';
+        foreach ($this->commands as $command => $function) {
+            if (!empty($commands)) {
+                $commands .= ', ';
+            }
+
+            $commands .= $command;
+        }
+
+        print $commands . PHP_EOL;
     }
 }
