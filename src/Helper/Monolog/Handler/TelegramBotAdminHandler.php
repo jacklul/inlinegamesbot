@@ -73,6 +73,14 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
 
         $cached_error_file = sys_get_temp_dir() . '/' . $this->bot_id . '_last_error.tmp';
 
+        if (!is_writable($cached_error_file)) {
+            if (!is_dir(VAR_PATH . '/tmp')) {
+                mkdir(VAR_PATH . '/tmp');
+            }
+
+            $cached_error_file = VAR_PATH . '/tmp/' . $this->bot_id . '_last_error.tmp';
+        }
+
         if (file_exists($cached_error_file)) {
             $previous_reports = file_get_contents($cached_error_file);
             $previous_reports = json_decode($previous_reports, true);
