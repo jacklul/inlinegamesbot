@@ -75,7 +75,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
 
         if (!is_writable($cached_error_file)) {
             if (!is_dir(VAR_PATH . '/tmp')) {
-                mkdir(VAR_PATH . '/tmp');
+                mkdir(VAR_PATH . '/tmp', 0755, true);
             }
 
             $cached_error_file = VAR_PATH . '/tmp/' . $this->bot_id . '_last_error.tmp';

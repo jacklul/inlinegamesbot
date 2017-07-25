@@ -8,4 +8,5 @@ compoer.phar
 # Project
 .env
 var/*
+!var/.gitkeep
 app/language/*.mo
