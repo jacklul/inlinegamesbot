@@ -78,10 +78,12 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
             $previous_reports = json_decode($previous_reports, true);
         }
 
+        $message_check = preg_split("/\\r\\n|\\r|\\n/", $record['message'])[0];
+
         // Do not send already reported error messages for 1 day
         if (isset($previous_reports) && is_array($previous_reports)) {
             foreach ($previous_reports as $previous_report) {
-                if ($previous_report['message'] ===  $record['message'] && $previous_report['time'] + 86400 > $record['datetime']->format('U')) {
+                if ($previous_report['message'] === $message_check && $previous_report['time'] + 86400 > $record['datetime']->format('U')) {
                     Debug::print('Log report prevented because the message is a duplicate of the previous report');
                     return false;
                 }
@@ -106,7 +108,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
         }
 
         if ($success) {
-            array_push($previous_reports, ['message' => $record['message'], 'time' => $record['datetime']->format('U')]);
+            array_push($previous_reports, ['message' => $message_check, 'time' => $record['datetime']->format('U')]);
 
             while (count($previous_reports) > 100) {
                 array_shift($previous_reports);
