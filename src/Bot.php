@@ -21,7 +21,6 @@ use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
 use Monolog\Logger;
-use PHPUnit\Runner\Exception;
 
 define("ROOT_PATH", realpath(dirname(__DIR__)));
 define("BIN_PATH", ROOT_PATH . '/bin');
@@ -121,8 +120,6 @@ class Bot
             if (!$this->telegram instanceof Telegram) {
                 $this->initialize();
             }
-
-            throw new Exception('test');
 
             if (!empty($this->arg) && isset($this->commands[$this->arg])) {
                 $function = $this->commands[$this->arg];
