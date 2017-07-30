@@ -304,7 +304,7 @@ class Game
 
         $this->data['players']['host'] = $this->getCurrentUser(true);
         $this->data['players']['guest'] = null;
-        $this->data['players']['data'] = null;
+        $this->data['data'] = null;
 
         if ($this->manager->saveData($this->data)) {
             return $this->editMessage(__('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));

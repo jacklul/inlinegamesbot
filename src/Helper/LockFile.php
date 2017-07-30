@@ -40,6 +40,15 @@ class LockFile
     public function __construct($name, $delete = true)
     {
         $this->file = sys_get_temp_dir() . '/' . $name . '.tmp';
+
+        if (!is_writable($this->file)) {
+            if (!is_dir(VAR_PATH . '/tmp')) {
+                mkdir(VAR_PATH . '/tmp', 0755, true);
+            }
+
+            $this->file = VAR_PATH . '/tmp/' . $name . '.tmp';
+        }
+
         $this->delete = $delete;
     }
 
