@@ -97,6 +97,7 @@ class Game
         Debug::print('Executing: ' . $action);
 
         $result = $this->$action();
+        $data_before = $this->data;
 
         if ($result instanceof ServerResponse) {
             if ($result->isOk() || strpos($result->getDescription(), 'message is not modified') !== false) {
@@ -114,6 +115,7 @@ class Game
 
         TelegramLog::error($this->crashDump([
             'Game' => $this->manager->getGame()::getTitle(),
+            'Game data (before)' => json_encode($data_before),
             'Game data' => json_encode($this->data),
             'Callback data' => $this->manager->getUpdate()->getCallbackQuery() ? $this->manager->getUpdate()->getCallbackQuery()->getData() : '<not a callback query>',
             'Result' => $result,
