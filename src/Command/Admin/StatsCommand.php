@@ -74,16 +74,12 @@ class StatsCommand extends AdminCommand
                 $stats['games'][$game_title] = 1;
             }
 
-            $stats['total']++;
+            if (!isset($stats['games_5min'][$game_title])) {
+                $stats['games_5min'][$game_title] = 0;
+            }
 
             if (strtotime($game['updated_at']) >= strtotime('-5 minutes')) {
-                $stats['5min']++;
-
-                if (isset($stats['games_5min'][$game_title])) {
-                    $stats['games_5min'][$game_title] = $stats['games_5min'][$game_title] + 1;
-                } else {
-                    $stats['games_5min'][$game_title] = 1;
-                }
+                $stats['games_5min'][$game_title] = $stats['games_5min'][$game_title] + 1;
             }
         }
 
