@@ -10,7 +10,7 @@
     ],
     "type": "project",
     "require": {
-        "php": "^7.0",
+        "php": "^7.1.0",
         "ext-curl": "*",
         "ext-gettext": "*",
         "ext-mbstring": "*",
@@ -43,7 +43,7 @@
     },
     "scripts": {
         "check-code": [
-            "php vendor/squizlabs/php_codesniffer/scripts/phpcs --standard=PSR2 -snp --encoding=utf-8 src/ --report-width=120"
+            "php lib/squizlabs/php_codesniffer/scripts/phpcs --standard=PSR2 -snp --encoding=utf-8 src/ --report-width=120"
         ]
     }
 }
