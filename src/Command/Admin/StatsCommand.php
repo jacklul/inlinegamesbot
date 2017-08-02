@@ -61,6 +61,8 @@ class StatsCommand extends AdminCommand
         $stats = [
             'games' => [],
             'games_5min' => [],
+            'total' => 0,
+            '5min' => 0,
         ];
 
         foreach ($games as $game) {
@@ -80,7 +82,10 @@ class StatsCommand extends AdminCommand
 
             if (strtotime($game['updated_at']) >= strtotime('-5 minutes')) {
                 $stats['games_5min'][$game_title] = $stats['games_5min'][$game_title] + 1;
+                $stats['5min']++;
             }
+
+            $stats['total']++;
         }
 
         $stats['games']['All'] = $stats['total'];
