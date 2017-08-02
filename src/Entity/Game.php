@@ -795,7 +795,7 @@ class Game
      *
      * @return ServerResponse|mixed
      */
-    private function handleEmptyData()
+    protected function handleEmptyData()
     {
         Debug::print('Empty game data');
 
