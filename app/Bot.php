@@ -8,8 +8,6 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot;
-
 use Bot\Exception\BotException;
 use Bot\Helper\Debug;
 use Bot\Helper\Monolog\Handler\TelegramBotAdminHandler;
@@ -23,10 +21,9 @@ use Longman\TelegramBot\TelegramLog;
 use Monolog\Logger;
 
 define("ROOT_PATH", realpath(dirname(__DIR__)));
-define("BIN_PATH", ROOT_PATH . '/bin');
 define("APP_PATH", ROOT_PATH . '/app');
 define("SRC_PATH", ROOT_PATH . '/src');
-define("VAR_PATH", ROOT_PATH . '/var');
+define("DATA_PATH", ROOT_PATH . '/data');
 
 /**
  * Class Bot
@@ -87,7 +84,7 @@ class Bot
             $env->load();
         }
 
-        (new Translator())->register();
+        (new Translator())->register(); // must be initialized as all public messages are using __() function
 
         $bot_config_file = APP_PATH . '/config.php';
         if (!file_exists($bot_config_file)) {
@@ -249,6 +246,8 @@ class Bot
     {
         if ($this->validateRequest()) {
             $this->telegram->handle();
+        } else {
+            header($_SERVER['SERVER_PROTOCOL'] . ' 403 Forbidden', true, 403);
         }
     }
 
@@ -260,7 +259,11 @@ class Bot
     private function setWebhook(): void
     {
         if (empty($this->config['webhook']['url'])) {
-            throw new BotException('Webhook URL is empty!');
+            if (!empty($herokuAppName = getenv('HEROKU_APP_NAME'))) {
+                $this->config['webhook']['url'] = 'https://' . $herokuAppName . '.herokuapp.com/';
+            } else {
+                throw new BotException('Webhook URL is empty!');
+            }
         }
 
         $options = [];
@@ -291,6 +294,7 @@ class Bot
         $result = $this->telegram->setWebhook($url, $options);
 
         if ($result->isOk()) {
+            print 'Webhook URL: ' . $this->config['webhook']['url'] . PHP_EOL;
             print $result->getDescription();
         } else {
             print 'Request failed: ' . $result->getDescription();

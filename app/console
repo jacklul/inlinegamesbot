@@ -9,12 +9,10 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use Bot\Bot;
-
 /**
- * @var Composer\Autoload\ClassLoader
+ * Composer autoloader
  */
-$loader = require __DIR__ . ' /../vendor/autoload.php';
+require __DIR__ . ' /../lib/autoload.php';
 
 try {
     $app = new Bot();

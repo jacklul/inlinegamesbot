@@ -74,11 +74,11 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
         $cached_error_file = sys_get_temp_dir() . '/' . $this->bot_id . '_last_error.tmp';
 
         if (!is_writable($cached_error_file)) {
-            if (!is_dir(VAR_PATH . '/tmp')) {
-                mkdir(VAR_PATH . '/tmp', 0755, true);
+            if (!is_dir(DATA_PATH . '/tmp')) {
+                mkdir(DATA_PATH . '/tmp', 0755, true);
             }
 
-            $cached_error_file = VAR_PATH . '/tmp/' . $this->bot_id . '_last_error.tmp';
+            $cached_error_file = DATA_PATH . '/tmp/' . $this->bot_id . '_last_error.tmp';
         }
 
         if (file_exists($cached_error_file)) {
@@ -123,6 +123,8 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
             }
 
             file_put_contents($cached_error_file, json_encode($previous_reports));
+        } else {
+            print($record['message']);  // log error to console instead
         }
 
         $this->last_timestamp = time();

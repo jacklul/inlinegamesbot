@@ -21,6 +21,8 @@ use PDOException;
 /**
  * Class PostgreSQL
  *
+ * @TODO needs database-powered locking
+ *
  * @package Bot\Storage\Driver
  */
 class PostgreSQL

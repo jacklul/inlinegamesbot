@@ -1,12 +1,6 @@
-# PhpStorm
-.idea/
-
-# Composer
-vendor/
-compoer.phar
-
-# Project
-.env
-var/*
-!var/.gitkeep
-app/language/*.mo
+/.idea/
+/lib/
+/.env
+/data/*
+/!data/.gitkeep
+/app/language/*.mo

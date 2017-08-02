@@ -11,7 +11,7 @@
 /**
  * Default configuration
  *
- * This configuration array is compatible with Telegam Bot Manager even though this library is not used
+ * This configuration array is compatible with Telegam Bot Manager even though it is not used
  * (https://github.com/php-telegram-bot/telegram-bot-manager)
  */
 $config = [

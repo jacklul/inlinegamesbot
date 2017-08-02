@@ -1,5 +1,5 @@
 {
-    "name": "Inline Games",
+    "name": "jacklul/inlinegamesbot",
     "description": "A Telegram bot providing games that can be played in any chat.",
     "authors": [
         {
@@ -12,27 +12,34 @@
     "require": {
         "php": "^7.0",
         "ext-curl": "*",
-        "ext-pdo": "*",
         "ext-gettext": "*",
         "ext-mbstring": "*",
-        "ext-zip": "*",
+        "ext-pdo": "*",
         "ext-pgsql": "*",
-        "longman/telegram-bot": "^0.46.0",
-        "longman/ip-tools": "^1.2",
-        "vlucas/phpdotenv": "^2.4.0",
+        "ext-zip": "*",
+        "ad7six/dsn": "^0.4.0",
         "gettext/gettext": "^4.3.0",
+        "longman/ip-tools": "^1.2",
+        "longman/telegram-bot": "^0.46.0",
         "spatie/emoji": "^1.0.5",
-        "ad7six/dsn": "^0.4.0"
+        "vlucas/phpdotenv": "^2.4.0"
     },
     "require-dev": {
         "heroku/heroku-buildpack-php": "*",
         "squizlabs/php_codesniffer": "^2.8",
-        "symfony/symfony": "^3.3.4"
+        "symfony/symfony": "^3.3"
     },
     "autoload": {
         "psr-4": {
             "Bot\\": "src/"
-        }
+        },
+        "classmap": [
+            "app/Bot.php"
+        ]
+    },
+    "config": {
+        "sort-packages": true,
+        "vendor-dir": "lib/"
     },
     "scripts": {
         "check-code": [

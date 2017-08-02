@@ -13,6 +13,8 @@ namespace Bot\Helper;
 /**
  * Class LockFile
  *
+ * @TODO this is not good for multi-dyno setup on Heroku as filesystem is not shared
+ *
  * @package Bot\Helper
  */
 class LockFile
@@ -42,11 +44,11 @@ class LockFile
         $this->file = sys_get_temp_dir() . '/' . $name . '.tmp';
 
         if (!is_writable($this->file)) {
-            if (!is_dir(VAR_PATH . '/tmp')) {
-                mkdir(VAR_PATH . '/tmp', 0755, true);
+            if (!is_dir(DATA_PATH . '/tmp')) {
+                mkdir(DATA_PATH . '/tmp', 0755, true);
             }
 
-            $this->file = VAR_PATH . '/tmp/' . $name . '.tmp';
+            $this->file = DATA_PATH . '/tmp/' . $name . '.tmp';
         }
 
         $this->delete = $delete;

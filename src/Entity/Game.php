@@ -116,12 +116,10 @@ class Game
         TelegramLog::error($this->crashDump([
             'Game' => $this->manager->getGame()::getTitle(),
             'Game data (before)' => json_encode($data_before),
-            'Game data' => json_encode($this->data),
+            'Game data (after)' => json_encode($this->data),
             'Callback data' => $this->manager->getUpdate()->getCallbackQuery() ? $this->manager->getUpdate()->getCallbackQuery()->getData() : '<not a callback query>',
             'Result' => $result,
         ]));
-
-        Debug::print(print_r(debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT), true));
 
         if ($this->manager->saveData([])) {
             $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
@@ -309,7 +307,7 @@ class Game
         $this->data['data'] = null;
 
         if ($this->manager->saveData($this->data)) {
-            return $this->editMessage(__('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+            return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
         } else {
             return $this->returnStorageFailure();
         }
@@ -328,7 +326,7 @@ class Game
             $this->data['players']['host'] = $this->getCurrentUser(true);
 
             if ($this->manager->saveData($this->data)) {
-                return $this->editMessage(__('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+                return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
             } else {
                 return $this->returnStorageFailure();
             }
@@ -370,7 +368,7 @@ class Game
                 $this->data['players']['guest'] = null;
 
                 if ($this->manager->saveData($this->data)) {
-                    return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $this->getCurrentUserMention()]) . PHP_EOL . __("{PLAYER} is waiting for opponent to join...", ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+                    return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $this->getCurrentUserMention()]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
                 } else {
                     return $this->returnStorageFailure();
                 }
@@ -419,7 +417,7 @@ class Game
             $this->data['players']['guest'] = null;
 
             if ($this->manager->saveData($this->data)) {
-                return $this->editMessage(__('{PLAYER_GUEST} was kicked...', ['{PLAYER_GUEST}' => $user]) . PHP_EOL . __("{PLAYER} is waiting for opponent to join...", ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+                return $this->editMessage(__('{PLAYER_GUEST} was kicked...', ['{PLAYER_GUEST}' => $user]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
             } else {
                 return $this->returnStorageFailure();
             }
@@ -512,7 +510,7 @@ class Game
         }
 
         if ($this->getUser('host') && !$this->getUser('guest')) {
-            $this->editMessage(__('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+            $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
         } elseif ($this->getUser('host') && $this->getUser('guest')) {
             $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
         }
@@ -750,7 +748,7 @@ class Game
         ];
 
         if (getenv('Debug')) {
-            if (class_exists('\Symfony\Component\Console\Helper\Table')) {
+            if (class_exists('\Symfony\Component\Console\Helper\Table')) {  // @TODO replace with lighter dependency
                 $output = new \Symfony\Component\Console\Output\BufferedOutput();
                 $table = new \Symfony\Component\Console\Helper\Table($output);
                 $table->setRows($board);
@@ -790,5 +788,25 @@ class Game
         }
 
         return $output;
+    }
+
+    /**
+     * Handle a case when game data is empty but received a game action request
+     *
+     * @return ServerResponse|mixed
+     */
+    private function handleEmptyData()
+    {
+        Debug::print('Empty game data');
+
+        if ($this->getUser('host') && !$this->getUser('guest')) {
+            $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+        } elseif ($this->getUser('host') && $this->getUser('guest')) {
+            $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
+        } else {
+            $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
+        }
+
+        return $this->answerCallbackQuery(__('Error!'), true);
     }
 }

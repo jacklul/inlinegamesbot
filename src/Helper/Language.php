@@ -44,11 +44,11 @@ class Language
         $t = new Translator();
 
         if (file_exists(APP_PATH . '/language/messages.' . $language . '.po')) {
-            if (!file_exists(VAR_PATH . '/language/messages.' . $language . '.cache') || md5_file(APP_PATH . '/language/messages.' . $language . '.po') != file_get_contents(VAR_PATH . '/language/messages.' . $language . '.cache')) {
+            if (!file_exists(DATA_PATH . '/language/messages.' . $language . '.cache') || md5_file(APP_PATH . '/language/messages.' . $language . '.po') != file_get_contents(DATA_PATH . '/language/messages.' . $language . '.cache')) {
                 self::compileToArray($language);
             }
 
-            $t->loadTranslations(VAR_PATH . '/language/messages.' . $language . '.php');
+            $t->loadTranslations(DATA_PATH . '/language/messages.' . $language . '.php');
 
             self::$current_language = $language;
         } else {
@@ -89,15 +89,15 @@ class Language
      */
     private static function compileToArray($language)
     {
-        if (!file_exists(VAR_PATH . '/language/messages.' . $language . '/.php')) {
+        if (!file_exists(DATA_PATH . '/language/messages.' . $language . '/.php')) {
             $translation = Translations::fromPoFile(APP_PATH . '/language/messages.' . $language . '.po');
 
-            if (!is_dir(VAR_PATH . '/language/')) {
-                mkdir(VAR_PATH . '/language/', 0755, true);
+            if (!is_dir(DATA_PATH . '/language/')) {
+                mkdir(DATA_PATH . '/language/', 0755, true);
             }
 
-            $translation->toPhpArrayFile(VAR_PATH . '/language/messages.' . $language . '.php');
-            file_put_contents(VAR_PATH . '/language/messages.' . $language . '.cache', md5_file(APP_PATH . '/language/messages.' . $language . '.po'));
+            $translation->toPhpArrayFile(DATA_PATH . '/language/messages.' . $language . '.php');
+            file_put_contents(DATA_PATH . '/language/messages.' . $language . '.cache', md5_file(APP_PATH . '/language/messages.' . $language . '.po'));
         }
     }
 

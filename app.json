@@ -20,13 +20,13 @@
             "description": "Bot username set in @BotFather (without '@' symbol)",
             "value": ""
         },
-        "BOT_WEBHOOK": {
-            "description": "Webhook URL (webhook will be set automatically after deployment)",
-            "value": "https://YOURAPPNAME.herokuapp.com/webhook"
-        },
         "BOT_SECRET": {
             "description": "Secret variable used to secure the web hook",
             "generator": "secret"
+        },
+        "BOT_WEBHOOK": {
+            "description": "Webhook URL (webhook will be set automatically after deployment - make sure app name matches)",
+            "value": "https://YOURAPPNAME.herokuapp.com/"
         },
         "BOT_ADMIN": {
             "description": "Admin user's Telegram ID",
@@ -41,8 +41,8 @@
     },
     "scripts": {
         "postdeploy": [
-            "php bin/bot install",
-            "php bin/bot set"
+            "php app/console install",
+            "php app/console set"
         ]
     }
 }

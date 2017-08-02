@@ -61,8 +61,6 @@ class StatsCommand extends AdminCommand
         $stats = [
             'games' => [],
             'games_5min' => [],
-            'total' => 0,
-            '5min' => 0,
         ];
 
         foreach ($games as $game) {
@@ -94,10 +92,10 @@ class StatsCommand extends AdminCommand
 
         $output = '*Active sessions:*' . PHP_EOL;
 
-        arsort($stats['games']);
+        arsort($stats['games_5min']);
 
-        foreach ($stats['games'] as $game => $count) {
-            $output .= ' ' . $game . ' - *' . (isset($stats['games_5min'][$game]) ? $stats['games_5min'][$game] : 0 ) . '* (*' . $count . '* total)' . PHP_EOL;
+        foreach ($stats['games_5min'] as $game) {
+            $output .= ' ' . $game . ' - *' . (isset($stats['games_5min'][$game]) ? $stats['games_5min'][$game] : 0) . '* (*' . $stats['games'][$game] . '* total)' . PHP_EOL;
         }
 
         $data = [];

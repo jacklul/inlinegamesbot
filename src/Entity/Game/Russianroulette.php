@@ -159,7 +159,7 @@ class Russianroulette extends Game
         }
 
         if (empty($data)) {
-            return false;
+            return $this->handleEmptyData();
         }
 
         if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
@@ -216,7 +216,7 @@ class Russianroulette extends Game
                 $hit = $arg;
 
                 if ($this->manager->saveData($this->data)) {
-                    return $this->editMessage($gameOutput . PHP_EOL . PHP_EOL . __('{PLAYER} is waiting for opponent to join...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->gameKeyboard($hit));
+                    return $this->editMessage($gameOutput . PHP_EOL . PHP_EOL . __('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->gameKeyboard($hit));
                 } else {
                     return $this->returnStorageFailure();
                 }

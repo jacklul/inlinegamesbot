@@ -8,14 +8,12 @@
  * file that was distributed with this source code.
  */
 
-use Bot\Bot;
-
 /**
- * @var Composer\Autoload\ClassLoader
+ * Composer autoloader
  */
-$loader = include __DIR__ . ' /../vendor/autoload.php';
+require __DIR__ . ' /../lib/autoload.php';
 
-//We do not want to unnecessarily run the bot when this is not a web hook request
+// We do not want to unnecessarily run the bot when this is not a POST request
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $app = new Bot();
@@ -24,5 +22,5 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
         header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
     }
 } else {
-    header("Location: /");
+    header("Location: https://github.com/jacklul/inlinegamesbot");
 }

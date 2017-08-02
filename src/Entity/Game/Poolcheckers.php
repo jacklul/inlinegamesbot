@@ -194,7 +194,7 @@ class Poolcheckers extends Game
         }
 
         if (empty($data)) {
-            return false;
+            return $this->handleEmptyData();
         }
 
         if (isset($data['current_turn']) && $data['current_turn'] == 'E') {

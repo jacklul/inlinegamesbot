@@ -21,6 +21,8 @@ use PDOException;
 /**
  * Class MySQL
  *
+ * @TODO needs database-powered locking
+ *
  * @package Bot\Storage\Driver
  */
 class MySQL
