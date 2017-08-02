@@ -260,7 +260,7 @@ class Bot
     {
         if (empty($this->config['webhook']['url'])) {
             if (!empty($herokuAppName = getenv('HEROKU_APP_NAME'))) {
-                $this->config['webhook']['url'] = 'https://' . $herokuAppName . '.herokuapp.com/';
+                $this->config['webhook']['url'] = 'https://' . $herokuAppName . '.herokuapp.com';
             } else {
                 throw new BotException('Webhook URL is empty!');
             }
@@ -286,6 +286,8 @@ class Bot
 
             if (strpos($url, '?') !== false) {
                 $query_string_char = '&';
+            } elseif (substr($url, -1) !== '/') {
+                $url = $url . '/';
             }
 
             $url = $url . $query_string_char . 'a=handle&s=' . $this->config['secret'];
@@ -295,9 +297,9 @@ class Bot
 
         if ($result->isOk()) {
             print 'Webhook URL: ' . $this->config['webhook']['url'] . PHP_EOL;
-            print $result->getDescription();
+            print $result->getDescription() . PHP_EOL;
         } else {
-            print 'Request failed: ' . $result->getDescription();
+            print 'Request failed: ' . $result->getDescription() . PHP_EOL;
         }
     }
 
@@ -320,9 +322,9 @@ class Bot
         $result = Request::getWebhookInfo();
 
         if ($result->isOk()) {
-            print_r($result->getResult());
+            print_r($result->getResult()) . PHP_EOL;
         } else {
-            print 'Request failed: ' . $result->getDescription();
+            print 'Request failed: ' . $result->getDescription() . PHP_EOL;
         }
     }
 
