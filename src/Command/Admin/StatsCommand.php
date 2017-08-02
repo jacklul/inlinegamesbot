@@ -94,7 +94,7 @@ class StatsCommand extends AdminCommand
 
         arsort($stats['games_5min']);
 
-        foreach ($stats['games_5min'] as $game) {
+        foreach ($stats['games_5min'] as $game => $value) {
             $output .= ' ' . $game . ' - *' . (isset($stats['games_5min'][$game]) ? $stats['games_5min'][$game] : 0) . '* (*' . $stats['games'][$game] . '* total)' . PHP_EOL;
         }
 
