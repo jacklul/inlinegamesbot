@@ -20,10 +20,6 @@ use Longman\TelegramBot\Request;
 /**
  * Class StatsCommand
  *
- * @TODO number of sessions per game
- * @TODO fancy layout
- * @TODO use only one query
- *
  * @package Longman\TelegramBot\Commands\AdminCommands
  */
 class StatsCommand extends AdminCommand
@@ -31,6 +27,7 @@ class StatsCommand extends AdminCommand
     protected $name = 'stats';
     protected $description = 'Display stats';
     protected $usage = '/stats';
+    protected $private_only = true;
 
     /**
      * @return \Longman\TelegramBot\Entities\ServerResponse

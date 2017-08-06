@@ -28,6 +28,7 @@ class CleanCommand extends AdminCommand
     protected $name = 'clean';
     protected $description = 'Clean old game messages and set them as empty';
     protected $usage = '/clean';
+    protected $private_only = true;
 
     /**
      * @return \Longman\TelegramBot\Entities\ServerResponse
