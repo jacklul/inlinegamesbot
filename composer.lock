@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "148557822306bf87d3fbe93ecb8f1d72",
+    "content-hash": "da1324c274b456b89b455e90989f5793",
     "packages": [
         {
             "name": "ad7six/dsn",
@@ -410,16 +410,16 @@
         },
         {
             "name": "longman/telegram-bot",
-            "version": "0.47.0",
+            "version": "0.47.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-telegram-bot/core.git",
-                "reference": "75d992c3d2d13305593c72cdaa8fdbdc01901b45"
+                "reference": "e7303ed0702a3340b6344eb47270a8801bb564d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-telegram-bot/core/zipball/75d992c3d2d13305593c72cdaa8fdbdc01901b45",
-                "reference": "75d992c3d2d13305593c72cdaa8fdbdc01901b45",
+                "url": "https://api.github.com/repos/php-telegram-bot/core/zipball/e7303ed0702a3340b6344eb47270a8801bb564d6",
+                "reference": "e7303ed0702a3340b6344eb47270a8801bb564d6",
                 "shasum": ""
             },
             "require": {
@@ -459,7 +459,7 @@
                 "bot",
                 "telegram"
             ],
-            "time": "2017-08-06T11:24:13+00:00"
+            "time": "2017-08-06T15:28:26+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -1193,16 +1193,16 @@
         },
         {
             "name": "heroku/heroku-buildpack-php",
-            "version": "v121",
+            "version": "v122",
             "source": {
                 "type": "git",
                 "url": "https://github.com/heroku/heroku-buildpack-php.git",
-                "reference": "727aa850a02a7af94c9225237464be8e8c8ff6db"
+                "reference": "82b6fbf8d6a9693ec2f01ccf993202bfc1bc528a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/heroku/heroku-buildpack-php/zipball/727aa850a02a7af94c9225237464be8e8c8ff6db",
-                "reference": "727aa850a02a7af94c9225237464be8e8c8ff6db",
+                "url": "https://api.github.com/repos/heroku/heroku-buildpack-php/zipball/82b6fbf8d6a9693ec2f01ccf993202bfc1bc528a",
+                "reference": "82b6fbf8d6a9693ec2f01ccf993202bfc1bc528a",
                 "shasum": ""
             },
             "bin": [
@@ -1233,7 +1233,7 @@
                 "nginx",
                 "php"
             ],
-            "time": "2017-03-27T23:33:27+00:00"
+            "time": "2017-08-03T22:13:11+00:00"
         },
         {
             "name": "paragonie/random_compat",
