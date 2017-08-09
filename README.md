@@ -1,6 +1,6 @@
 # Inline Games
 
-A Telegram bot that provides real-time multi-player games that can be played in any chat.
+A Telegram bot that provides real-time multiplayer games that can be played in any chat.
 
 You can see the bot in action by messaging [@inlinegamesbot](https://telegram.me/inlinegamesbot).
 
