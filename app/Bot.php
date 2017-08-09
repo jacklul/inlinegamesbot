@@ -10,8 +10,8 @@
 
 use Bot\Exception\BotException;
 use Bot\Helper\Debug;
-use Bot\Helper\Monolog\Handler\TelegramBotAdminHandler;
-use Bot\Storage\Driver;
+use Bot\Monolog\Handler\TelegramBotAdminHandler;
+use Bot\Helper\Storage;
 use Dotenv\Dotenv;
 use Gettext\Translator;
 use Longman\IPTools\Ip;
@@ -57,15 +57,15 @@ class Bot
      * @var array
      */
     private $commands = [
-        'help' => 'showHelp',
-        'set' => 'setWebhook',
-        'unset' => 'deleteWebhook',
-        'info' => 'webhookInfo',
+        'help'    => 'showHelp',
+        'set'     => 'setWebhook',
+        'unset'   => 'deleteWebhook',
+        'info'    => 'webhookInfo',
         'install' => 'handleInstall',
-        'handle' => 'handleWebhook',
-        'cron' => 'handleCron',
-        'loop' => 'handleLongPolling',
-        'worker' => 'handleWorker',
+        'handle'  => 'handleWebhook',
+        'cron'    => 'handleCron',
+        'loop'    => 'handleLongPolling',
+        'worker'  => 'handleWorker',
     ];
 
     /**
@@ -437,7 +437,7 @@ class Bot
     {
         print 'Installing database structure...' . PHP_EOL;
 
-        if (Driver::getStorageClass()::createStructure()) {
+        if (Storage::getClass()::createStructure()) {
             print 'Installed!' . PHP_EOL;
         } else {
             print 'Error!' . PHP_EOL;

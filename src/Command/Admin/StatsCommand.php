@@ -11,7 +11,7 @@
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
 use Bot\Manager\Game as GameManager;
-use Bot\Storage\Driver;
+use Bot\Storage\Storage;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
@@ -51,7 +51,7 @@ class StatsCommand extends AdminCommand
             $data_query['callback_query_id'] = $callback_query->getId();
         }
 
-        $storage = Driver::getStorageClass();
+        $storage = Storage::getStorageClass();
         $storage::initializeStorage();
 
         $games = $storage::listFromGame(0);

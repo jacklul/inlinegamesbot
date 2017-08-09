@@ -86,8 +86,7 @@ class Game
 
         $this->id = $id;
         $this->update = $command->getUpdate();
-        $this->telegram = $command->getTelegram();
-        $this->storage = Driver::getStorageClass();
+        $this->storage = Storage::getClass();
 
         if (!$this->storage::initializeStorage()) {
             Debug::print('Storage initialization failed: \'' . $this->storage . '\'');

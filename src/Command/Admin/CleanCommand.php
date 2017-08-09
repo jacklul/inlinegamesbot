@@ -12,7 +12,7 @@ namespace Longman\TelegramBot\Commands\AdminCommands;
 
 use Bot\Helper\Debug;
 use Bot\Manager\Game as GameManager;
-use Bot\Storage\Driver;
+use Bot\Storage\Storage;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
@@ -64,7 +64,7 @@ class CleanCommand extends AdminCommand
             set_time_limit(10);
         }
 
-        $storage = Driver::getStorageClass();
+        $storage = Storage::getStorageClass();
 
         if (class_exists($storage)) {
             $storage::initializeStorage();
