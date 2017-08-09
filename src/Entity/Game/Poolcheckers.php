@@ -472,15 +472,8 @@ class Poolcheckers extends Game
             )
         ];
 
-        if (getenv('Debug')) {
-            if (class_exists('\Symfony\Component\Console\Helper\Table')) {
-                $output = new \Symfony\Component\Console\Output\BufferedOutput();
-                $table = new \Symfony\Component\Console\Helper\Table($output);
-                $table->setRows($board);
-                $table->render();
-
-                Debug::print('CURRENT BOARD:' . PHP_EOL . $output->fetch());
-            }
+        if (getenv('DEBUG')) {
+            $this->boardPrint($board);
 
             $inline_keyboard[] = [
                 new InlineKeyboardButton(

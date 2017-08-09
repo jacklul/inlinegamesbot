@@ -747,15 +747,8 @@ class Game
             )
         ];
 
-        if (getenv('Debug')) {
-            if (class_exists('\Symfony\Component\Console\Helper\Table')) {  // @TODO replace with lighter dependency
-                $output = new \Symfony\Component\Console\Output\BufferedOutput();
-                $table = new \Symfony\Component\Console\Helper\Table($output);
-                $table->setRows($board);
-                $table->render();
-
-                Debug::print('CURRENT BOARD:' . PHP_EOL . $output->fetch());
-            }
+        if (getenv('DEBUG')) {
+            $this->boardPrint($board);
 
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
@@ -773,16 +766,41 @@ class Game
     }
 
     /**
+     * Debug print of game board
+     *
+     * @param $board
+     */
+    protected function boardPrint($board)
+    {
+        if (!empty($board) && is_array($board) && isset($this->max_y) && isset($this->max_x)) {
+            $board_out = str_repeat(' ---', $this->max_x) . PHP_EOL;
+
+            for ($x = 0; $x < $this->max_x; $x++) {
+                $line = '';
+
+                for ($y = 0; $y < $this->max_y; $y++) {
+                    $line .= '|' . (!empty($board[$x][$y]) ? ' ' . $board[$x][$y] . ' ' : '   ');
+                }
+
+                $board_out .= $line . '|' . PHP_EOL;
+                $board_out .= str_repeat(' ---', $this->max_x) . PHP_EOL;
+            }
+
+            Debug::print('CURRENT BOARD:' . PHP_EOL . $board_out);
+        }
+    }
+
+    /**
      * Make a debug dump of crashed game session
      *
      * @param array $data
      *
+     * @param string $id
      * @return string
-     * @throws BotException
      */
-    private function crashDump($data = [])
+    private function crashDump($data = [], $id = '')
     {
-        $output = 'CRASH DETAILS:' . PHP_EOL;
+        $output = 'CRASH' . (isset($id) ? ' (ID: ' . $id . ')' : '' ) . ':' . PHP_EOL;
         foreach ($data as $var => $val) {
             $output .= $var . ': ' . (is_array($val) ? print_r($val, true) : (is_bool($val) ? ($val ? 'true' : 'false') : $val)) . PHP_EOL;
         }

@@ -26,8 +26,7 @@
     },
     "require-dev": {
         "heroku/heroku-buildpack-php": "*",
-        "squizlabs/php_codesniffer": "^2.8",
-        "symfony/symfony": "^3.3"
+        "squizlabs/php_codesniffer": "^2.8"
     },
     "autoload": {
         "psr-4": {
