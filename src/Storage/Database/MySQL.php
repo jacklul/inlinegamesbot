@@ -8,12 +8,12 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Storage\Driver;
+namespace Bot\Storage\Database;
 
 use AD7six\Dsn\Dsn;
 use Bot\Exception\StorageException;
 use Bot\Helper\Debug;
-use Bot\Helper\LockFile;
+use Bot\Entity\LockFile;
 use Longman\TelegramBot\TelegramLog;
 use PDO;
 use PDOException;
@@ -61,7 +61,7 @@ class MySQL
      * @param null $pdo
      * @return bool
      */
-    public static function initializeStorage($pdo = null)
+    public static function initializeStorage($pdo = null): bool
     {
         if (self::isDbConnected()) {
             return true;
@@ -84,6 +84,7 @@ class MySQL
                 }
 
                 Debug::print('Connection to the database failed');
+
                 return false;
             }
         } else {
@@ -99,7 +100,7 @@ class MySQL
      * @return bool
      * @throws StorageException
      */
-    public static function createStructure()
+    public static function createStructure(): bool
     {
         if (!self::isDbConnected()) {
             self::initializeStorage();
@@ -117,7 +118,7 @@ class MySQL
      *
      * @return bool
      */
-    public static function isDbConnected()
+    public static function isDbConnected(): bool
     {
         return self::$pdo !== null;
     }
@@ -152,7 +153,8 @@ class MySQL
 
             if ($result = $sth->execute()) {
                 $result = $sth->fetchAll(PDO::FETCH_ASSOC);
-                return isset($result[0]) ? json_decode($result[0]['data'], true): $result;
+
+                return isset($result[0]) ? json_decode($result[0]['data'], true) : $result;
             } else {
                 return $result;
             }
@@ -170,7 +172,7 @@ class MySQL
      * @return bool
      * @throws StorageException
      */
-    public static function insertToGame($id, $data)
+    public static function insertToGame($id, $data): bool
     {
         if (!self::isDbConnected()) {
             return false;
@@ -218,7 +220,7 @@ class MySQL
      * @return bool
      * @throws StorageException
      */
-    public static function deleteFromGame($id)
+    public static function deleteFromGame($id): bool
     {
         if (!self::isDbConnected()) {
             return false;
@@ -252,7 +254,7 @@ class MySQL
      * @return bool
      * @throws StorageException
      */
-    public static function lockGame($id)
+    public static function lockGame($id): bool
     {
         if (!self::isDbConnected()) {
             return false;
@@ -264,7 +266,13 @@ class MySQL
 
         self::$lock = new LockFile($id);
 
-        return flock(fopen(self::$lock->getFile(), "a+"), LOCK_EX);
+        $file = self::$lock->getFile();
+
+        if (!$file) {
+            throw new StorageException('Cannot access lock file!');
+        }
+
+        return flock(fopen($file, "a+"), LOCK_EX);
     }
 
     /**
@@ -275,7 +283,7 @@ class MySQL
      * @return bool
      * @throws StorageException
      */
-    public static function unlockGame($id)
+    public static function unlockGame($id): bool
     {
         if (!self::isDbConnected()) {
             return false;
@@ -285,7 +293,13 @@ class MySQL
             throw new StorageException('Id is empty!');
         }
 
-        return flock(fopen(self::$lock->getFile(), "a+"), LOCK_UN);
+        $file = self::$lock->getFile();
+
+        if (!$file) {
+            throw new StorageException('Cannot access lock file!');
+        }
+
+        return flock(fopen($file, "a+"), LOCK_UN);
     }
 
     /**

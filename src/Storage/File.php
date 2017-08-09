@@ -8,7 +8,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Storage\Driver;
+namespace Bot\Storage;
 
 use Bot\Exception\StorageException;
 
@@ -26,7 +26,7 @@ class File
     /**
      * Initialize - define paths
      */
-    public static function initializeStorage()
+    public static function initializeStorage(): bool
     {
         if (!defined('STORAGE_GAME_PATH')) {
             define("STORAGE_GAME_PATH", DATA_PATH . '/game');
@@ -44,7 +44,7 @@ class File
      *
      * @return bool
      */
-    public static function createStructure()
+    public static function createStructure(): bool
     {
         return true;
     }
@@ -79,7 +79,7 @@ class File
      * @return bool
      * @throws StorageException
      */
-    public static function insertToGame($id, $data)
+    public static function insertToGame($id, $data): bool
     {
         if (empty($id)) {
             throw new StorageException('Id is empty!');
@@ -106,7 +106,7 @@ class File
      * @return bool
      * @throws StorageException
      */
-    public static function deleteFromGame($id)
+    public static function deleteFromGame($id): bool
     {
         if (empty($id)) {
             throw new StorageException('Id is empty!');
@@ -127,7 +127,7 @@ class File
      * @return bool
      * @throws StorageException
      */
-    public static function lockGame($id)
+    public static function lockGame($id): bool
     {
         if (empty($id)) {
             throw new StorageException('Id is empty!');
@@ -153,7 +153,7 @@ class File
      * @return bool
      * @throws StorageException
      */
-    public static function unlockGame($id)
+    public static function unlockGame($id): bool
     {
         if (empty($id)) {
             throw new StorageException('Id is empty!');
@@ -174,7 +174,7 @@ class File
      * @return array
      * @throws StorageException
      */
-    public static function listFromGame($time = 0)
+    public static function listFromGame($time = 0): array
     {
         if (!is_numeric($time)) {
             throw new StorageException('Time must be a number!');

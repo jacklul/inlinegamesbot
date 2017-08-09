@@ -8,9 +8,10 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Storage\Driver;
+namespace Bot\Storage;
 
 use Longman\TelegramBot\DB;
+use Bot\Storage\Database\MySQL;
 
 /**
  * Class BotDB
@@ -26,7 +27,7 @@ class BotDB extends DB
      *
      * @return bool
      */
-    public static function initializeStorage()
+    public static function initializeStorage(): bool
     {
         return MySQL::initializeStorage(self::$pdo);
     }
@@ -36,7 +37,7 @@ class BotDB extends DB
      *
      * @return bool
      */
-    public static function createStructure()
+    public static function createStructure(): bool
     {
         self::initializeStorage();
         return MySQL::createStructure();
@@ -62,7 +63,7 @@ class BotDB extends DB
      *
      * @return bool
      */
-    public static function insertToGame($id, $data)
+    public static function insertToGame($id, $data): bool
     {
         return MySQL::insertToGame($id, $data);
     }
@@ -74,7 +75,7 @@ class BotDB extends DB
      *
      * @return bool
      */
-    public static function deleteFromGame($id)
+    public static function deleteFromGame($id): bool
     {
         return MySQL::deleteFromGame($id);
     }
@@ -86,7 +87,7 @@ class BotDB extends DB
      *
      * @return bool
      */
-    public static function lockGame($id)
+    public static function lockGame($id): bool
     {
         return MySQL::lockGame($id);
     }
@@ -98,7 +99,7 @@ class BotDB extends DB
      *
      * @return bool
      */
-    public static function unlockGame($id)
+    public static function unlockGame($id): bool
     {
         return MySQL::unlockGame($id);
     }

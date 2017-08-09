@@ -8,24 +8,21 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Storage;
+namespace Bot\Helper;
 
 use AD7six\Dsn\Dsn;
 use Bot\Exception\StorageException;
-use Bot\Helper\Debug;
 use Longman\TelegramBot\DB;
 
 /**
- * Class DB
- *
- * Initializes PDO object based on DSN string from 'DATABASE_URL' environment variable
+ * Class Storage
  *
  * @package Bot\Storage
  */
-class Driver
+class Storage
 {
     /**
-     * Supported DB engines
+     * Supported database engines
      */
     private static $drivers = [
         'mysql'     => 'MySQL',
@@ -39,17 +36,17 @@ class Driver
      * @return string
      * @throws StorageException
      */
-    public static function getStorageClass()
+    public static function getClass(): string
     {
         if (DB::isDbConnected() && !getenv('DEBUG_NO_BOTDB')) {
-            $storage = 'Bot\Storage\Driver\BotDB';
+            $storage = 'Bot\Storage\BotDB';
         } elseif (getenv('DATABASE_URL')) {
             $dsn = Dsn::parse(getenv('DATABASE_URL'));
             $dsn = $dsn->toArray();
 
-            $storage = 'Bot\Storage\Driver\\' . (self::$drivers[$dsn['engine']]) ?: '';
+            $storage = 'Bot\Storage\Database\\' . (self::$drivers[$dsn['engine']]) ?: '';
         } else {
-            $storage = 'Bot\Storage\Driver\File';
+            $storage = 'Bot\Storage\File';
         }
 
         if ($env_storage = getenv('DEBUG_STORAGE')) {

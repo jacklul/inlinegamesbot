@@ -8,14 +8,14 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Helper;
+namespace Bot\Entity;
+
+use Bot\Helper\Debug;
 
 /**
  * Class LockFile
  *
- * @TODO this is not good for multi-dyno setup on Heroku as filesystem is not shared
- *
- * @package Bot\Helper
+ * @package Bot\Entity
  */
 class LockFile
 {
@@ -36,22 +36,29 @@ class LockFile
     /**
      * LockFile constructor
      *
-     * @param $name
-     * @param bool $delete
+     * @param string $name
+     * @param bool   $delete
      */
     public function __construct($name, $delete = true)
     {
         $this->file = sys_get_temp_dir() . '/' . $name . '.tmp';
+        $this->delete = $delete;
 
-        if (!is_writable($this->file)) {
+        if (!is_writable(dirname($this->file))) {
             if (!is_dir(DATA_PATH . '/tmp')) {
                 mkdir(DATA_PATH . '/tmp', 0755, true);
             }
 
             $this->file = DATA_PATH . '/tmp/' . $name . '.tmp';
+
+            if (!is_writable(dirname($this->file))) {
+                $this->file = false;
+            }
         }
 
-        $this->delete = $delete;
+        Debug::print('Lock file: ' . $this->file);
+
+        touch($this->file);
     }
 
     /**
@@ -59,13 +66,13 @@ class LockFile
      */
     public function __destruct()
     {
-        if ($this->delete) {
+        if ($this->delete && $this->file) {
             @unlink($this->file);
         }
     }
 
     /**
-     * Get the file path
+     * Get the file path or false
      *
      * @return bool|string
      */

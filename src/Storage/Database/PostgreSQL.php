@@ -8,12 +8,12 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Storage\Driver;
+namespace Bot\Storage\Database;
 
 use AD7six\Dsn\Dsn;
 use Bot\Exception\StorageException;
 use Bot\Helper\Debug;
-use Bot\Helper\LockFile;
+use Bot\Entity\LockFile;
 use Longman\TelegramBot\TelegramLog;
 use PDO;
 use PDOException;
@@ -58,7 +58,7 @@ class PostgreSQL
     /**
      * Initialize PDO connection
      */
-    public static function initializeStorage()
+    public static function initializeStorage(): bool
     {
         if (self::isDbConnected()) {
             return true;
@@ -92,7 +92,7 @@ class PostgreSQL
      * @return bool
      * @throws StorageException
      */
-    public static function createStructure()
+    public static function createStructure(): bool
     {
         if (!self::isDbConnected()) {
             self::initializeStorage();
@@ -110,7 +110,7 @@ class PostgreSQL
      *
      * @return bool
      */
-    public static function isDbConnected()
+    public static function isDbConnected(): bool
     {
         return self::$pdo !== null;
     }
@@ -163,7 +163,7 @@ class PostgreSQL
      * @return bool
      * @throws StorageException
      */
-    public static function insertToGame($id, $data)
+    public static function insertToGame($id, $data): bool
     {
         if (!self::isDbConnected()) {
             return false;
@@ -211,7 +211,7 @@ class PostgreSQL
      * @return array|bool|mixed
      * @throws StorageException
      */
-    public static function deleteFromGame($id)
+    public static function deleteFromGame($id): bool
     {
         if (!self::isDbConnected()) {
             return false;
@@ -245,7 +245,7 @@ class PostgreSQL
      * @return bool
      * @throws StorageException
      */
-    public static function lockGame($id)
+    public static function lockGame($id): bool
     {
         if (!self::isDbConnected()) {
             return false;
@@ -257,7 +257,13 @@ class PostgreSQL
 
         self::$lock = new LockFile($id);
 
-        return flock(fopen(self::$lock->getFile(), "a+"), LOCK_EX);
+        $file = self::$lock->getFile();
+
+        if (!$file) {
+            throw new StorageException('Cannot access lock file!');
+        }
+
+        return flock(fopen($file, "a+"), LOCK_EX);
     }
 
     /**
@@ -268,7 +274,7 @@ class PostgreSQL
      * @return bool
      * @throws StorageException
      */
-    public static function unlockGame($id)
+    public static function unlockGame($id): bool
     {
         if (!self::isDbConnected()) {
             return false;
@@ -278,7 +284,13 @@ class PostgreSQL
             throw new StorageException('Id is empty!');
         }
 
-        return flock(fopen(self::$lock->getFile(), "a+"), LOCK_UN);
+        $file = self::$lock->getFile();
+
+        if (!$file) {
+            throw new StorageException('Cannot access lock file!');
+        }
+
+        return flock(fopen($file, "a+"), LOCK_UN);
     }
 
     /**
