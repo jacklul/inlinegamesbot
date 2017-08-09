@@ -214,7 +214,7 @@ class Tictactoe extends Game
             $gameOutput = __("Current turn:") . ' ' . $this->symbols[$data['current_turn']];
         }
 
-        if ($this->manager->saveData($this->data)) {
+        if ($this->saveData($this->data)) {
             return $this->editMessage(
                 $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($data['board'], $isOver)

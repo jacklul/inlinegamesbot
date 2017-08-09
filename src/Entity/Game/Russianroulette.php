@@ -215,7 +215,7 @@ class Russianroulette extends Game
 
                 $hit = $arg;
 
-                if ($this->manager->saveData($this->data)) {
+                if ($this->saveData($this->data)) {
                     return $this->editMessage($gameOutput . PHP_EOL . PHP_EOL . __('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->gameKeyboard($hit));
                 } else {
                     return $this->returnStorageFailure();
@@ -238,7 +238,7 @@ class Russianroulette extends Game
 
         Debug::print('Cylinder: |' . implode('|', $data['cylinder']) . '|');
 
-        if ($this->manager->saveData($this->data)) {
+        if ($this->saveData($this->data)) {
             return $this->editMessage(
                 $this->getUserMention('host') . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($hit)
@@ -365,11 +365,11 @@ class Russianroulette extends Game
             ];
         }
 
-        if (getenv('Debug')) {
+        if (getenv('DEBUG')) {
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => 'Debug: ' . 'Restart',
+                        'text' => 'DEBUG: ' . 'Restart',
                         'callback_data' => $this->manager->getGame()::getCode() . ';start'
                     ]
                 )

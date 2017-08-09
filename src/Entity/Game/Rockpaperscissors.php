@@ -171,7 +171,7 @@ class Rockpaperscissors extends Game
                     $data['guest_pick'] = $arg;
                 }
 
-                if ($this->manager->saveData($this->data)) {
+                if ($this->saveData($this->data)) {
                     Debug::print($this->getCurrentUserMention() . ' picked ' . $arg);
 
                     if ($data['host_pick'] == '' || $data['guest_pick'] == '') {
@@ -233,7 +233,7 @@ class Rockpaperscissors extends Game
             $isOver = false;
         }
 
-        if ($this->manager->saveData($this->data)) {
+        if ($this->saveData($this->data)) {
             return $this->editMessage(
                 $this->getUserMention('host') . $hostPick . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . $guestPick . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($isOver)
@@ -285,11 +285,11 @@ class Rockpaperscissors extends Game
             ];
         }
 
-        if (getenv('Debug')) {
+        if (getenv('DEBUG')) {
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => 'Debug: ' . 'Restart',
+                        'text' => 'DEBUG: ' . 'Restart',
                         'callback_data' => $this->manager->getGame()::getCode() . ';start'
                     ]
                 )

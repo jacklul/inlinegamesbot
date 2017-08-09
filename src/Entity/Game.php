@@ -81,7 +81,7 @@ class Game
         $action = $action . 'Action';
 
         if (!method_exists($this, $action)) {
-            Debug::print('Method \'' . $action . '\ doesn\'t exist');
+            Debug::print('Method \'' . $action . '\' doesn\'t exist');
             return $this->answerCallbackQuery();
         }
 
@@ -119,13 +119,28 @@ class Game
             'Game data (after)' => json_encode($this->data),
             'Callback data' => $this->manager->getUpdate()->getCallbackQuery() ? $this->manager->getUpdate()->getCallbackQuery()->getData() : '<not a callback query>',
             'Result' => $result,
-        ]));
+        ],
+            $this->manager->getId()
+        ));
 
-        if ($this->manager->saveData([])) {
+        if ($this->saveData([])) {
             $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
         }
 
         return $this->answerCallbackQuery(__('Critical error!', true));
+    }
+
+    /**
+     * Save game data
+     *
+     * @param  $data
+     * @return bool
+     */
+    protected function saveData($data): bool
+    {
+        Debug::print('Saving game data to database');
+        $data['game_code'] = $this->manager->getGame()::getCode();    // make sure we have the game code in the data array for /clean command!
+        return $this->manager->getStorage()::insertToGame($this->manager->getId(), $data);
     }
 
     /**
@@ -306,7 +321,7 @@ class Game
         $this->data['players']['guest'] = null;
         $this->data['data'] = null;
 
-        if ($this->manager->saveData($this->data)) {
+        if ($this->saveData($this->data)) {
             return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
         } else {
             return $this->returnStorageFailure();
@@ -325,18 +340,18 @@ class Game
 
             $this->data['players']['host'] = $this->getCurrentUser(true);
 
-            if ($this->manager->saveData($this->data)) {
+            if ($this->saveData($this->data)) {
                 return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
             } else {
                 return $this->returnStorageFailure();
             }
         } elseif (!$this->getUser('guest')) {
-            if ($this->getCurrentUserId() != $this->getUserId('host') || (getenv('Debug') && $this->getCurrentUserId() == getenv('BOT_ADMIN'))) {
+            if ($this->getCurrentUserId() != $this->getUserId('host') || (getenv('DEBUG') && $this->getCurrentUserId() == getenv('BOT_ADMIN'))) {
                 Debug::print('Guest:' . $this->getCurrentUserMention());
 
                 $this->data['players']['guest'] = $this->getCurrentUser(true);
 
-                if ($this->manager->saveData($this->data)) {
+                if ($this->saveData($this->data)) {
                     return $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
                 } else {
                     return $this->returnStorageFailure();
@@ -367,7 +382,7 @@ class Game
                 $this->data['players']['host'] = $this->data['players']['guest'];
                 $this->data['players']['guest'] = null;
 
-                if ($this->manager->saveData($this->data)) {
+                if ($this->saveData($this->data)) {
                     return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $this->getCurrentUserMention()]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
                 } else {
                     return $this->returnStorageFailure();
@@ -377,7 +392,7 @@ class Game
 
                 $this->data['players']['host'] = null;
 
-                if ($this->manager->saveData($this->data)) {
+                if ($this->saveData($this->data)) {
                     return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
                 } else {
                     return $this->returnStorageFailure();
@@ -388,7 +403,7 @@ class Game
 
             $this->data['players']['guest'] = null;
 
-            if ($this->manager->saveData($this->data)) {
+            if ($this->saveData($this->data)) {
                 return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
             } else {
                 return $this->returnStorageFailure();
@@ -416,7 +431,7 @@ class Game
             $user = $this->getUserMention('guest');
             $this->data['players']['guest'] = null;
 
-            if ($this->manager->saveData($this->data)) {
+            if ($this->saveData($this->data)) {
                 return $this->editMessage(__('{PLAYER_GUEST} was kicked...', ['{PLAYER_GUEST}' => $user]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
             } else {
                 return $this->returnStorageFailure();
@@ -504,7 +519,7 @@ class Game
 
         $this->data['settings']['language'] = $selected_language;
 
-        if ($this->manager->saveData($this->data)) {
+        if ($this->saveData($this->data)) {
             Debug::log('Set language: ' . $selected_language);
             Language::set($selected_language);
         }
@@ -557,7 +572,7 @@ class Game
 
         $keyboard = $this->$keyboard();
 
-        if (getenv('Debug')) {
+        if (getenv('DEBUG')) {
             $keyboard[] = [
                 new InlineKeyboardButton(
                     [

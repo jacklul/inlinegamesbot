@@ -15,7 +15,7 @@ use Bot\Exception\BotException;
 use Bot\Helper\Botan;
 use Bot\Helper\Debug;
 use Bot\Helper\Language;
-use Bot\Storage\Driver;
+use Bot\Helper\Storage;
 use Longman\TelegramBot\Commands\Command;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Entities\Update;
@@ -31,19 +31,19 @@ class Game
     /**
      * Game ID (inline_message_id)
      *
-     * @var
+     * @var string
      */
     private $id;
 
     /**
      * Game object
      *
-     * @var
+     * @var GameEntity
      */
     private $game;
 
     /**
-     * Currently used storage class
+     * Currently used storage class name
      *
      * @var string
      */
@@ -52,23 +52,16 @@ class Game
     /**
      * Update object
      *
-     * @var \Longman\TelegramBot\Entities\Update
+     * @var Update
      */
     private $update;
 
     /**
-     * Telegram object
-     *
-     * @var \Longman\TelegramBot\Telegram
-     */
-    private $telegram;
-
-    /**
      * Game Manager constructor
      *
-     * @param $id
-     * @param $game_code
-     * @param Command   $command
+     * @param string  $id
+     * @param string  $game_code
+     * @param Command $command
      *
      * @throws BotException
      */
@@ -110,7 +103,7 @@ class Game
      *
      * @param $game_code
      *
-     * @return mixed
+     * @return GameEntity|bool
      */
     private function findGame($game_code)
     {
@@ -118,9 +111,9 @@ class Game
             foreach (new \DirectoryIterator(SRC_PATH . '/Entity/Game') as $file) {
                 if (!$file->isDir() && !$file->isDot()) {
                     $game_class = '\Bot\Entity\Game\\' . basename($file->getFilename(), '.php');
+
                     if ($game_class::getCode() == $game_code) {
-                        $game = new $game_class($this);
-                        return $game;
+                        return new $game_class($this);
                     }
                 }
             }
@@ -216,7 +209,7 @@ class Game
      *
      * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
@@ -226,7 +219,7 @@ class Game
      *
      * @return mixed
      */
-    public function getGame()
+    public function getGame(): GameEntity
     {
         return $this->game;
     }
@@ -236,7 +229,7 @@ class Game
      *
      * @return string
      */
-    public function getStorage()
+    public function getStorage(): string
     {
         return $this->storage;
     }
@@ -251,16 +244,4 @@ class Game
         return $this->update;
     }
 
-    /**
-     * Save game data
-     *
-     * @param  $data
-     * @return bool
-     */
-    public function saveData($data): bool
-    {
-        Debug::print('Saving game data to database');
-        $data['game_code'] = $this->game::getCode();    // make sure we have the game code in the data array for /clean command!
-        return $this->storage::insertToGame($this->id, $data);
-    }
 }

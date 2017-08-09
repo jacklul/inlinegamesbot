@@ -363,7 +363,7 @@ class Checkers extends Game
             Debug::print('Game is still in progress');
         }
 
-        if ($this->manager->saveData($this->data)) {
+        if ($this->saveData($this->data)) {
             return $this->editMessage(
                 $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($data['board'], $isOver, $data['move_counter'])
@@ -801,7 +801,7 @@ class Checkers extends Game
 
                 $this->data['data']['current_turn'] = 'E';
 
-                if ($this->manager->saveData($this->data)) {
+                if ($this->saveData($this->data)) {
                     return $this->editMessage(
                         $this->getUserMention('host') . ' (' . (($this->data['data']['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($this->data['data']['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                         $this->gameKeyboard($this->data['data']['board'], 'surrender')
@@ -814,7 +814,7 @@ class Checkers extends Game
             Debug::print($this->getCurrentUserMention() . ' voted to surrender');
             $this->data['data']['vote']['host']['surrender'] = true;
 
-            if ($this->manager->saveData($this->data)) {
+            if ($this->saveData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
             } else {
                 return $this->returnStorageFailure();
@@ -828,7 +828,7 @@ class Checkers extends Game
 
                 $this->data['data']['current_turn'] = 'E';
 
-                if ($this->manager->saveData($this->data)) {
+                if ($this->saveData($this->data)) {
                     return $this->editMessage(
                         $this->getUserMention('host') . ' (' . (($this->data['data']['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($this->data['data']['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                         $this->gameKeyboard($this->data['data']['board'], 'surrender')
@@ -841,7 +841,7 @@ class Checkers extends Game
             Debug::print($this->getCurrentUserMention() . ' voted to surrender');
             $this->data['data']['vote']['guest']['surrender'] = true;
 
-            if ($this->manager->saveData($this->data)) {
+            if ($this->saveData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
             } else {
                 return $this->returnStorageFailure();
@@ -871,7 +871,7 @@ class Checkers extends Game
         if ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host') && !$this->data['data']['vote']['host']['draw']) {
             $this->data['data']['vote']['host']['draw'] = true;
 
-            if ($this->manager->saveData($this->data)) {
+            if ($this->saveData($this->data)) {
                 Debug::print($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
@@ -881,7 +881,7 @@ class Checkers extends Game
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest') && !$this->data['data']['vote']['guest']['draw']) {
             $this->data['data']['vote']['guest']['draw'] = true;
 
-            if ($this->manager->saveData($this->data)) {
+            if ($this->saveData($this->data)) {
                 Debug::print($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
