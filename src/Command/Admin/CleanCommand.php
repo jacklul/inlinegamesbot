@@ -64,7 +64,7 @@ class CleanCommand extends AdminCommand
             set_time_limit(10);
         }
 
-        $storage = Storage::getStorageClass();
+        $storage = Storage::getClass();
 
         if (class_exists($storage)) {
             $storage::initializeStorage();

@@ -51,7 +51,7 @@ class StatsCommand extends AdminCommand
             $data_query['callback_query_id'] = $callback_query->getId();
         }
 
-        $storage = Storage::getStorageClass();
+        $storage = Storage::getClass();
         $storage::initializeStorage();
 
         $games = $storage::listFromGame(0);
