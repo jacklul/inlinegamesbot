@@ -1,5 +1,4 @@
 .idea/
 lib/
 data/
-composer.lock
 .env
