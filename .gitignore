@@ -1,6 +1,5 @@
-/.idea/
-/lib/
-/.env
-/data/*
-!/data/.gitkeep
-/app/language/*.mo
+.idea/
+lib/
+data/
+composer.lock
+.env

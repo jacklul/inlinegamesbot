@@ -7,7 +7,7 @@ Now make all your changes and test them.
 
 To test the changes you will obviously need a bot, assuming you already have one - put the token and bot username in `.env` file for local development.
 
-The easiest way to test your changes is to run the bot with `getUpdates` method - use `php bin/bot l=300` command. 
+The easiest way to test your changes is to run the bot with `getUpdates` method - use `php bot/console loop` command.
 
 Make sure your code is following PSR-2 coding standard - run [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) with `composer check-code` command.
 

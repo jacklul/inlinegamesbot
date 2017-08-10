@@ -13,7 +13,9 @@
  */
 require __DIR__ . ' /../lib/autoload.php';
 
-// We do not want to unnecessarily run the bot when this is not a POST request
+/**
+ * Handle webhook request only when it's a POST request
+ */
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $app = new Bot();

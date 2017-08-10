@@ -21,9 +21,8 @@ use Longman\TelegramBot\TelegramLog;
 use Monolog\Logger;
 
 define("ROOT_PATH", realpath(dirname(__DIR__)));
-define("APP_PATH", ROOT_PATH . '/app');
+define("APP_PATH", ROOT_PATH . '/bot');
 define("SRC_PATH", ROOT_PATH . '/src');
-define("DATA_PATH", ROOT_PATH . '/data');
 
 /**
  * Class Bot
@@ -79,6 +78,12 @@ class Bot
             throw new BotException('Root path not defined!');
         }
 
+        if (!empty($data_path = getenv('DATA_PATH'))) {
+            define("DATA_PATH", $data_path);
+        } else {
+            define("DATA_PATH", ROOT_PATH . '/data');
+        }
+
         if (file_exists(ROOT_PATH . '/.env')) {
             $env = new Dotenv(ROOT_PATH);
             $env->load();
@@ -101,7 +106,7 @@ class Bot
 
         if (isset($_SERVER['argv'][1])) {
             $this->arg = strtolower(trim($_SERVER['argv'][1]));
-        } elseif (isset($_GET['a']) && $_GET['a'] === 'handle') {   // from webspace allow only handling webhook
+        } elseif (isset($_GET['a'])) {   // from webspace allow only handling webhook
             $this->arg = 'handle';
         }
 
@@ -246,8 +251,6 @@ class Bot
     {
         if ($this->validateRequest()) {
             $this->telegram->handle();
-        } else {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 403 Forbidden', true, 403);
         }
     }
 
@@ -291,6 +294,8 @@ class Bot
             }
 
             $url = $url . $query_string_char . 'a=handle&s=' . $this->config['secret'];
+        } else {
+            throw new BotException('Secret is empty!');
         }
 
         $result = $this->telegram->setWebhook($url, $options);
@@ -435,10 +440,12 @@ class Bot
      */
     private function handleInstall()
     {
-        print 'Installing database structure...' . PHP_EOL;
+        $storage = Storage::getClass();
 
-        if (Storage::getClass()::createStructure()) {
-            print 'Installed!' . PHP_EOL;
+        print 'Installing storage structure (' . end(explode('\\', $storage)) . ')...' . PHP_EOL;
+
+        if ($storage::createStructure()) {
+            print 'Ok!' . PHP_EOL;
         } else {
             print 'Error!' . PHP_EOL;
         }
@@ -449,7 +456,7 @@ class Bot
      */
     private function showHelp()
     {
-        print 'Bot CLI' . PHP_EOL . PHP_EOL;
+        print 'Bot Console' . ($this->config['bot_username'] ? ' (@' . $this->config['bot_username'] . ')' : ''). PHP_EOL . PHP_EOL;
         print 'Available commands:' . PHP_EOL . ' ';
 
         $commands = '';

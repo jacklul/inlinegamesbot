@@ -33,7 +33,7 @@
             "Bot\\": "src/"
         },
         "classmap": [
-            "app/Bot.php"
+            "src/Bot.php"
         ]
     },
     "config": {
