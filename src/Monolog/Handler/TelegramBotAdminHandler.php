@@ -73,7 +73,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
 
         $this->reports_file = sys_get_temp_dir() . '/' . $this->bot_id . '_reports.json';
 
-        if (!is_writable($this->reports_file)) {
+        if (!is_writable(dirname($this->reports_file))) {
             if (!is_dir(DATA_PATH . '/tmp')) {
                 mkdir(DATA_PATH . '/tmp', 0755, true);
             }
