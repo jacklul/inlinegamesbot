@@ -22,9 +22,9 @@ class LockFile
     /**
      * The temporary file, or false
      *
-     * @var bool|string
+     * @var null|string
      */
-    private $file;
+    private $file = null;
 
     /**
      * Should the file be delete after script ends
@@ -52,7 +52,7 @@ class LockFile
             $this->file = DATA_PATH . '/tmp/' . $name . '.tmp';
 
             if (!is_writable(dirname($this->file))) {
-                $this->file = false;
+                $this->file = null;
             }
         }
 
@@ -66,7 +66,7 @@ class LockFile
      */
     public function __destruct()
     {
-        if ($this->delete && $this->file) {
+        if ($this->delete && !is_null($this->file)) {
             @unlink($this->file);
         }
     }
@@ -74,7 +74,7 @@ class LockFile
     /**
      * Get the file path or false
      *
-     * @return bool|string
+     * @return null|string
      */
     public function getFile()
     {

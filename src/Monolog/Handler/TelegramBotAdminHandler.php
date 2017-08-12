@@ -41,9 +41,9 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
     /**
      * File with last reports (up to 100 entries)
      *
-     * @var string
+     * @var null|string
      */
-    private $reports_file = '';
+    private $reports_file = null;
 
     /**
      * Last error time
@@ -79,6 +79,10 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
             }
 
             $this->reports_file = DATA_PATH . '/tmp/' . $this->bot_id . '_reports.json';
+
+            if (!is_writable(dirname($this->reports_file))) {
+                $this->reports_file = null;
+            }
         }
 
         parent::__construct($level, $bubble);
@@ -156,7 +160,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
      */
     private function getReports(): array
     {
-        if (file_exists($this->reports_file)) {
+        if (!is_null($this->reports_file) && file_exists($this->reports_file)) {
             $reports = json_decode(file_get_contents($this->reports_file), true);
         }
 
@@ -176,7 +180,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
      */
     private function addReport($report = []): bool
     {
-        if (empty($report['message']) || empty($report['time'])) {
+        if (empty($report['message']) || empty($report['time']) || is_null($this->reports_file)) {
             return false;
         }
 
