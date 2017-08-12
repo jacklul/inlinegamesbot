@@ -1,48 +1,48 @@
 {
-    "name": "jacklul/inlinegamesbot",
-    "description": "A Telegram bot providing games that can be played in any chat.",
-    "authors": [
-        {
-            "name": "Jack'lul",
-            "email": "jacklulcat@gmail.com",
-            "homepage": "https://jacklul.com"
-        }
-    ],
-    "type": "project",
-    "require": {
-        "php": "^7.1.0",
-        "ext-curl": "*",
-        "ext-gettext": "*",
-        "ext-mbstring": "*",
-        "ext-pdo": "*",
-        "ext-pgsql": "*",
-        "ext-zip": "*",
-        "ad7six/dsn": "^0.4.0",
-        "gettext/gettext": "^4.3.0",
-        "longman/ip-tools": "^1.2",
-        "longman/telegram-bot": "^0.47.1",
-        "spatie/emoji": "^1.0.5",
-        "vlucas/phpdotenv": "^2.4.0"
-    },
-    "require-dev": {
-        "heroku/heroku-buildpack-php": "*",
-        "squizlabs/php_codesniffer": "^2.8"
-    },
-    "autoload": {
-        "psr-4": {
-            "Bot\\": "src/"
-        },
-        "classmap": [
-            "src/Bot.php"
-        ]
-    },
-    "config": {
-        "sort-packages": true,
-        "vendor-dir": "lib/"
-    },
-    "scripts": {
-        "check-code": [
-            "php lib/squizlabs/php_codesniffer/scripts/phpcs --standard=PSR2 -snp --encoding=utf-8 src/ --report-width=120"
-        ]
+  "name": "jacklul/inlinegamesbot",
+  "description": "A Telegram bot providing games that can be played in any chat.",
+  "authors": [
+    {
+      "name": "Jack'lul",
+      "email": "jacklulcat@gmail.com",
+      "homepage": "https://jacklul.com"
     }
+  ],
+  "type": "project",
+  "require": {
+    "php": "^7.1.0",
+    "ext-curl": "*",
+    "ext-gettext": "*",
+    "ext-mbstring": "*",
+    "ext-pdo": "*",
+    "ext-pgsql": "*",
+    "ext-zip": "*",
+    "ad7six/dsn": "^0.4.0",
+    "gettext/gettext": "^4.3.0",
+    "longman/ip-tools": "^1.2",
+    "longman/telegram-bot": "^0.47.1",
+    "spatie/emoji": "^1.0.5",
+    "vlucas/phpdotenv": "^2.4.0"
+  },
+  "require-dev": {
+    "heroku/heroku-buildpack-php": "*",
+    "squizlabs/php_codesniffer": "^2.8"
+  },
+  "autoload": {
+    "psr-4": {
+      "Bot\\": "src/"
+    },
+    "classmap": [
+      "src/Bot.php"
+    ]
+  },
+  "config": {
+    "sort-packages": true,
+    "vendor-dir": "lib/"
+  },
+  "scripts": {
+    "check-code": [
+      "php lib/squizlabs/php_codesniffer/scripts/phpcs --standard=PSR2 -snp --encoding=utf-8 src/ --report-width=120"
+    ]
+  }
 }
