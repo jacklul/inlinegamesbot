@@ -15,12 +15,12 @@
  * (https://github.com/php-telegram-bot/telegram-bot-manager)
  */
 $config = [
-    'api_key'      => getenv('BOT_TOKEN'),
-    'bot_username' => getenv('BOT_USERNAME'),
-    'secret'       => getenv('BOT_SECRET'),
-    'admins'       => [(integer) getenv('BOT_ADMIN') ?: 0],
-    'commands' => [
-        'paths' => [
+    'api_key'          => getenv('BOT_TOKEN'),
+    'bot_username'     => getenv('BOT_USERNAME'),
+    'secret'           => getenv('BOT_SECRET'),
+    'admins'           => [(integer)getenv('BOT_ADMIN') ?: 0],
+    'commands'         => [
+        'paths'   => [
             SRC_PATH . '/Command',
         ],
         'configs' => [
@@ -29,7 +29,7 @@ $config = [
             ],
         ],
     ],
-    'webhook' => [
+    'webhook'          => [
         'url'             => getenv('BOT_WEBHOOK'),
         'max_connections' => 20,
         'allowed_updates' => [
@@ -39,23 +39,23 @@ $config = [
             'callback_query',
         ],
     ],
-    'mysql' => [
+    'mysql'            => [
         'host'     => getenv('DB_HOST'),
         'user'     => getenv('DB_USER'),
         'password' => getenv('DB_PASS'),
         'database' => getenv('DB_NAME'),
     ],
     'validate_request' => true,
-    'valid_ips' => [
+    'valid_ips'        => [
         '149.154.167.197-149.154.167.233',
     ],
-    'botan' => [
+    'botan'            => [
         'token'   => getenv('BOTAN_TOKEN'),
         'options' => [
             'timeout' => 5,
         ],
     ],
-    'cron' => [
+    'cron'             => [
         'groups' => [
             'default' => [
                 '/clean',

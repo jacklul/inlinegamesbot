@@ -28,7 +28,7 @@ class CallbackqueryCommand extends SystemCommand
      * @var array
      */
     private $aliases = [
-        'stats' => 'stats'
+        'stats' => 'stats',
     ];
 
     /**
@@ -57,9 +57,9 @@ class CallbackqueryCommand extends SystemCommand
 
         return Request::answerCallbackQuery(
             [
-            'callback_query_id' => $callback_query->getId(),
-            'text' => __("Bad request!"),
-            'show_alert' => true,
+                'callback_query_id' => $callback_query->getId(),
+                'text'              => __("Bad request!"),
+                'show_alert'        => true,
             ]
         );
     }

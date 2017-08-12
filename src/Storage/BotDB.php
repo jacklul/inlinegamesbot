@@ -10,8 +10,8 @@
 
 namespace Bot\Storage;
 
-use Longman\TelegramBot\DB;
 use Bot\Storage\Database\MySQL;
+use Longman\TelegramBot\DB;
 
 /**
  * Class BotDB
@@ -40,6 +40,7 @@ class BotDB extends DB
     public static function createStructure(): bool
     {
         self::initializeStorage();
+
         return MySQL::createStructure();
     }
 

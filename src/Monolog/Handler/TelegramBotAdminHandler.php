@@ -64,7 +64,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
      *
      * @param Telegram $telegram
      * @param bool|int $level
-     * @param bool     $bubble
+     * @param bool $bubble
      */
     public function __construct(Telegram $telegram, $level = Logger::ERROR, $bubble = true)
     {
@@ -101,6 +101,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
 
         if ($message === $this->last_message) {
             Debug::print('Log report prevented - message is a duplicate (session)');
+
             return false;
         }
 
@@ -109,6 +110,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
             foreach ($reports as $report) {
                 if ($report['message'] === $message && $report['time'] + 86400 > $record['datetime']->format('U')) {
                     Debug::print('Log report prevented - message is a duplicate (last 24 hours)');
+
                     return false;
                 }
             }
@@ -119,8 +121,8 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
             if ($admin != $this->bot_id) {
                 try {
                     $result = Request::sendMessage([
-                        'chat_id' => $admin,
-                        'text' => '<b>' . $record['level_name'] . ' (' . $record['datetime']->format('H:i:s d-m-Y') . ')</b>' . PHP_EOL . '<code>' . htmlentities($record['message']) . '</code>',
+                        'chat_id'    => $admin,
+                        'text'       => '<b>' . $record['level_name'] . ' (' . $record['datetime']->format('H:i:s d-m-Y') . ')</b>' . PHP_EOL . '<code>' . htmlentities($record['message']) . '</code>',
                         'parse_mode' => 'HTML',
                     ]);
                 } catch (TelegramException $e) {
@@ -156,7 +158,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
             $reports = json_decode(file_get_contents($this->reports_file), true);
         }
 
-        if (!isset($reports) || !is_array($reports)){
+        if (!isset($reports) || !is_array($reports)) {
             $reports = [];
         }
 

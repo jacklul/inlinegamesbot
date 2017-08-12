@@ -10,8 +10,8 @@
 
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
-use Bot\Manager\Game as GameManager;
 use Bot\Helper\Storage;
+use Bot\Manager\Game as GameManager;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
@@ -56,10 +56,10 @@ class StatsCommand extends AdminCommand
 
         $games = $storage::listFromGame(0);
         $stats = [
-            'games' => [],
+            'games'      => [],
             'games_5min' => [],
-            'total' => 0,
-            '5min' => 0,
+            'total'      => 0,
+            '5min'       => 0,
         ];
 
         foreach ($games as $game) {
@@ -107,6 +107,7 @@ class StatsCommand extends AdminCommand
         } elseif ($callback_query) {
             $data['message_id'] = $callback_query->getMessage()->getMessageId();
             Request::editMessageText($data);
+
             return Request::answerCallbackQuery($data_query);
         }
 
@@ -124,11 +125,11 @@ class StatsCommand extends AdminCommand
             [
                 new InlineKeyboardButton(
                     [
-                        'text' => 'Refresh',
-                        'callback_data' => 'stats;refresh'
+                        'text'          => 'Refresh',
+                        'callback_data' => 'stats;refresh',
                     ]
-                )
-            ]
+                ),
+            ],
         ];
 
         $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);

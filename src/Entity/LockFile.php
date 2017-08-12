@@ -37,7 +37,7 @@ class LockFile
      * LockFile constructor
      *
      * @param string $name
-     * @param bool   $delete
+     * @param bool $delete
      */
     public function __construct($name, $delete = true)
     {

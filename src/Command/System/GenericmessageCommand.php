@@ -22,7 +22,7 @@ use Longman\TelegramBot\Request;
 class GenericmessageCommand extends SystemCommand
 {
     /**
-     * @return \Longman\TelegramBot\Entities\ServerResponse
+     * @return mixed
      */
     public function executeNoDb()
     {
@@ -32,7 +32,7 @@ class GenericmessageCommand extends SystemCommand
     }
 
     /**
-     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     * @return mixed
      */
     public function execute()
     {
@@ -60,7 +60,7 @@ class GenericmessageCommand extends SystemCommand
         if (!$this->getMessage()->getChat()->isPrivateChat()) {
             return Request::leaveChat(
                 [
-                'chat_id' => $this->getMessage()->getChat()->getId()
+                    'chat_id' => $this->getMessage()->getChat()->getId(),
                 ]
             );
         }

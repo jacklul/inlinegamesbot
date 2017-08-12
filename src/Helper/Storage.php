@@ -25,9 +25,9 @@ class Storage
      * Supported database engines
      */
     private static $drivers = [
-        'mysql'     => 'MySQL',
-        'pgsql'     => 'PostgreSQL',
-        'postgres'  => 'PostgreSQL',
+        'mysql'    => 'MySQL',
+        'pgsql'    => 'PostgreSQL',
+        'postgres' => 'PostgreSQL',
     ];
 
     /**

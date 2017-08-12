@@ -55,11 +55,11 @@ class HelpCommand extends UserCommand
         $text .= __('This bot is open source - click the {BUTTON} button to go the repository.', ['{BUTTON}' => '<b>\'Github\'</b>']) . ' <b>' . __('Please report all issues there!') . '</b>';
 
         $data = [
-            'chat_id' => $chat_id,
-            'text' => $text,
-            'parse_mode' => 'HTML',
+            'chat_id'                  => $chat_id,
+            'text'                     => $text,
+            'parse_mode'               => 'HTML',
             'disable_web_page_preview' => true,
-            'reply_markup' => $this->createInlineKeyboard(),
+            'reply_markup'             => $this->createInlineKeyboard(),
         ];
 
         if ($message) {
@@ -68,6 +68,7 @@ class HelpCommand extends UserCommand
             $data['message_id'] = $callback_query->getMessage()->getMessageId();
             $result = Request::editMessageText($data);
             Request::answerCallbackQuery($data_query);
+
             return $result;
         }
 
@@ -85,8 +86,8 @@ class HelpCommand extends UserCommand
             [
                 new InlineKeyboardButton(
                     [
-                        'text' => __('Play') . ' ' . Emoji::gameDie(),
-                        'switch_inline_query' => Emoji::gameDie()
+                        'text'                => __('Play') . ' ' . Emoji::gameDie(),
+                        'switch_inline_query' => Emoji::gameDie(),
                     ]
                 ),
             ],
@@ -94,16 +95,16 @@ class HelpCommand extends UserCommand
                 new InlineKeyboardButton(
                     [
                         'text' => __('Rate') . ' ' . Emoji::whiteMediumStar(),
-                        'url' => 'https://telegram.me/storebot?start=' . $this->getTelegram()->getBotUsername()
+                        'url'  => 'https://telegram.me/storebot?start=' . $this->getTelegram()->getBotUsername(),
                     ]
                 ),
                 new InlineKeyboardButton(
                     [
                         'text' => 'Github ' . Emoji::bookmark(),
-                        'url' => 'https://github.com/jacklul/inlinegamesbot/'
+                        'url'  => 'https://github.com/jacklul/inlinegamesbot/',
                     ]
                 ),
-            ]
+            ],
         ];
 
         $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);

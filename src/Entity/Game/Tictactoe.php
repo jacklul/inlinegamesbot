@@ -157,7 +157,7 @@ class Tictactoe extends Game
             $data['board'] = [
                 ['', '', ''],
                 ['', '', ''],
-                ['', '', '']
+                ['', '', ''],
             ];
 
             Debug::print('Game initialization');
@@ -173,7 +173,7 @@ class Tictactoe extends Game
             return $this->answerCallbackQuery(__("This game has ended!"), true);
         }
 
-        if ($this->getCurrentUserId()!== $this->getUserId($data['settings'][$data['current_turn']])) {
+        if ($this->getCurrentUserId() !== $this->getUserId($data['settings'][$data['current_turn']])) {
             return $this->answerCallbackQuery(__("It's not your turn!"), true);
         }
 
@@ -193,6 +193,7 @@ class Tictactoe extends Game
                 $data['current_turn'] = 'X';
             } else {
                 Debug::print('Invalid move data: ' . ($args[0]) . ' - ' . ($args[1]));
+
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
 

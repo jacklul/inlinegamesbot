@@ -82,6 +82,7 @@ class Game
 
         if (!method_exists($this, $action)) {
             Debug::print('Method \'' . $action . '\' doesn\'t exist');
+
             return $this->answerCallbackQuery();
         }
 
@@ -103,22 +104,24 @@ class Game
             if ($result->isOk() || strpos($result->getDescription(), 'message is not modified') !== false) {
                 Debug::print('Server response is ok');
                 $this->answerCallbackQuery();
+
                 return $result;
             }
 
             Debug::print('Server response is not ok');
             Debug::print($result->getErrorCode() . ': ' . $result->getDescription());
+
             return $this->answerCallbackQuery(__('Telegram API error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."), true);
         }
 
         Debug::print('CRASHED');
 
         TelegramLog::error($this->crashDump([
-            'Game' => $this->manager->getGame()::getTitle(),
+            'Game'               => $this->manager->getGame()::getTitle(),
             'Game data (before)' => json_encode($data_before),
-            'Game data (after)' => json_encode($this->data),
-            'Callback data' => $this->manager->getUpdate()->getCallbackQuery() ? $this->manager->getUpdate()->getCallbackQuery()->getData() : '<not a callback query>',
-            'Result' => $result,
+            'Game data (after)'  => json_encode($this->data),
+            'Callback data'      => $this->manager->getUpdate()->getCallbackQuery() ? $this->manager->getUpdate()->getCallbackQuery()->getData() : '<not a callback query>',
+            'Result'             => $result,
         ],
             $this->manager->getId()
         ));
@@ -140,6 +143,7 @@ class Game
     {
         Debug::print('Saving game data to database');
         $data['game_code'] = $this->manager->getGame()::getCode();    // make sure we have the game code in the data array for /clean command!
+
         return $this->manager->getStorage()::insertToGame($this->manager->getId(), $data);
     }
 
@@ -147,7 +151,7 @@ class Game
      * Answer to callback query helper
      *
      * @param string $text
-     * @param bool   $alert
+     * @param bool $alert
      *
      * @return ServerResponse|mixed
      */
@@ -157,8 +161,8 @@ class Game
             return Request::answerCallbackQuery(
                 [
                     'callback_query_id' => $callback_query->getId(),
-                    'text' => $text,
-                    'show_alert' => $alert
+                    'text'              => $text,
+                    'show_alert'        => $alert,
                 ]
             );
         }
@@ -178,10 +182,10 @@ class Game
     {
         return Request::editMessageText(
             [
-                'inline_message_id' => $this->manager->getId(),
-                'text' => '<b>' . $this->manager->getGame()::getTitle() . '</b>' . PHP_EOL . PHP_EOL . $text,
-                'reply_markup' => $reply_markup,
-                'parse_mode' => 'HTML',
+                'inline_message_id'        => $this->manager->getId(),
+                'text'                     => '<b>' . $this->manager->getGame()::getTitle() . '</b>' . PHP_EOL . PHP_EOL . $text,
+                'reply_markup'             => $reply_markup,
+                'parse_mode'               => 'HTML',
                 'disable_web_page_preview' => true,
             ]
         );
@@ -195,6 +199,7 @@ class Game
     protected function returnStorageFailure()
     {
         Debug::print('Storage failure');
+
         return $this->answerCallbackQuery(__('Database failure!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."), true);
     }
 
@@ -208,7 +213,7 @@ class Game
      */
     protected function getUser($user, $as_json = false)
     {
-        Debug::print($user . ' (as_json: ' . ($as_json ? 'true':'false') . ')');
+        Debug::print($user . ' (as_json: ' . ($as_json ? 'true' : 'false') . ')');
 
         if ($as_json) {
             $result = isset($this->data['players'][$user]['id']) ? $this->data['players'][$user] : false;
@@ -235,7 +240,7 @@ class Game
      */
     protected function getCurrentUser($as_json = false)
     {
-        Debug::print('(as_json: ' . ($as_json ? 'true':'false') . ')');
+        Debug::print('(as_json: ' . ($as_json ? 'true' : 'false') . ')');
 
         if ($callback_query = $this->manager->getUpdate()->getCallbackQuery()) {
             $update_object = $callback_query;
@@ -410,6 +415,7 @@ class Game
             }
         } else {
             Debug::print('User quitting an empty game?');
+
             return $this->answerCallbackQuery();
         }
     }
@@ -438,6 +444,7 @@ class Game
             }
         } else {
             Debug::print('Kick executed on a game without a host');
+
             return $this->answerCallbackQuery();
         }
     }
@@ -451,6 +458,7 @@ class Game
     {
         if (!$this->getUser('host')) {
             $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
+
             return $this->answerCallbackQuery();
         }
 
@@ -464,6 +472,7 @@ class Game
 
         if (!$this->getUser('host') || !$this->getUser('guest')) {
             Debug::print('Received request to start the game but one of the players wasn\'t in the game');
+
             return $this->answerCallbackQuery();
         }
 
@@ -576,10 +585,10 @@ class Game
             $keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => 'DEBUG: ' . 'CRASH',
-                        'callback_data' => $this->manager->getGame()::getCode() . ';crash'
+                        'text'          => 'DEBUG: ' . 'CRASH',
+                        'callback_data' => $this->manager->getGame()::getCode() . ';crash',
                     ]
-                )
+                ),
             ];
         }
 
@@ -599,11 +608,11 @@ class Game
             [
                 new InlineKeyboardButton(
                     [
-                        'text' => __('Create'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';new'
+                        'text'          => __('Create'),
+                        'callback_data' => $this->manager->getGame()::getCode() . ';new',
                     ]
-                )
-            ]
+                ),
+            ],
         ];
     }
 
@@ -620,26 +629,26 @@ class Game
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => ucfirst(locale_get_display_language(Language::getCurrentLanguage(), Language::getCurrentLanguage())),
-                        'callback_data' => $this->manager->getGame()::getCode() . ";language"
+                        'text'          => ucfirst(locale_get_display_language(Language::getCurrentLanguage(), Language::getCurrentLanguage())),
+                        'callback_data' => $this->manager->getGame()::getCode() . ";language",
                     ]
-                )
+                ),
             ];
         }
 
         $inline_keyboard[] = [
             new InlineKeyboardButton(
                 [
-                    'text' => __('Quit'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ";quit"
+                    'text'          => __('Quit'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ";quit",
                 ]
             ),
             new InlineKeyboardButton(
                 [
-                    'text' => __('Join'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ";join"
+                    'text'          => __('Join'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ";join",
                 ]
-            )
+            ),
         ];
 
         return $inline_keyboard;
@@ -657,36 +666,36 @@ class Game
         $inline_keyboard[] = [
             new InlineKeyboardButton(
                 [
-                    'text' => __('Play'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ";start"
+                    'text'          => __('Play'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ";start",
                 ]
-            )
+            ),
         ];
 
         if (count($this->languages) > 1) {
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => ucfirst(locale_get_display_language(Language::getCurrentLanguage(), Language::getCurrentLanguage())),
-                        'callback_data' => $this->manager->getGame()::getCode() . ";language"
+                        'text'          => ucfirst(locale_get_display_language(Language::getCurrentLanguage(), Language::getCurrentLanguage())),
+                        'callback_data' => $this->manager->getGame()::getCode() . ";language",
                     ]
-                )
+                ),
             ];
         }
 
         $inline_keyboard[] = [
             new InlineKeyboardButton(
                 [
-                    'text' => __('Quit'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ";quit"
+                    'text'          => __('Quit'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ";quit",
                 ]
             ),
             new InlineKeyboardButton(
                 [
-                    'text' => __('Kick'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ";kick"
+                    'text'          => __('Kick'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ";kick",
                 ]
-            )
+            ),
         ];
 
         return $inline_keyboard;
@@ -695,7 +704,7 @@ class Game
     /**
      * Keyboard for game in progress
      *
-     * @param array  $board
+     * @param array $board
      * @param string $winner
      *
      * @return InlineKeyboard
@@ -724,7 +733,7 @@ class Game
                         new InlineKeyboardButton(
                             [
                                 'text'          => $field,
-                                'callback_data' => $this->manager->getGame()::getCode() . ';game;' . $x . '-' . $y
+                                'callback_data' => $this->manager->getGame()::getCode() . ';game;' . $x . '-' . $y,
                             ]
                         )
                     );
@@ -740,26 +749,26 @@ class Game
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => __('Play again!'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';start'
+                        'text'          => __('Play again!'),
+                        'callback_data' => $this->manager->getGame()::getCode() . ';start',
                     ]
-                )
+                ),
             ];
         }
 
         $inline_keyboard[] = [
             new InlineKeyboardButton(
                 [
-                    'text' => __('Quit'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ';quit'
+                    'text'          => __('Quit'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ';quit',
                 ]
             ),
             new InlineKeyboardButton(
                 [
-                    'text' => __('Kick'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ';kick'
+                    'text'          => __('Kick'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ';kick',
                 ]
-            )
+            ),
         ];
 
         if (getenv('DEBUG')) {
@@ -768,10 +777,10 @@ class Game
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => 'DEBUG: ' . 'Restart',
-                        'callback_data' => $this->manager->getGame()::getCode() . ';start'
+                        'text'          => 'DEBUG: ' . 'Restart',
+                        'callback_data' => $this->manager->getGame()::getCode() . ';start',
                     ]
-                )
+                ),
             ];
         }
 
@@ -815,7 +824,7 @@ class Game
      */
     private function crashDump($data = [], $id = '')
     {
-        $output = 'CRASH' . (isset($id) ? ' (ID: ' . $id . ')' : '' ) . ':' . PHP_EOL;
+        $output = 'CRASH' . (isset($id) ? ' (ID: ' . $id . ')' : '') . ':' . PHP_EOL;
         foreach ($data as $var => $val) {
             $output .= $var . ': ' . (is_array($val) ? print_r($val, true) : (is_bool($val) ? ($val ? 'true' : 'false') : $val)) . PHP_EOL;
         }

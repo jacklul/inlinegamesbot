@@ -11,9 +11,9 @@
 namespace Bot\Storage\Database;
 
 use AD7six\Dsn\Dsn;
+use Bot\Entity\LockFile;
 use Bot\Exception\StorageException;
 use Bot\Helper\Debug;
-use Bot\Entity\LockFile;
 use Longman\TelegramBot\TelegramLog;
 use PDO;
 use PDOException;
@@ -80,6 +80,7 @@ class PostgreSQL
             }
 
             Debug::print('Connection to the database failed');
+
             return false;
         }
 
@@ -145,7 +146,8 @@ class PostgreSQL
 
             if ($result = $sth->execute()) {
                 $result = $sth->fetchAll(PDO::FETCH_ASSOC);
-                return isset($result[0]) ? json_decode($result[0]['data'], true): $result;
+
+                return isset($result[0]) ? json_decode($result[0]['data'], true) : $result;
             } else {
                 return $result;
             }

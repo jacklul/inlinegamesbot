@@ -91,7 +91,7 @@ class File
             $data['created_at'] = $data['updated_at'];
         }
 
-        if (file_exists(STORAGE_GAME_PATH . '/' . $id .  '.json')) {
+        if (file_exists(STORAGE_GAME_PATH . '/' . $id . '.json')) {
             return file_put_contents(STORAGE_GAME_PATH . '/' . $id . '.json', json_encode($data));
         }
 
@@ -112,7 +112,7 @@ class File
             throw new StorageException('Id is empty!');
         }
 
-        if (file_exists(STORAGE_GAME_PATH . '/' . $id .  '.json')) {
+        if (file_exists(STORAGE_GAME_PATH . '/' . $id . '.json')) {
             return unlink(STORAGE_GAME_PATH . '/' . $id . '.json');
         }
 
@@ -138,7 +138,7 @@ class File
             file_put_contents(STORAGE_GAME_PATH . '/' . $id . '.json', json_encode(['created_at' => $timestamp, 'updated_at' => $timestamp]));
         }
 
-        if (flock(fopen(STORAGE_GAME_PATH . '/' . $id .  '.json', "a+"), LOCK_EX)) {
+        if (flock(fopen(STORAGE_GAME_PATH . '/' . $id . '.json', "a+"), LOCK_EX)) {
             return true;
         }
 
@@ -159,7 +159,7 @@ class File
             throw new StorageException('Id is empty!');
         }
 
-        if (flock(fopen(STORAGE_GAME_PATH . '/' . $id .  '.json', "a+"), LOCK_UN)) {
+        if (flock(fopen(STORAGE_GAME_PATH . '/' . $id . '.json', "a+"), LOCK_UN)) {
             return true;
         }
 

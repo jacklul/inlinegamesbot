@@ -11,9 +11,9 @@
 namespace Bot\Storage\Database;
 
 use AD7six\Dsn\Dsn;
+use Bot\Entity\LockFile;
 use Bot\Exception\StorageException;
 use Bot\Helper\Debug;
-use Bot\Entity\LockFile;
 use Longman\TelegramBot\TelegramLog;
 use PDO;
 use PDOException;

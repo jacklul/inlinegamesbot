@@ -160,7 +160,7 @@ class Connectfour extends Game
                 ['', '', '', '', '', '', ''],
                 ['', '', '', '', '', '', ''],
                 ['', '', '', '', '', '', ''],
-                ['', '', '', '', '', '', '']
+                ['', '', '', '', '', '', ''],
             ];
 
             Debug::print('Game initialization');
@@ -176,7 +176,7 @@ class Connectfour extends Game
             return $this->answerCallbackQuery(__("This game has ended!", true));
         }
 
-        if ($this->getCurrentUserId()!== $this->getUserId($data['settings'][$data['current_turn']])) {
+        if ($this->getCurrentUserId() !== $this->getUserId($data['settings'][$data['current_turn']])) {
             return $this->answerCallbackQuery(__("It's not your turn!"), true);
         }
 
@@ -203,6 +203,7 @@ class Connectfour extends Game
                     }
                 } else {
                     Debug::print('Invalid move data: ' . ($args[0]) . ' - ' . ($y));
+
                     return $this->answerCallbackQuery(__("Invalid move!"), true);
                 }
             }
@@ -266,10 +267,10 @@ class Connectfour extends Game
                 if (isset($board[$x][$y]) && isset($board[$x + 1][$y]) && isset($board[$x + 2][$y]) && isset($board[$x + 3][$y])) {
                     if ($board[$x][$y] != '' && $board[$x][$y] == $board[$x + 1][$y] && $board[$x][$y] == $board[$x + 2][$y] && $board[$x][$y] == $board[$x + 3][$y]) {
                         $winner = $board[$x][$y];
-                        $board[$x + 1][$y] = $board[$x][$y].'_won';
-                        $board[$x + 2][$y] = $board[$x][$y].'_won';
-                        $board[$x + 3][$y] = $board[$x][$y].'_won';
-                        $board[$x][$y] = $board[$x][$y].'_won';
+                        $board[$x + 1][$y] = $board[$x][$y] . '_won';
+                        $board[$x + 2][$y] = $board[$x][$y] . '_won';
+                        $board[$x + 3][$y] = $board[$x][$y] . '_won';
+                        $board[$x][$y] = $board[$x][$y] . '_won';
 
                         return $winner;
                     }

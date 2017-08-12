@@ -59,8 +59,8 @@ class Game
     /**
      * Game Manager constructor
      *
-     * @param string  $id
-     * @param string  $game_code
+     * @param string $id
+     * @param string $game_code
      * @param Command $command
      *
      * @throws BotException
@@ -75,7 +75,7 @@ class Game
             throw new BotException('Game code is empty!');
         }
 
-        Debug::print('ID: ' .  $id);
+        Debug::print('ID: ' . $id);
 
         $this->id = $id;
         $this->update = $command->getUpdate();
@@ -154,8 +154,8 @@ class Game
                 return Request::answerCallbackQuery(
                     [
                         'callback_query_id' => $callback_query->getId(),
-                        'text' => __('Database failure!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."),
-                        'show_alert' => true
+                        'text'              => __('Database failure!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."),
+                        'show_alert'        => true,
                     ]
                 );
             }
@@ -170,8 +170,8 @@ class Game
                 return Request::answerCallbackQuery(
                     [
                         'callback_query_id' => $callback_query->getId(),
-                        'text' => __('Process for this game is busy!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."),
-                        'show_alert' => true
+                        'text'              => __('Process for this game is busy!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."),
+                        'show_alert'        => true,
                     ]
                 );
             }
@@ -188,7 +188,7 @@ class Game
 
             Botan::track($this->getUpdate(), $this->getGame()::getTitle());  // track game traffic
         } elseif ($chosen_inline_result) {
-            $result =  $this->game->handleAction('new');
+            $result = $this->game->handleAction('new');
 
             $this->storage::unlockGame($this->id);
 

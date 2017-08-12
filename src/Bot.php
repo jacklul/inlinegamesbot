@@ -10,8 +10,8 @@
 
 use Bot\Exception\BotException;
 use Bot\Helper\Debug;
-use Bot\Monolog\Handler\TelegramBotAdminHandler;
 use Bot\Helper\Storage;
+use Bot\Monolog\Handler\TelegramBotAdminHandler;
 use Dotenv\Dotenv;
 use Gettext\Translator;
 use Longman\IPTools\Ip;
@@ -456,7 +456,7 @@ class Bot
      */
     private function showHelp()
     {
-        print 'Bot Console' . ($this->config['bot_username'] ? ' (@' . $this->config['bot_username'] . ')' : ''). PHP_EOL . PHP_EOL;
+        print 'Bot Console' . ($this->config['bot_username'] ? ' (@' . $this->config['bot_username'] . ')' : '') . PHP_EOL . PHP_EOL;
         print 'Available commands:' . PHP_EOL . ' ';
 
         $commands = '';

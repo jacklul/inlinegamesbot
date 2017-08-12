@@ -166,7 +166,7 @@ class Russianroulette extends Game
             return $this->answerCallbackQuery(__("This game has ended!"), true);
         }
 
-        if ($this->getCurrentUserId()!== $this->getUserId($data['settings'][$data['current_turn']])) {
+        if ($this->getCurrentUserId() !== $this->getUserId($data['settings'][$data['current_turn']])) {
             return $this->answerCallbackQuery(__("It's not your turn!"), true);
         }
 
@@ -180,6 +180,7 @@ class Russianroulette extends Game
 
             if (!isset($data['cylinder'][$arg - 1])) {
                 Debug::print('Bad move data received: ' . $arg);
+
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
 
@@ -261,76 +262,76 @@ class Russianroulette extends Game
         $inline_keyboard[] = [
             new InlineKeyboardButton(
                 [
-                    'text' => $this->symbols['empty'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null'
+                    'text'          => $this->symbols['empty'],
+                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null',
                 ]
             ),
             new InlineKeyboardButton(
                 [
-                    'text' => ($hit == 1) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;1'
+                    'text'          => ($hit == 1) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
+                    'callback_data' => $this->manager->getGame()::getCode() . ';game;1',
                 ]
             ),
             new InlineKeyboardButton(
                 [
-                    'text' => ($hit == 2) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;2'
+                    'text'          => ($hit == 2) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
+                    'callback_data' => $this->manager->getGame()::getCode() . ';game;2',
                 ]
             ),
             new InlineKeyboardButton(
                 [
-                    'text' => $this->symbols['empty'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null'
+                    'text'          => $this->symbols['empty'],
+                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null',
                 ]
-            )
+            ),
         ];
 
         $inline_keyboard[] = [
             new InlineKeyboardButton(
                 [
-                    'text' => ($hit == 6) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;6'
+                    'text'          => ($hit == 6) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
+                    'callback_data' => $this->manager->getGame()::getCode() . ';game;6',
                 ]
             ),
             new InlineKeyboardButton(
                 [
-                    'text' => $this->symbols['empty'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null'
+                    'text'          => $this->symbols['empty'],
+                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null',
                 ]
             ),
             new InlineKeyboardButton(
                 [
-                    'text' => ($hit == 3) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;3'
+                    'text'          => ($hit == 3) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
+                    'callback_data' => $this->manager->getGame()::getCode() . ';game;3',
                 ]
-            )
+            ),
         ];
 
         $inline_keyboard[] = [
             new InlineKeyboardButton(
                 [
-                    'text' => $this->symbols['empty'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null'
+                    'text'          => $this->symbols['empty'],
+                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null',
                 ]
             ),
             new InlineKeyboardButton(
                 [
-                    'text' => ($hit == 5) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;5'
+                    'text'          => ($hit == 5) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
+                    'callback_data' => $this->manager->getGame()::getCode() . ';game;5',
                 ]
             ),
             new InlineKeyboardButton(
                 [
-                    'text' => ($hit == 4) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;4'
+                    'text'          => ($hit == 4) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
+                    'callback_data' => $this->manager->getGame()::getCode() . ';game;4',
                 ]
             ),
             new InlineKeyboardButton(
                 [
-                    'text' => $this->symbols['empty'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null'
+                    'text'          => $this->symbols['empty'],
+                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null',
                 ]
-            )
+            ),
         ];
 
         if (!is_numeric($hit)) {
@@ -338,30 +339,30 @@ class Russianroulette extends Game
                 new InlineKeyboardButton(
                     [
                         'text'          => __('Quit'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';quit'
+                        'callback_data' => $this->manager->getGame()::getCode() . ';quit',
                     ]
                 ),
                 new InlineKeyboardButton(
                     [
                         'text'          => __('Kick'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';kick'
+                        'callback_data' => $this->manager->getGame()::getCode() . ';kick',
                     ]
-                )
+                ),
             ];
         } else {
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
                         'text'          => __('Quit'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';quit'
+                        'callback_data' => $this->manager->getGame()::getCode() . ';quit',
                     ]
                 ),
                 new InlineKeyboardButton(
                     [
                         'text'          => __('Join'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';join'
+                        'callback_data' => $this->manager->getGame()::getCode() . ';join',
                     ]
-                )
+                ),
             ];
         }
 
@@ -369,10 +370,10 @@ class Russianroulette extends Game
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => 'DEBUG: ' . 'Restart',
-                        'callback_data' => $this->manager->getGame()::getCode() . ';start'
+                        'text'          => 'DEBUG: ' . 'Restart',
+                        'callback_data' => $this->manager->getGame()::getCode() . ';start',
                     ]
-                )
+                ),
             ];
         }
 

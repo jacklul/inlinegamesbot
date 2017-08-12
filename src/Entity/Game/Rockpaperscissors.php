@@ -182,6 +182,7 @@ class Rockpaperscissors extends Game
                 }
             } else {
                 Debug::print('Invalid move data: ' . $arg);
+
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
         }
@@ -213,8 +214,8 @@ class Rockpaperscissors extends Game
                 }
             }
 
-            $hostPick = ' (' . $this->symbols[$data['host_pick'].'_short'] . ')';
-            $guestPick = ' (' . $this->symbols[$data['guest_pick'].'_short'] . ')';
+            $hostPick = ' (' . $this->symbols[$data['host_pick'] . '_short'] . ')';
+            $guestPick = ' (' . $this->symbols[$data['guest_pick'] . '_short'] . ')';
         }
 
         if ($data['host_wins'] >= $data['guest_wins'] + 3 || ($data['round'] > 5 && $data['host_wins'] > $data['guest_wins'])) {
@@ -257,31 +258,31 @@ class Rockpaperscissors extends Game
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => $this->symbols['R'] . ' ' . $this->symbols['R_short'],
-                        'callback_data' => $this->manager->getGame()::getCode() . ';game;R'
+                        'text'          => $this->symbols['R'] . ' ' . $this->symbols['R_short'],
+                        'callback_data' => $this->manager->getGame()::getCode() . ';game;R',
                     ]
                 ),
                 new InlineKeyboardButton(
                     [
-                        'text' => $this->symbols['P'] . ' ' . $this->symbols['P_short'],
-                        'callback_data' => $this->manager->getGame()::getCode() . ';game;P'
+                        'text'          => $this->symbols['P'] . ' ' . $this->symbols['P_short'],
+                        'callback_data' => $this->manager->getGame()::getCode() . ';game;P',
                     ]
                 ),
                 new InlineKeyboardButton(
                     [
-                        'text' => $this->symbols['S'] . ' ' . $this->symbols['S_short'],
-                        'callback_data' => $this->manager->getGame()::getCode() . ';game;S'
+                        'text'          => $this->symbols['S'] . ' ' . $this->symbols['S_short'],
+                        'callback_data' => $this->manager->getGame()::getCode() . ';game;S',
                     ]
-                )
+                ),
             ];
         } else {
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => __('Play again!'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';start'
+                        'text'          => __('Play again!'),
+                        'callback_data' => $this->manager->getGame()::getCode() . ';start',
                     ]
-                )
+                ),
             ];
         }
 
@@ -289,26 +290,26 @@ class Rockpaperscissors extends Game
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => 'DEBUG: ' . 'Restart',
-                        'callback_data' => $this->manager->getGame()::getCode() . ';start'
+                        'text'          => 'DEBUG: ' . 'Restart',
+                        'callback_data' => $this->manager->getGame()::getCode() . ';start',
                     ]
-                )
+                ),
             ];
         }
 
         $inline_keyboard[] = [
             new InlineKeyboardButton(
                 [
-                    'text' => __('Quit'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ';quit'
+                    'text'          => __('Quit'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ';quit',
                 ]
             ),
             new InlineKeyboardButton(
                 [
-                    'text' => __('Kick'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ';kick'
+                    'text'          => __('Kick'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ';kick',
                 ]
-            )
+            ),
         ];
 
         $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);

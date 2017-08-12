@@ -34,18 +34,18 @@ class InlinequeryCommand extends SystemCommand
         foreach ($this->getGamesList() as $game) {
             if (class_exists($game_class = $game['class'])) {
                 $articles[] = [
-                    'id' => $game_class::getCode(),
-                    'title' => $game_class::getTitle() . (method_exists($game_class, 'getTitleExtra') ? ' ' . $game_class::getTitleExtra() : ''),
-                    'description' => $game_class::getDescription(),
+                    'id'                    => $game_class::getCode(),
+                    'title'                 => $game_class::getTitle() . (method_exists($game_class, 'getTitleExtra') ? ' ' . $game_class::getTitleExtra() : ''),
+                    'description'           => $game_class::getDescription(),
                     'input_message_content' => new InputTextMessageContent(
                         [
-                            'message_text' => '<b>' . $game_class::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __('This game session is empty.') . '</i>',
-                            'parse_mode' => 'HTML',
+                            'message_text'             => '<b>' . $game_class::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __('This game session is empty.') . '</i>',
+                            'parse_mode'               => 'HTML',
                             'disable_web_page_preview' => true,
                         ]
                     ),
-                    'reply_markup' => $this->createInlineKeyboard($game_class::getCode()),
-                    'thumb_url' => $game_class::getImage(),
+                    'reply_markup'          => $this->createInlineKeyboard($game_class::getCode()),
+                    'thumb_url'             => $game_class::getImage(),
                 ];
             }
         }
@@ -57,11 +57,11 @@ class InlinequeryCommand extends SystemCommand
 
         return Request::answerInlineQuery(
             [
-                'inline_query_id' => $this->getUpdate()->getInlineQuery()->getId(),
-                'cache_time' => 60,
-                'results' => '[' . implode(',', $array_article) . ']',
-                'switch_pm_text' => 'Help',
-                'switch_pm_parameter' => 'start'
+                'inline_query_id'     => $this->getUpdate()->getInlineQuery()->getId(),
+                'cache_time'          => 60,
+                'results'             => '[' . implode(',', $array_article) . ']',
+                'switch_pm_text'      => 'Help',
+                'switch_pm_parameter' => 'start',
             ]
         );
     }
@@ -81,7 +81,7 @@ class InlinequeryCommand extends SystemCommand
 
                     $games[] = [
                         'class' => $game_class,
-                        'order' => $game_class::getOrder()
+                        'order' => $game_class::getOrder(),
                     ];
                 }
             }
@@ -110,11 +110,11 @@ class InlinequeryCommand extends SystemCommand
             [
                 new InlineKeyboardButton(
                     [
-                    'text' => __('Create'),
-                    'callback_data' => $game_code . ';new'
+                        'text'          => __('Create'),
+                        'callback_data' => $game_code . ';new',
                     ]
-                )
-            ]
+                ),
+            ],
         ];
 
         $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);

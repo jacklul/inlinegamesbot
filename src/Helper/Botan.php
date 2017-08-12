@@ -46,8 +46,8 @@ class Botan
     /**
      * Track function
      *
-     * @param Update  $update
-     * @param string  $event_name
+     * @param Update $update
+     * @param string $event_name
      * @param integer $timeout
      *
      * @return bool|string
@@ -71,7 +71,7 @@ class Botan
             throw new BotException('Update object is empty!');
         }
 
-        $update_data = (array) $update;
+        $update_data = (array)$update;
         $data = $update_data[$update->getUpdateType()];
 
         $uid = isset($data['from']['id']) ? $data['from']['id'] : 0;
@@ -92,7 +92,7 @@ class Botan
                 ]
             );
 
-            $result = (string) $response->getBody();
+            $result = (string)$response->getBody();
         } catch (RequestException $e) {
             $result = $e->getMessage();
         }

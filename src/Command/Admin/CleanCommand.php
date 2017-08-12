@@ -11,8 +11,8 @@
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
 use Bot\Helper\Debug;
-use Bot\Manager\Game as GameManager;
 use Bot\Helper\Storage;
+use Bot\Manager\Game as GameManager;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
@@ -117,10 +117,10 @@ class CleanCommand extends AdminCommand
 
                             $result = Request::editMessageText(
                                 [
-                                    'inline_message_id' => $inactive_game['id'],
-                                    'text' => '<b>' . $game->getGame()::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __("This game session has expired.") . '</i>',
-                                    'reply_markup' => $this->createInlineKeyboard($game_data['game_code']),
-                                    'parse_mode' => 'HTML',
+                                    'inline_message_id'        => $inactive_game['id'],
+                                    'text'                     => '<b>' . $game->getGame()::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __("This game session has expired.") . '</i>',
+                                    'reply_markup'             => $this->createInlineKeyboard($game_data['game_code']),
+                                    'parse_mode'               => 'HTML',
                                     'disable_web_page_preview' => true,
                                 ]
                             );
@@ -174,11 +174,11 @@ class CleanCommand extends AdminCommand
             [
                 new InlineKeyboardButton(
                     [
-                        'text' => __('Create'),
-                        'callback_data' => $game_code . ';new'
+                        'text'          => __('Create'),
+                        'callback_data' => $game_code . ';new',
                     ]
-                )
-            ]
+                ),
+            ],
         ];
 
         $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);

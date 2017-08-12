@@ -258,9 +258,9 @@ class Poolcheckers extends Game
                                 $killed = true;
                             }
 
-                            if ($killed == true && $this->possibleMoves($data['board'], $args[0].$args[1], true, null, $data['current_selection'][0].$data['current_selection'][1])) {
+                            if ($killed == true && $this->possibleMoves($data['board'], $args[0] . $args[1], true, null, $data['current_selection'][0] . $data['current_selection'][1])) {
                                 $data['current_selection_lock'] = true;
-                                $data['current_selection'] = $args[0].$args[1];
+                                $data['current_selection'] = $args[0] . $args[1];
                             } else {
                                 if (strpos($data['board'][$args[0]][$args[1]], 'K') === false && (($data['current_turn'] == 'X' && $args[1] == 7) || ($data['current_turn'] == 'O' && $args[1] == 0))) {
                                     $data['board'][$args[0]][$args[1]] .= 'K';
@@ -378,9 +378,9 @@ class Poolcheckers extends Game
     /**
      * Keyboard for game in progress
      *
-     * @param array  $board
+     * @param array $board
      * @param string $winner
-     * @param int    $moveCounter
+     * @param int $moveCounter
      *
      * @return InlineKeyboard
      */
@@ -410,7 +410,7 @@ class Poolcheckers extends Game
                         new InlineKeyboardButton(
                             [
                                 'text'          => $field,
-                                'callback_data' => $this->manager->getGame()::getCode() . ';game;' . $x . '-' . $y
+                                'callback_data' => $this->manager->getGame()::getCode() . ';game;' . $x . '-' . $y,
                             ]
                         )
                     );
@@ -430,29 +430,29 @@ class Poolcheckers extends Game
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => __('Play again!'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';start'
+                        'text'          => __('Play again!'),
+                        'callback_data' => $this->manager->getGame()::getCode() . ';start',
                     ]
-                )
+                ),
             ];
         } else {
             if ($moveCounter == 0 || ($moveCounter > 0 && $piecesLeft['X'] != $piecesLeft['O'])) {
                 $inline_keyboard[] = [
                     new InlineKeyboardButton(
                         [
-                            'text' => __('Surrender'),
-                            'callback_data' => $this->manager->getGame()::getCode() . ';forfeit'
+                            'text'          => __('Surrender'),
+                            'callback_data' => $this->manager->getGame()::getCode() . ';forfeit',
                         ]
-                    )
+                    ),
                 ];
             } else {
                 $inline_keyboard[] = [
                     new InlineKeyboardButton(
                         [
-                            'text' => __('Vote to draw'),
-                            'callback_data' => $this->manager->getGame()::getCode() . ';draw'
+                            'text'          => __('Vote to draw'),
+                            'callback_data' => $this->manager->getGame()::getCode() . ';draw',
                         ]
-                    )
+                    ),
                 ];
             };
         }
@@ -460,16 +460,16 @@ class Poolcheckers extends Game
         $inline_keyboard[] = [
             new InlineKeyboardButton(
                 [
-                    'text' => __('Quit'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ';quit'
+                    'text'          => __('Quit'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ';quit',
                 ]
             ),
             new InlineKeyboardButton(
                 [
-                    'text' => __('Kick'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ';kick'
+                    'text'          => __('Kick'),
+                    'callback_data' => $this->manager->getGame()::getCode() . ';kick',
                 ]
-            )
+            ),
         ];
 
         if (getenv('DEBUG')) {
@@ -478,22 +478,22 @@ class Poolcheckers extends Game
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
-                        'text' => 'DEBUG: ' . 'Restart',
-                        'callback_data' => $this->manager->getGame()::getCode() . ';start'
+                        'text'          => 'DEBUG: ' . 'Restart',
+                        'callback_data' => $this->manager->getGame()::getCode() . ';start',
                     ]
                 ),
                 new InlineKeyboardButton(
                     [
-                        'text' => 'DEBUG: ' . 'Surrender',
-                        'callback_data' => $this->manager->getGame()::getCode() . ';forfeit'
+                        'text'          => 'DEBUG: ' . 'Surrender',
+                        'callback_data' => $this->manager->getGame()::getCode() . ';forfeit',
                     ]
                 ),
                 new InlineKeyboardButton(
                     [
-                        'text' => 'DEBUG: ' . 'Draw',
-                        'callback_data' => $this->manager->getGame()::getCode() . ';draw'
+                        'text'          => 'DEBUG: ' . 'Draw',
+                        'callback_data' => $this->manager->getGame()::getCode() . ';draw',
                     ]
-                )
+                ),
             ];
         }
 
@@ -507,9 +507,9 @@ class Poolcheckers extends Game
      *
      * @param $board
      * @param $selection
-     * @param bool      $onlykill
-     * @param string    $char
-     * @param string    $backmultijumpblock
+     * @param bool $onlykill
+     * @param string $char
+     * @param string $backmultijumpblock
      *
      * @return array|bool
      */
@@ -537,27 +537,27 @@ class Poolcheckers extends Game
                 }
 
                 if ($board[($sel_x + 1)][($sel_y + 1)] == '') {
-                    $valid_moves[] = ($sel_x + 1).($sel_y + 1); //right down
+                    $valid_moves[] = ($sel_x + 1) . ($sel_y + 1); //right down
                 }
 
                 if (strpos($board[($sel_x - 1)][($sel_y + 1)], 'O') !== false) {
-                    $valid_moves[] = ($sel_x - 2).($sel_y + 2); //right up
-                    $kill[($sel_x - 2).($sel_y + 2)] = ($sel_x - 1).($sel_y + 1);
+                    $valid_moves[] = ($sel_x - 2) . ($sel_y + 2); //right up
+                    $kill[($sel_x - 2) . ($sel_y + 2)] = ($sel_x - 1) . ($sel_y + 1);
                 }
 
                 if (strpos($board[($sel_x + 1)][($sel_y + 1)], 'O') !== false) {
-                    $valid_moves[] = ($sel_x + 2).($sel_y + 2); //right down
-                    $kill[($sel_x + 2).($sel_y + 2)] = ($sel_x + 1).($sel_y + 1);
+                    $valid_moves[] = ($sel_x + 2) . ($sel_y + 2); //right down
+                    $kill[($sel_x + 2) . ($sel_y + 2)] = ($sel_x + 1) . ($sel_y + 1);
                 }
 
                 if (strpos($board[($sel_x + 1)][($sel_y - 1)], 'O') !== false) {
-                    $valid_moves[] = ($sel_x + 2).($sel_y - 2); //left up
-                    $kill[($sel_x + 2).($sel_y - 2)] = ($sel_x + 1).($sel_y - 1);
+                    $valid_moves[] = ($sel_x + 2) . ($sel_y - 2); //left up
+                    $kill[($sel_x + 2) . ($sel_y - 2)] = ($sel_x + 1) . ($sel_y - 1);
                 }
 
                 if (strpos($board[($sel_x - 1)][($sel_y - 1)], 'O') !== false) {
-                    $valid_moves[] = ($sel_x - 2).($sel_y - 2); //left down
-                    $kill[($sel_x - 2).($sel_y - 2)] = ($sel_x - 1).($sel_y - 1);
+                    $valid_moves[] = ($sel_x - 2) . ($sel_y - 2); //left down
+                    $kill[($sel_x - 2) . ($sel_y - 2)] = ($sel_x - 1) . ($sel_y - 1);
                 }
             } elseif ($board[$sel_x][$sel_y] == 'XK') {
                 for ($move = 1; $move <= 8; $move++) {
@@ -570,7 +570,7 @@ class Poolcheckers extends Game
 
                 for ($move = 1; $move <= 8; $move++) {
                     if ($board[($sel_x + $move)][($sel_y + $move)] == '') {
-                        $valid_moves[] = ($sel_x + $move).($sel_y + $move); //right down
+                        $valid_moves[] = ($sel_x + $move) . ($sel_y + $move); //right down
                     } else {
                         break;
                     }
@@ -578,7 +578,7 @@ class Poolcheckers extends Game
 
                 for ($move = 1; $move <= 8; $move++) {
                     if ($board[($sel_x + $move)][($sel_y - $move)] == '') {
-                        $valid_moves[] = ($sel_x + $move).($sel_y - $move); //left up
+                        $valid_moves[] = ($sel_x + $move) . ($sel_y - $move); //left up
                     } else {
                         break;
                     }
@@ -586,7 +586,7 @@ class Poolcheckers extends Game
 
                 for ($move = 1; $move <= 8; $move++) {
                     if ($board[($sel_x - $move)][($sel_y - $move)] == '') {
-                        $valid_moves[] = ($sel_x - $move).($sel_y - $move); //left down
+                        $valid_moves[] = ($sel_x - $move) . ($sel_y - $move); //left down
                     } else {
                         break;
                     }
@@ -600,9 +600,9 @@ class Poolcheckers extends Game
                             }
                         }
 
-                        $valid_moves[] = ($sel_x - ($move + 1)).($sel_y + ($move + 1)); //right up
+                        $valid_moves[] = ($sel_x - ($move + 1)) . ($sel_y + ($move + 1)); //right up
 
-                        $kill[($sel_x - ($move + 1)).($sel_y + ($move + 1))] = ($sel_x - $move).($sel_y + $move);
+                        $kill[($sel_x - ($move + 1)) . ($sel_y + ($move + 1))] = ($sel_x - $move) . ($sel_y + $move);
                         break;
                     }
                 }
@@ -629,8 +629,8 @@ class Poolcheckers extends Game
                             }
                         }
 
-                        $valid_moves[] = ($sel_x + ($move + 1)).($sel_y - ($move + 1)); //left up
-                        $kill[($sel_x + ($move + 1)).($sel_y - ($move + 1))] = ($sel_x + $move).($sel_y - $move);
+                        $valid_moves[] = ($sel_x + ($move + 1)) . ($sel_y - ($move + 1)); //left up
+                        $kill[($sel_x + ($move + 1)) . ($sel_y - ($move + 1))] = ($sel_x + $move) . ($sel_y - $move);
                         break;
                     }
                 }
@@ -643,8 +643,8 @@ class Poolcheckers extends Game
                             }
                         }
 
-                        $valid_moves[] = ($sel_x - ($move + 1)).($sel_y - ($move + 1)); //left down
-                        $kill[($sel_x - ($move + 1)).($sel_y - ($move + 1))] = ($sel_x - $move).($sel_y - $move);
+                        $valid_moves[] = ($sel_x - ($move + 1)) . ($sel_y - ($move + 1)); //left down
+                        $kill[($sel_x - ($move + 1)) . ($sel_y - ($move + 1))] = ($sel_x - $move) . ($sel_y - $move);
                         break;
                     }
                 }
@@ -652,31 +652,31 @@ class Poolcheckers extends Game
         } elseif (strpos($char, 'O') !== false) {
             if ($board[$sel_x][$sel_y] == 'O') {
                 if ($board[($sel_x + 1)][($sel_y - 1)] == '') {
-                    $valid_moves[] = ($sel_x + 1).($sel_y - 1); //left up
+                    $valid_moves[] = ($sel_x + 1) . ($sel_y - 1); //left up
                 }
 
                 if ($board[($sel_x - 1)][($sel_y - 1)] == '') {
-                    $valid_moves[] = ($sel_x - 1).($sel_y - 1); //left down
+                    $valid_moves[] = ($sel_x - 1) . ($sel_y - 1); //left down
                 }
 
                 if (strpos($board[($sel_x - 1)][($sel_y + 1)], 'X') !== false) {
-                    $valid_moves[] = ($sel_x - 2).($sel_y + 2); //right up
-                    $kill[($sel_x - 2).($sel_y + 2)] = ($sel_x - 1).($sel_y + 1);
+                    $valid_moves[] = ($sel_x - 2) . ($sel_y + 2); //right up
+                    $kill[($sel_x - 2) . ($sel_y + 2)] = ($sel_x - 1) . ($sel_y + 1);
                 }
 
                 if (strpos($board[($sel_x + 1)][($sel_y + 1)], 'X') !== false) {
-                    $valid_moves[] = ($sel_x + 2).($sel_y + 2); //right down
-                    $kill[($sel_x + 2).($sel_y + 2)] = ($sel_x + 1).($sel_y + 1);
+                    $valid_moves[] = ($sel_x + 2) . ($sel_y + 2); //right down
+                    $kill[($sel_x + 2) . ($sel_y + 2)] = ($sel_x + 1) . ($sel_y + 1);
                 }
 
                 if (strpos($board[($sel_x + 1)][($sel_y - 1)], 'X') !== false) {
-                    $valid_moves[] = ($sel_x + 2).($sel_y - 2); //left up
-                    $kill[($sel_x + 2).($sel_y - 2)] = ($sel_x + 1).($sel_y - 1);
+                    $valid_moves[] = ($sel_x + 2) . ($sel_y - 2); //left up
+                    $kill[($sel_x + 2) . ($sel_y - 2)] = ($sel_x + 1) . ($sel_y - 1);
                 }
 
                 if (strpos($board[($sel_x - 1)][($sel_y - 1)], 'X') !== false) {
-                    $valid_moves[] = ($sel_x - 2).($sel_y - 2); //left down
-                    $kill[($sel_x - 2).($sel_y - 2)] = ($sel_x - 1).($sel_y - 1);
+                    $valid_moves[] = ($sel_x - 2) . ($sel_y - 2); //left down
+                    $kill[($sel_x - 2) . ($sel_y - 2)] = ($sel_x - 1) . ($sel_y - 1);
                 }
             } elseif ($board[$sel_x][$sel_y] == 'OK') {
                 for ($move = 1; $move <= 8; $move++) {
@@ -689,7 +689,7 @@ class Poolcheckers extends Game
 
                 for ($move = 1; $move <= 8; $move++) {
                     if ($board[($sel_x + $move)][($sel_y + $move)] == '') {
-                        $valid_moves[] = ($sel_x + $move).($sel_y + $move); //right down
+                        $valid_moves[] = ($sel_x + $move) . ($sel_y + $move); //right down
                     } else {
                         break;
                     }
@@ -697,7 +697,7 @@ class Poolcheckers extends Game
 
                 for ($move = 1; $move <= 8; $move++) {
                     if ($board[($sel_x + $move)][($sel_y - $move)] == '') {
-                        $valid_moves[] = ($sel_x + $move).($sel_y - $move); //left up
+                        $valid_moves[] = ($sel_x + $move) . ($sel_y - $move); //left up
                     } else {
                         break;
                     }
@@ -705,7 +705,7 @@ class Poolcheckers extends Game
 
                 for ($move = 1; $move <= 8; $move++) {
                     if ($board[($sel_x - $move)][($sel_y - $move)] == '') {
-                        $valid_moves[] = ($sel_x - $move).($sel_y - $move); //left down
+                        $valid_moves[] = ($sel_x - $move) . ($sel_y - $move); //left down
                     } else {
                         break;
                     }
@@ -719,9 +719,9 @@ class Poolcheckers extends Game
                             }
                         }
 
-                        $valid_moves[] = ($sel_x - ($move + 1)).($sel_y + ($move + 1)); //right up
+                        $valid_moves[] = ($sel_x - ($move + 1)) . ($sel_y + ($move + 1)); //right up
 
-                        $kill[($sel_x - ($move + 1)).($sel_y + ($move + 1))] = ($sel_x - $move).($sel_y + $move);
+                        $kill[($sel_x - ($move + 1)) . ($sel_y + ($move + 1))] = ($sel_x - $move) . ($sel_y + $move);
                         break;
                     }
                 }
@@ -748,8 +748,8 @@ class Poolcheckers extends Game
                             }
                         }
 
-                        $valid_moves[] = ($sel_x + ($move + 1)).($sel_y - ($move + 1)); //left up
-                        $kill[($sel_x + ($move + 1)).($sel_y - ($move + 1))] = ($sel_x + $move).($sel_y - $move);
+                        $valid_moves[] = ($sel_x + ($move + 1)) . ($sel_y - ($move + 1)); //left up
+                        $kill[($sel_x + ($move + 1)) . ($sel_y - ($move + 1))] = ($sel_x + $move) . ($sel_y - $move);
                         break;
                     }
                 }
@@ -762,8 +762,8 @@ class Poolcheckers extends Game
                             }
                         }
 
-                        $valid_moves[] = ($sel_x - ($move + 1)).($sel_y - ($move + 1)); //left down
-                        $kill[($sel_x - ($move + 1)).($sel_y - ($move + 1))] = ($sel_x - $move).($sel_y - $move);
+                        $valid_moves[] = ($sel_x - ($move + 1)) . ($sel_y - ($move + 1)); //left down
+                        $kill[($sel_x - ($move + 1)) . ($sel_y - ($move + 1))] = ($sel_x - $move) . ($sel_y - $move);
                         break;
                     }
                 }
@@ -776,7 +776,7 @@ class Poolcheckers extends Game
 
         if ($onlykill) {
             foreach ($kill as $thismove => $thiskill) {
-                $thismove = (string) $thismove;
+                $thismove = (string)$thismove;
 
                 if (preg_match('/\-/', $thismove) || $thismove[0] >= $this->max_x || $thismove[1] >= $this->max_y || $thismove[0] < 0 || $thismove[1] < 0) {
                     continue;
@@ -801,13 +801,13 @@ class Poolcheckers extends Game
                 unset($kill[$value]);
             } elseif ($board[$x][$y] != '') {
                 unset($valid_moves[$key]);
-                unset($kill[$x.$y]);
+                unset($kill[$x . $y]);
             }
         }
 
         $c = function ($v) {
             if (is_array($v)) {
-                return array_filter($v) != array();
+                return array_filter($v) != [];
             }
         };
 
@@ -816,7 +816,7 @@ class Poolcheckers extends Game
 
         return [
             'valid_moves' => $valid_moves,
-            'kills' => $kill
+            'kills'       => $kill,
         ];
     }
 
@@ -851,8 +851,8 @@ class Poolcheckers extends Game
         }
 
         return [
-            'X' => $xs,
-            'O' => $ys,
+            'X'  => $xs,
+            'O'  => $ys,
             'XK' => $xks,
             'OK' => $yks,
         ];
@@ -883,9 +883,9 @@ class Poolcheckers extends Game
         for ($x = 0; $x < $this->max_x; $x++) {
             for ($y = 0; $y < $this->max_y; $y++) {
                 if (strpos($board[$x][$y], 'X') !== false) {
-                    array_push($availableMoves_X, $this->possibleMoves($board, $x.$y, false, 'X"'));
+                    array_push($availableMoves_X, $this->possibleMoves($board, $x . $y, false, 'X"'));
                 } elseif (strpos($board[$x][$y], 'O') !== false) {
-                    array_push($availableMoves_O, $this->possibleMoves($board, $x.$y, false, 'O'));
+                    array_push($availableMoves_O, $this->possibleMoves($board, $x . $y, false, 'O'));
                 }
             }
         }
@@ -923,6 +923,7 @@ class Poolcheckers extends Game
     private function transpose($array)
     {
         array_unshift($array, null);
+
         return call_user_func_array('array_map', $array);
     }
 
@@ -998,6 +999,7 @@ class Poolcheckers extends Game
             }
         } else {
             Debug::print('Someone else executed forfeit action');
+
             return $this->answerCallbackQuery();
         }
     }
