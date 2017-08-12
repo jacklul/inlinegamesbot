@@ -28,7 +28,7 @@ class GenericmessageCommand extends SystemCommand
     {
         $this->leaveGroupChat();
 
-        return Request::emptyResponse();
+        return $this->getTelegram()->executeCommand('start');
     }
 
     /**
@@ -47,7 +47,7 @@ class GenericmessageCommand extends SystemCommand
             return $this->telegram->executeCommand($command);
         }
 
-        return Request::emptyResponse();
+        return $this->getTelegram()->executeCommand('start');
     }
 
     /**
