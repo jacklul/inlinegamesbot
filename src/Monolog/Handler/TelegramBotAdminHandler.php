@@ -64,7 +64,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
      *
      * @param Telegram $telegram
      * @param bool|int $level
-     * @param bool $bubble
+     * @param bool     $bubble
      */
     public function __construct(Telegram $telegram, $level = Logger::ERROR, $bubble = true)
     {
@@ -120,11 +120,13 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
         foreach ($this->telegram->getAdminList() as $admin) {
             if ($admin != $this->bot_id) {
                 try {
-                    $result = Request::sendMessage([
+                    $result = Request::sendMessage(
+                        [
                         'chat_id'    => $admin,
                         'text'       => '<b>' . $record['level_name'] . ' (' . $record['datetime']->format('H:i:s d-m-Y') . ')</b>' . PHP_EOL . '<code>' . htmlentities($record['message']) . '</code>',
                         'parse_mode' => 'HTML',
-                    ]);
+                        ]
+                    );
                 } catch (TelegramException $e) {
                     print($e->getMessage());
                 }

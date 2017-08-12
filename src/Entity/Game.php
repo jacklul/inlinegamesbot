@@ -116,15 +116,18 @@ class Game
 
         Debug::print('CRASHED');
 
-        TelegramLog::error($this->crashDump([
-            'Game'               => $this->manager->getGame()::getTitle(),
-            'Game data (before)' => json_encode($data_before),
-            'Game data (after)'  => json_encode($this->data),
-            'Callback data'      => $this->manager->getUpdate()->getCallbackQuery() ? $this->manager->getUpdate()->getCallbackQuery()->getData() : '<not a callback query>',
-            'Result'             => $result,
-        ],
-            $this->manager->getId()
-        ));
+        TelegramLog::error(
+            $this->crashDump(
+                [
+                'Game'               => $this->manager->getGame()::getTitle(),
+                'Game data (before)' => json_encode($data_before),
+                'Game data (after)'  => json_encode($this->data),
+                'Callback data'      => $this->manager->getUpdate()->getCallbackQuery() ? $this->manager->getUpdate()->getCallbackQuery()->getData() : '<not a callback query>',
+                'Result'             => $result,
+                ],
+                $this->manager->getId()
+            )
+        );
 
         if ($this->saveData([])) {
             $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
@@ -151,7 +154,7 @@ class Game
      * Answer to callback query helper
      *
      * @param string $text
-     * @param bool $alert
+     * @param bool   $alert
      *
      * @return ServerResponse|mixed
      */
@@ -704,7 +707,7 @@ class Game
     /**
      * Keyboard for game in progress
      *
-     * @param array $board
+     * @param array  $board
      * @param string $winner
      *
      * @return InlineKeyboard
@@ -817,9 +820,9 @@ class Game
     /**
      * Make a debug dump of crashed game session
      *
-     * @param array $data
+     * @param array  $data
      *
-     * @param string $id
+     * @param  string $id
      * @return string
      */
     private function crashDump($data = [], $id = '')

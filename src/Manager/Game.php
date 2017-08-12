@@ -59,8 +59,8 @@ class Game
     /**
      * Game Manager constructor
      *
-     * @param string $id
-     * @param string $game_code
+     * @param string  $id
+     * @param string  $game_code
      * @param Command $command
      *
      * @throws BotException
@@ -243,5 +243,4 @@ class Game
     {
         return $this->update;
     }
-
 }
