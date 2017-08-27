@@ -50,10 +50,10 @@ class Botan
      * @param string  $event_name
      * @param integer $timeout
      *
-     * @return bool|string
+     * @return bool
      * @throws BotException
      */
-    public static function track(Update $update, $event_name = '', $timeout = 5)
+    public static function track(Update $update, $event_name = '', $timeout = 5): bool
     {
         if (empty(self::$token)) {
             self::$token = getenv('BOTAN_TOKEN');
@@ -105,6 +105,6 @@ class Botan
             return false;
         }
 
-        return $responseData;
+        return true;
     }
 }

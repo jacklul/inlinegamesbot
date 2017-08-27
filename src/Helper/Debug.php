@@ -66,7 +66,7 @@ class Debug
      *
      * @param bool $enabled
      */
-    public static function setEnabled(bool $enabled)
+    public static function setEnabled(bool $enabled): void
     {
         self::$enabled = $enabled;
     }

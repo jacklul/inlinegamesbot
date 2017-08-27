@@ -116,7 +116,7 @@ class Language
      *
      * @param string $default_language
      */
-    public static function setDefaultLanguage(string $default_language)
+    public static function setDefaultLanguage(string $default_language): void
     {
         self::$default_language = $default_language;
         self::set($default_language);
