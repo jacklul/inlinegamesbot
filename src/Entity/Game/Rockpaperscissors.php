@@ -201,11 +201,11 @@ class Rockpaperscissors extends Game
                 if ($isOver == 'X') {
                     $data['host_wins'] = $data['host_wins'] + 1;
 
-                    $gameOutput = '<b>' . __("{PLAYER} won this round!", ['{PLAYER}' => '</b>' . $this->getCurrentUserMention() . '<b>']) . '</b>' . PHP_EOL;
+                    $gameOutput = '<b>' . __("{PLAYER} won this round!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
                 } elseif ($isOver == 'O') {
                     $data['guest_wins'] = $data['guest_wins'] + 1;
 
-                    $gameOutput = '<b>' . __("{PLAYER} won this round!", ['{PLAYER}' => '</b>' . $this->getCurrentUserMention() . '<b>']) . '</b>' . PHP_EOL;
+                    $gameOutput = '<b>' . __("{PLAYER} won this round!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
                 } else {
                     $data['host_wins'] += 1;
                     $data['guest_wins'] += 1;
