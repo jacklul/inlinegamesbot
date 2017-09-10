@@ -57,6 +57,10 @@ class GenericmessageCommand extends SystemCommand
      */
     private function leaveGroupChat()
     {
+        if (getenv('DEBUG')) {
+            return false;
+        }
+
         if (!$this->getMessage()->getChat()->isPrivateChat()) {
             return Request::leaveChat(
                 [
