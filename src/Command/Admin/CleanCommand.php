@@ -156,6 +156,8 @@ class CleanCommand extends AdminCommand
 
         if ($chat_id != $bot_id) {
             return Request::sendMessage($data);
+        } elseif (defined("STDIN")) {
+            echo $data['text'] . PHP_EOL;
         }
 
         return Request::emptyResponse();

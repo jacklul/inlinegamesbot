@@ -10,6 +10,7 @@
 
 namespace Bot\Monolog\Handler;
 
+use Bot\Entity\LockFile;
 use Bot\Helper\Debug;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
@@ -71,7 +72,8 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
         $this->telegram = $telegram;
         $this->bot_id = $telegram->getBotId();
 
-        $this->reports_file = sys_get_temp_dir() . '/' . $this->bot_id . '_reports.json';
+        $lockfile = new LockFile($this->bot_id, false);
+        $this->reports_file = $lockfile->getFile();
 
         if (!is_writable(dirname($this->reports_file))) {
             if (!is_dir(DATA_PATH . '/tmp')) {
@@ -102,6 +104,10 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
 
         $reports = $this->getReports();
         $message = preg_split("/\\r\\n|\\r|\\n/", $record['message'])[0];   // get only the actual message without stacktrace
+
+        if (empty($message)) {
+            return false;
+        }
 
         if ($message === $this->last_message) {
             Debug::print('Log report prevented - message is a duplicate (session)');
