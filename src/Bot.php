@@ -53,46 +53,46 @@ class Bot
      */
     private $commands = [
         'help'    => [
-				'function' 		=> 'showHelp',
-				'description' 	=> 'Shows this help message',
-			],
+                'function'         => 'showHelp',
+                'description'     => 'Shows this help message',
+        ],
         'set'     => [
-				'function' 		=> 'setWebhook',
-				'description' 	=> 'Sets the webhook',
-			],
+        'function'         => 'setWebhook',
+        'description'     => 'Sets the webhook',
+        ],
         'unset'   => [
-				'function' 		=> 'deleteWebhook',
-				'description' 	=> 'Deletes the webhook',
-			],
+        'function'         => 'deleteWebhook',
+        'description'     => 'Deletes the webhook',
+        ],
         'info'    => [
-				'function' 		=> 'webhookInfo',
-				'description' 	=> 'Prints webhookInfo request result',
-			],
+        'function'         => 'webhookInfo',
+        'description'     => 'Prints webhookInfo request result',
+        ],
         'install' => [
-				'function' 		=> 'installDb',
-				'description' 	=> 'Executes database creation script',
-			],
+        'function'         => 'installDb',
+        'description'     => 'Executes database creation script',
+        ],
         'handle'  => [
-				'function' 		=> 'handleWebhook',
-				'description' 	=> 'Handles incoming webhook update',
-			],
+        'function'         => 'handleWebhook',
+        'description'     => 'Handles incoming webhook update',
+        ],
         'cron'    => [
-				'function' 		=> 'handleCron',
-				'description' 	=> 'Runs scheduled commands once',
-			],
+        'function'         => 'handleCron',
+        'description'     => 'Runs scheduled commands once',
+        ],
         'loop'    => [
-				'function' 		=> 'handleLongPolling',
-				'description' 	=> 'Runs using getUpdates in a loop',
-			],
+        'function'         => 'handleLongPolling',
+        'description'     => 'Runs using getUpdates in a loop',
+        ],
         'worker'  => [
-				'function' 		=> 'handleWorker',
-				'description' 	=> 'Runs scheduled commands every minute',
-			],
+        'function'         => 'handleWorker',
+        'description'     => 'Runs scheduled commands every minute',
+        ],
         'getupdates'    => [
-				'function' 		=> 'handleLongPolling',
-				'hidden'		=> true
-			],
-		];
+        'function'         => 'handleLongPolling',
+        'hidden'        => true
+        ],
+    ];
 
     /**
      * Telegram object
@@ -114,14 +114,14 @@ class Bot
             throw new BotException('Root path not defined!');
         }
 
-	      // Set custom data path if variable exists, otherwise use 'data' directory
+        // Set custom data path if variable exists, otherwise use 'data' directory
         if (!empty($data_path = getenv('DATA_PATH'))) {
             define("DATA_PATH", $data_path);
         } else {
             define("DATA_PATH", ROOT_PATH . '/data');
         }
 
-	      // Load environment variables from file if it exists
+        // Load environment variables from file if it exists
         if (file_exists(ROOT_PATH . '/.env')) {
             $env = new Dotenv(ROOT_PATH);
             $env->load();
@@ -130,84 +130,84 @@ class Bot
         // gettext '__()' function must be initialized as all public messages are using it
         (new Translator())->register();
 
-	      $this->loadDefaultConfig();
+        $this->loadDefaultConfig();
 
-		    // Merge default config with user config
+        // Merge default config with user config
         $config_file = APP_PATH . '/config.php';
         if (file_exists($config_file)) {
             $config = $this->config;
-		        include $config_file;
+            include $config_file;
 
-      			if (isset($config) && is_array($config)) {
+            if (isset($config) && is_array($config)) {
                 $this->config = $config;
-      			}
+            }
         }
 
-    		// Get passed parameter
-    		if ($web) {
-    			$this->arg = 'handle';	// from webspace allow only handling webhook
-    		} elseif (isset($_SERVER['argv'][1])) {
+        // Get passed parameter
+        if ($web) {
+            $this->arg = 'handle';    // from webspace allow only handling webhook
+        } elseif (isset($_SERVER['argv'][1])) {
             $this->arg = strtolower(trim($_SERVER['argv'][1]));
         }
 
         return $this;
     }
 
-	/**
-	 * Load default config values
-	 */
-	private function loadDefaultConfig()
-	{
-  		$this->config = [
-  			'api_key'          => getenv('BOT_TOKEN'),
-  			'bot_username'     => getenv('BOT_USERNAME'),
-  			'secret'           => getenv('BOT_SECRET'),
-  			'admins'           => [(integer)getenv('BOT_ADMIN') ?: 0],
-  			'commands'         => [
-  				'paths'   => [
-  					SRC_PATH . '/Command',
-  				],
-  				'configs' => [
-  					'clean' => [
-  						'clean_interval' => 21600,
-  					],
-  				],
-  			],
-  			'webhook'          => [
-  				'url'             => getenv('BOT_WEBHOOK'),
-  				'max_connections' => 100,
-  				'allowed_updates' => [
-  					'message',
-  					'inline_query',
-  					'chosen_inline_result',
-  					'callback_query',
-  				],
-  			],
-  			'mysql'            => [
-  				'host'     => getenv('DB_HOST'),
-  				'user'     => getenv('DB_USER'),
-  				'password' => getenv('DB_PASS'),
-  				'database' => getenv('DB_NAME'),
-  			],
-  			'validate_request' => true,
-  			'valid_ips'        => [
-  				'149.154.167.197-149.154.167.233',
-  			],
-  			'botan'            => [
-  				'token'   => getenv('BOTAN_TOKEN'),
-  				'options' => [
-  					'timeout' => 5,
-  				],
-  			],
-  			'cron'             => [
-  				'groups' => [
-  					'default' => [
-  						'/clean',
-  					],
-  				],
-  			],
-  		];
-	}
+    /**
+     * Load default config values
+     */
+    private function loadDefaultConfig()
+    {
+        $this->config = [
+        'api_key'          => getenv('BOT_TOKEN'),
+        'bot_username'     => getenv('BOT_USERNAME'),
+        'secret'           => getenv('BOT_SECRET'),
+        'admins'           => [(integer)getenv('BOT_ADMIN') ?: 0],
+        'commands'         => [
+         'paths'   => [
+          SRC_PATH . '/Command',
+         ],
+         'configs' => [
+          'clean' => [
+           'clean_interval' => 21600,
+          ],
+         ],
+        ],
+        'webhook'          => [
+         'url'             => getenv('BOT_WEBHOOK'),
+         'max_connections' => 100,
+         'allowed_updates' => [
+          'message',
+          'inline_query',
+          'chosen_inline_result',
+          'callback_query',
+         ],
+        ],
+        'mysql'            => [
+         'host'     => getenv('DB_HOST'),
+         'user'     => getenv('DB_USER'),
+         'password' => getenv('DB_PASS'),
+         'database' => getenv('DB_NAME'),
+        ],
+        'validate_request' => true,
+        'valid_ips'        => [
+         '149.154.167.197-149.154.167.233',
+        ],
+        'botan'            => [
+         'token'   => getenv('BOTAN_TOKEN'),
+         'options' => [
+          'timeout' => 5,
+         ],
+        ],
+        'cron'             => [
+         'groups' => [
+          'default' => [
+                          '/clean',
+          ],
+         ],
+        ],
+        ];
+    }
 
     /**
      * Run the bot
@@ -251,13 +251,13 @@ class Bot
                 $commands .= PHP_EOL;
             }
 
-			if (isset($data['hidden']) && $data['hidden'] === true) {
-				continue;
-			}
+            if (isset($data['hidden']) && $data['hidden'] === true) {
+                continue;
+            }
 
-			if (!isset($data['description'])) {
-				$data['description'] = 'No description available';
-			}
+            if (!isset($data['description'])) {
+                $data['description'] = 'No description available';
+            }
 
             $commands .= ' ' . $command . str_repeat(' ', 10 - strlen($command)) . '- ' . $data['description'];
         }
@@ -471,7 +471,9 @@ class Bot
         $file = $lockfile->getFile();
 
         if (!$file || !flock(fopen($file, "a+"), LOCK_EX)) {
-            if(defined('STDIN')) echo "There is already another cron task running in the background!\n";
+            if (defined('STDIN')) {
+                echo "There is already another cron task running in the background!\n";
+            }
             exit;
         }
 
