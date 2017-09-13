@@ -8,7 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2017-08-10 18:10+0200\n"
+"POT-Creation-Date: 2017-09-13 18:17+0200\n"
 "PO-Revision-Date: 2017-07-13T17:47:54+00:00\n"
 "X-Poedit-Basepath: ../../src\n"
 "X-Poedit-KeywordsList: __\n"
@@ -19,8 +19,8 @@ msgstr ""
 msgid "This game session has expired."
 msgstr ""
 
-#: Command/Admin/CleanCommand.php:177 Command/System/InlinequeryCommand.php:113
-#: Entity/Game.php:602
+#: Command/Admin/CleanCommand.php:179 Command/System/InlinequeryCommand.php:113
+#: Entity/Game.php:614
 msgid "Create"
 msgstr ""
 
@@ -28,8 +28,8 @@ msgstr ""
 msgid "Bad request!"
 msgstr ""
 
-#: Command/System/InlinequeryCommand.php:42 Entity/Game.php:396
-#: Entity/Game.php:407 Entity/Game.php:453 Entity/Game.php:840
+#: Command/System/InlinequeryCommand.php:42 Entity/Game.php:404
+#: Entity/Game.php:415 Entity/Game.php:463 Entity/Game.php:852
 msgid "This game session is empty."
 msgstr ""
 
@@ -37,9 +37,9 @@ msgstr ""
 msgid "Hi!"
 msgstr ""
 
-#: Command/User/HelpCommand.php:54 Command/User/HelpCommand.php:88
-#: Entity/Game.php:355 Entity/Game.php:530 Entity/Game.php:660
-#: Entity/Game.php:838
+#: Command/User/HelpCommand.php:54 Command/User/HelpCommand.php:89
+#: Entity/Game.php:363 Entity/Game.php:542 Entity/Game.php:672
+#: Entity/Game.php:850
 msgid "Play"
 msgstr ""
 
@@ -55,114 +55,114 @@ msgstr ""
 msgid "Please report all issues there!"
 msgstr ""
 
-#: Command/User/HelpCommand.php:96
+#: Command/User/HelpCommand.php:97
 msgid "Rate"
 msgstr ""
 
-#: Entity/Game.php:111
+#: Entity/Game.php:114
 msgid "Telegram API error!"
 msgstr ""
 
-#: Entity/Game.php:111 Entity/Game.php:198 Manager/Game.php:157
+#: Entity/Game.php:114 Entity/Game.php:206 Manager/Game.php:157
 #: Manager/Game.php:173
 msgid "Try again in a few seconds."
 msgstr ""
 
-#: Entity/Game.php:127
+#: Entity/Game.php:133
 msgid "This game session has crashed."
 msgstr ""
 
-#: Entity/Game.php:130
+#: Entity/Game.php:136
 msgid "Critical error!"
 msgstr ""
 
-#: Entity/Game.php:198 Manager/Game.php:157
+#: Entity/Game.php:206 Manager/Game.php:157
 msgid "Database failure!"
 msgstr ""
 
-#: Entity/Game.php:317
+#: Entity/Game.php:325
 msgid "This game is already created!"
 msgstr ""
 
-#: Entity/Game.php:325 Entity/Game.php:344 Entity/Game.php:386
-#: Entity/Game.php:435 Entity/Game.php:528 Entity/Game.php:836
-#: Entity/Game/Russianroulette.php:219
+#: Entity/Game.php:333 Entity/Game.php:352 Entity/Game.php:394
+#: Entity/Game.php:444 Entity/Game.php:540 Entity/Game.php:848
+#: Entity/Game/Russianroulette.php:220
 msgid "{PLAYER_HOST} is waiting for opponent to join..."
 msgstr ""
 
-#: Entity/Game.php:325 Entity/Game.php:344 Entity/Game.php:386
-#: Entity/Game.php:435 Entity/Game.php:528 Entity/Game.php:639
-#: Entity/Game.php:836 Entity/Game/Russianroulette.php:219
-#: Entity/Game/Russianroulette.php:361
+#: Entity/Game.php:333 Entity/Game.php:352 Entity/Game.php:394
+#: Entity/Game.php:444 Entity/Game.php:540 Entity/Game.php:651
+#: Entity/Game.php:848 Entity/Game/Russianroulette.php:220
+#: Entity/Game/Russianroulette.php:362
 msgid "Join"
 msgstr ""
 
-#: Entity/Game.php:325 Entity/Game.php:344 Entity/Game.php:386
-#: Entity/Game.php:435 Entity/Game.php:528 Entity/Game.php:836
-#: Entity/Game/Russianroulette.php:219
+#: Entity/Game.php:333 Entity/Game.php:352 Entity/Game.php:394
+#: Entity/Game.php:444 Entity/Game.php:540 Entity/Game.php:848
+#: Entity/Game/Russianroulette.php:220
 msgid "Press {BUTTON} button to join."
 msgstr ""
 
-#: Entity/Game.php:355 Entity/Game.php:530 Entity/Game.php:838
+#: Entity/Game.php:363 Entity/Game.php:542 Entity/Game.php:850
 msgid "{PLAYER_GUEST} joined..."
 msgstr ""
 
-#: Entity/Game.php:355 Entity/Game.php:530 Entity/Game.php:838
+#: Entity/Game.php:363 Entity/Game.php:542 Entity/Game.php:850
 msgid "Waiting for {PLAYER} to start..."
 msgstr ""
 
-#: Entity/Game.php:355 Entity/Game.php:530 Entity/Game.php:838
+#: Entity/Game.php:363 Entity/Game.php:542 Entity/Game.php:850
 msgid "Press {BUTTON} button to start."
 msgstr ""
 
-#: Entity/Game.php:360
+#: Entity/Game.php:368
 msgid "You cannot play with yourself!"
 msgstr ""
 
-#: Entity/Game.php:363
+#: Entity/Game.php:371
 msgid "This game is full!"
 msgstr ""
 
-#: Entity/Game.php:375 Entity/Game.php:458 Entity/Game.php:489
-#: Entity/Game/Checkers.php:146 Entity/Game/Checkers.php:787
-#: Entity/Game/Checkers.php:863 Entity/Game/Connectfour.php:131
-#: Entity/Game/Poolcheckers.php:146 Entity/Game/Poolcheckers.php:937
-#: Entity/Game/Poolcheckers.php:1013 Entity/Game/Rockpaperscissors.php:127
+#: Entity/Game.php:383 Entity/Game.php:469 Entity/Game.php:501
+#: Entity/Game/Checkers.php:146 Entity/Game/Checkers.php:788
+#: Entity/Game/Checkers.php:865 Entity/Game/Connectfour.php:131
+#: Entity/Game/Poolcheckers.php:146 Entity/Game/Poolcheckers.php:938
+#: Entity/Game/Poolcheckers.php:1015 Entity/Game/Rockpaperscissors.php:127
 #: Entity/Game/Russianroulette.php:127 Entity/Game/Tictactoe.php:131
 msgid "You're not in this game!"
 msgstr ""
 
-#: Entity/Game.php:386
+#: Entity/Game.php:394
 msgid "{PLAYER} quit..."
 msgstr ""
 
-#: Entity/Game.php:425 Entity/Game.php:462
+#: Entity/Game.php:434 Entity/Game.php:473
 msgid "You're not the host!"
 msgstr ""
 
-#: Entity/Game.php:435
+#: Entity/Game.php:444
 msgid "{PLAYER_GUEST} was kicked..."
 msgstr ""
 
-#: Entity/Game.php:633 Entity/Game.php:680 Entity/Game.php:753
+#: Entity/Game.php:645 Entity/Game.php:692 Entity/Game.php:765
 #: Entity/Game/Checkers.php:461 Entity/Game/Poolcheckers.php:463
-#: Entity/Game/Rockpaperscissors.php:302 Entity/Game/Russianroulette.php:340
-#: Entity/Game/Russianroulette.php:355
+#: Entity/Game/Rockpaperscissors.php:303 Entity/Game/Russianroulette.php:341
+#: Entity/Game/Russianroulette.php:356
 msgid "Quit"
 msgstr ""
 
-#: Entity/Game.php:686 Entity/Game.php:759 Entity/Game/Checkers.php:467
-#: Entity/Game/Poolcheckers.php:469 Entity/Game/Rockpaperscissors.php:308
-#: Entity/Game/Russianroulette.php:346
+#: Entity/Game.php:698 Entity/Game.php:771 Entity/Game/Checkers.php:467
+#: Entity/Game/Poolcheckers.php:469 Entity/Game/Rockpaperscissors.php:309
+#: Entity/Game/Russianroulette.php:347
 msgid "Kick"
 msgstr ""
 
-#: Entity/Game.php:743 Entity/Game/Checkers.php:431
-#: Entity/Game/Poolcheckers.php:433 Entity/Game/Rockpaperscissors.php:281
+#: Entity/Game.php:755 Entity/Game/Checkers.php:431
+#: Entity/Game/Poolcheckers.php:433 Entity/Game/Rockpaperscissors.php:282
 msgid "Play again!"
 msgstr ""
 
-#: Entity/Game.php:843
+#: Entity/Game.php:855
 msgid "Error!"
 msgstr ""
 
@@ -179,10 +179,10 @@ msgid "You must make a jump when possible!"
 msgstr ""
 
 #: Entity/Game/Checkers.php:298 Entity/Game/Checkers.php:310
-#: Entity/Game/Connectfour.php:202 Entity/Game/Connectfour.php:206
+#: Entity/Game/Connectfour.php:202 Entity/Game/Connectfour.php:207
 #: Entity/Game/Poolcheckers.php:300 Entity/Game/Poolcheckers.php:312
-#: Entity/Game/Rockpaperscissors.php:185 Entity/Game/Russianroulette.php:183
-#: Entity/Game/Tictactoe.php:181 Entity/Game/Tictactoe.php:196
+#: Entity/Game/Rockpaperscissors.php:186 Entity/Game/Russianroulette.php:184
+#: Entity/Game/Tictactoe.php:181 Entity/Game/Tictactoe.php:197
 msgid "Invalid move!"
 msgstr ""
 
@@ -197,16 +197,16 @@ msgid "It's not your turn!"
 msgstr ""
 
 #: Entity/Game/Checkers.php:329 Entity/Game/Checkers.php:331
-#: Entity/Game/Checkers.php:799 Entity/Game/Checkers.php:826
-#: Entity/Game/Connectfour.php:217 Entity/Game/Poolcheckers.php:331
-#: Entity/Game/Poolcheckers.php:333 Entity/Game/Poolcheckers.php:949
-#: Entity/Game/Poolcheckers.php:976 Entity/Game/Russianroulette.php:192
-#: Entity/Game/Russianroulette.php:203 Entity/Game/Tictactoe.php:206
+#: Entity/Game/Checkers.php:800 Entity/Game/Checkers.php:827
+#: Entity/Game/Connectfour.php:218 Entity/Game/Poolcheckers.php:331
+#: Entity/Game/Poolcheckers.php:333 Entity/Game/Poolcheckers.php:950
+#: Entity/Game/Poolcheckers.php:977 Entity/Game/Russianroulette.php:193
+#: Entity/Game/Russianroulette.php:204 Entity/Game/Tictactoe.php:207
 msgid "{PLAYER} won!"
 msgstr ""
 
-#: Entity/Game/Checkers.php:333 Entity/Game/Connectfour.php:219
-#: Entity/Game/Poolcheckers.php:335 Entity/Game/Tictactoe.php:208
+#: Entity/Game/Checkers.php:333 Entity/Game/Connectfour.php:220
+#: Entity/Game/Poolcheckers.php:335 Entity/Game/Tictactoe.php:209
 msgid "Game ended with a draw!"
 msgstr ""
 
@@ -215,9 +215,9 @@ msgstr ""
 msgid "{PLAYER} voted to draw!"
 msgstr ""
 
-#: Entity/Game/Checkers.php:349 Entity/Game/Connectfour.php:225
-#: Entity/Game/Poolcheckers.php:351 Entity/Game/Russianroulette.php:237
-#: Entity/Game/Tictactoe.php:214
+#: Entity/Game/Checkers.php:349 Entity/Game/Connectfour.php:226
+#: Entity/Game/Poolcheckers.php:351 Entity/Game/Russianroulette.php:238
+#: Entity/Game/Tictactoe.php:215
 msgid "Current turn:"
 msgstr ""
 
@@ -237,11 +237,11 @@ msgstr ""
 msgid "(Your move must continue)"
 msgstr ""
 
-#: Entity/Game/Checkers.php:368 Entity/Game/Checkers.php:806
-#: Entity/Game/Checkers.php:833 Entity/Game/Connectfour.php:230
-#: Entity/Game/Poolcheckers.php:370 Entity/Game/Poolcheckers.php:956
-#: Entity/Game/Poolcheckers.php:983 Entity/Game/Rockpaperscissors.php:238
-#: Entity/Game/Russianroulette.php:243 Entity/Game/Tictactoe.php:219
+#: Entity/Game/Checkers.php:368 Entity/Game/Checkers.php:807
+#: Entity/Game/Checkers.php:834 Entity/Game/Connectfour.php:231
+#: Entity/Game/Poolcheckers.php:370 Entity/Game/Poolcheckers.php:957
+#: Entity/Game/Poolcheckers.php:984 Entity/Game/Rockpaperscissors.php:239
+#: Entity/Game/Russianroulette.php:244 Entity/Game/Tictactoe.php:220
 msgid "vs."
 msgstr ""
 
@@ -253,41 +253,41 @@ msgstr ""
 msgid "Vote to draw"
 msgstr ""
 
-#: Entity/Game/Checkers.php:800 Entity/Game/Checkers.php:827
-#: Entity/Game/Poolcheckers.php:950 Entity/Game/Poolcheckers.php:977
+#: Entity/Game/Checkers.php:801 Entity/Game/Checkers.php:828
+#: Entity/Game/Poolcheckers.php:951 Entity/Game/Poolcheckers.php:978
 msgid "{PLAYER} surrendered!"
 msgstr ""
 
-#: Entity/Game/Checkers.php:818 Entity/Game/Checkers.php:845
-#: Entity/Game/Poolcheckers.php:968 Entity/Game/Poolcheckers.php:995
+#: Entity/Game/Checkers.php:819 Entity/Game/Checkers.php:846
+#: Entity/Game/Poolcheckers.php:969 Entity/Game/Poolcheckers.php:996
 msgid "Press the button again to surrender!"
 msgstr ""
 
-#: Entity/Game/Checkers.php:892 Entity/Game/Poolcheckers.php:1042
+#: Entity/Game/Checkers.php:894 Entity/Game/Poolcheckers.php:1044
 msgid "You already voted!"
 msgstr ""
 
-#: Entity/Game/Rockpaperscissors.php:203 Entity/Game/Rockpaperscissors.php:207
+#: Entity/Game/Rockpaperscissors.php:204 Entity/Game/Rockpaperscissors.php:208
 msgid "{PLAYER} won this round!"
 msgstr ""
 
-#: Entity/Game/Rockpaperscissors.php:212
+#: Entity/Game/Rockpaperscissors.php:213
 msgid "This round ended with a draw!"
 msgstr ""
 
-#: Entity/Game/Rockpaperscissors.php:221 Entity/Game/Rockpaperscissors.php:225
+#: Entity/Game/Rockpaperscissors.php:222 Entity/Game/Rockpaperscissors.php:226
 msgid "{PLAYER} won the game!"
 msgstr ""
 
-#: Entity/Game/Rockpaperscissors.php:229
+#: Entity/Game/Rockpaperscissors.php:230
 msgid "Round {ROUND} - make your picks!"
 msgstr ""
 
-#: Entity/Game/Russianroulette.php:193 Entity/Game/Russianroulette.php:204
+#: Entity/Game/Russianroulette.php:194 Entity/Game/Russianroulette.php:205
 msgid "{PLAYER} died! (kicked from the game)"
 msgstr ""
 
-#: Entity/Game/Russianroulette.php:224
+#: Entity/Game/Russianroulette.php:225
 msgid "{PLAYER} survived!"
 msgstr ""
 
