@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Inline Games - Telegram Bot (@inlinegamesbot)
+ *
+ * (c) 2017 Jack'lul <jacklulcat@gmail.com>
+ *
+ * For the full copyright and license information, please view
+ * the LICENSE file that was distributed with this source code.
+ */
+
+use Bot\Bot;
+
+/**
+ * Composer autoloader
+ */
+require __DIR__ . ' /../lib/autoload.php';
+
+/**
+ * Run console interface
+ */
+try {
+    $app = new Bot();
+    $app->run();
+} catch (\Throwable $e) {
+    print $e;
+}
