@@ -20,11 +20,11 @@ require __DIR__ . ' /../lib/autoload.php';
  */
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        $app = new Bot();
+        $app = new Bot(true);
         $app->run();
     } catch (\Throwable $e) {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+        header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);    // On error return HTTP 500 so that Telegram API can retry request later
     }
-} else {
+} else {    // Redirect non-POST requests to Github repository
     header("Location: https://github.com/jacklul/inlinegamesbot");
 }
