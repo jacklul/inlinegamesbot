@@ -72,7 +72,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
         $this->telegram = $telegram;
         $this->bot_id = $telegram->getBotId();
 
-        $lockfile = new LockFile($this->bot_id, false);
+        $lockfile = new LockFile($this->bot_id . '_reports', false);
         $this->reports_file = $lockfile->getFile();
 
         if (!is_writable(dirname($this->reports_file))) {
@@ -80,7 +80,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
                 mkdir(DATA_PATH . '/tmp', 0755, true);
             }
 
-            $this->reports_file = DATA_PATH . '/tmp/' . $this->bot_id . '_reports.json';
+            $this->reports_file = DATA_PATH . '/tmp/' . $this->bot_id . '_reports.tmp';
 
             if (!is_writable(dirname($this->reports_file))) {
                 $this->reports_file = null;
@@ -109,6 +109,8 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
             return false;
         }
 
+        Debug::print('Sending report: ' . $message);
+
         if ($message === $this->last_message) {
             Debug::print('Log report prevented - message is a duplicate (session)');
 
@@ -133,7 +135,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
                     $result = Request::sendMessage(
                         [
                         'chat_id'    => $admin,
-                        'text'       => '<b>' . $record['level_name'] . ' (' . $record['datetime']->format('H:i:s d-m-Y') . ')</b>' . PHP_EOL . '<code>' . htmlentities($record['message']) . '</code>',
+                        'text'       => '<b>' . $record['level_name'] . ' (' . $record['datetime']->format('H:i:s d-m-Y') . ')</b>' . PHP_EOL . '<code>' . htmlentities(utf8_decode($record['message'])) . '</code>',
                         'parse_mode' => 'HTML',
                         ]
                     );
