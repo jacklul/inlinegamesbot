@@ -10,6 +10,7 @@
 
 namespace Bot;
 
+use Bot\Entity\LockFile;
 use Bot\Exception\BotException;
 use Bot\Helper\Debug;
 use Bot\Helper\Storage;
@@ -46,6 +47,54 @@ class Bot
     private $config = [];
 
     /**
+     * Commands
+     *
+     * @var array
+     */
+    private $commands = [
+        'help'    => [
+				'function' 		=> 'showHelp',
+				'description' 	=> 'Shows this help message',
+			],
+        'set'     => [
+				'function' 		=> 'setWebhook',
+				'description' 	=> 'Sets the webhook',
+			],
+        'unset'   => [
+				'function' 		=> 'deleteWebhook',
+				'description' 	=> 'Deletes the webhook',
+			],
+        'info'    => [
+				'function' 		=> 'webhookInfo',
+				'description' 	=> 'Prints webhookInfo request result',
+			],
+        'install' => [
+				'function' 		=> 'installDb',
+				'description' 	=> 'Executes database creation script',
+			],
+        'handle'  => [
+				'function' 		=> 'handleWebhook',
+				'description' 	=> 'Handles incoming webhook update',
+			],
+        'cron'    => [
+				'function' 		=> 'handleCron',
+				'description' 	=> 'Runs scheduled commands once',
+			],
+        'loop'    => [
+				'function' 		=> 'handleLongPolling',
+				'description' 	=> 'Runs using getUpdates in a loop',
+			],
+        'worker'  => [
+				'function' 		=> 'handleWorker',
+				'description' 	=> 'Runs scheduled commands every minute',
+			],
+        'getupdates'    => [
+				'function' 		=> 'handleLongPolling',
+				'hidden'		=> true
+			],
+		];
+
+    /**
      * Telegram object
      *
      * @var Telegram
@@ -53,67 +102,112 @@ class Bot
     private $telegram;
 
     /**
-     * Commands
+     * Bot constructor
      *
-     * @var array
-     */
-    private $commands = [
-        'help'    => 'showHelp',
-        'set'     => 'setWebhook',
-        'unset'   => 'deleteWebhook',
-        'info'    => 'webhookInfo',
-        'install' => 'handleInstall',
-        'handle'  => 'handleWebhook',
-        'cron'    => 'handleCron',
-        'loop'    => 'handleLongPolling',
-        'worker'  => 'handleWorker',
-    ];
-
-    /**
-     * App constructor
+     * @param bool $web
      *
      * @throws BotException
      */
-    public function __construct()
+    public function __construct($web = false)
     {
         if (!defined('ROOT_PATH')) {
             throw new BotException('Root path not defined!');
         }
 
+	      // Set custom data path if variable exists, otherwise use 'data' directory
         if (!empty($data_path = getenv('DATA_PATH'))) {
             define("DATA_PATH", $data_path);
         } else {
             define("DATA_PATH", ROOT_PATH . '/data');
         }
 
+	      // Load environment variables from file if it exists
         if (file_exists(ROOT_PATH . '/.env')) {
             $env = new Dotenv(ROOT_PATH);
             $env->load();
         }
 
-        (new Translator())->register(); // must be initialized as all public messages are using __() function
+        // gettext '__()' function must be initialized as all public messages are using it
+        (new Translator())->register();
 
-        $bot_config_file = APP_PATH . '/config.php';
-        if (!file_exists($bot_config_file)) {
-            throw new BotException('Configuration file doesn\'t exist!');
+	      $this->loadDefaultConfig();
+
+		    // Merge default config with user config
+        $config_file = APP_PATH . '/config.php';
+        if (file_exists($config_file)) {
+            $config = $this->config;
+		        include $config_file;
+
+      			if (isset($config) && is_array($config)) {
+                $this->config = $config;
+      			}
         }
 
-        include $bot_config_file;
-
-        if (isset($config) && is_array($config)) {
-            $this->config = $config;
-        } else {
-            throw new BotException('Couldn\'t load configuration!');
-        }
-
-        if (isset($_SERVER['argv'][1])) {
+    		// Get passed parameter
+    		if ($web) {
+    			$this->arg = 'handle';	// from webspace allow only handling webhook
+    		} elseif (isset($_SERVER['argv'][1])) {
             $this->arg = strtolower(trim($_SERVER['argv'][1]));
-        } elseif (isset($_GET['a'])) {   // from webspace allow only handling webhook
-            $this->arg = 'handle';
         }
 
         return $this;
     }
+
+	/**
+	 * Load default config values
+	 */
+	private function loadDefaultConfig()
+	{
+  		$this->config = [
+  			'api_key'          => getenv('BOT_TOKEN'),
+  			'bot_username'     => getenv('BOT_USERNAME'),
+  			'secret'           => getenv('BOT_SECRET'),
+  			'admins'           => [(integer)getenv('BOT_ADMIN') ?: 0],
+  			'commands'         => [
+  				'paths'   => [
+  					SRC_PATH . '/Command',
+  				],
+  				'configs' => [
+  					'clean' => [
+  						'clean_interval' => 21600,
+  					],
+  				],
+  			],
+  			'webhook'          => [
+  				'url'             => getenv('BOT_WEBHOOK'),
+  				'max_connections' => 100,
+  				'allowed_updates' => [
+  					'message',
+  					'inline_query',
+  					'chosen_inline_result',
+  					'callback_query',
+  				],
+  			],
+  			'mysql'            => [
+  				'host'     => getenv('DB_HOST'),
+  				'user'     => getenv('DB_USER'),
+  				'password' => getenv('DB_PASS'),
+  				'database' => getenv('DB_NAME'),
+  			],
+  			'validate_request' => true,
+  			'valid_ips'        => [
+  				'149.154.167.197-149.154.167.233',
+  			],
+  			'botan'            => [
+  				'token'   => getenv('BOTAN_TOKEN'),
+  				'options' => [
+  					'timeout' => 5,
+  				],
+  			],
+  			'cron'             => [
+  				'groups' => [
+  					'default' => [
+  						'/clean',
+  					],
+  				],
+  			],
+  		];
+	}
 
     /**
      * Run the bot
@@ -125,11 +219,12 @@ class Bot
                 $this->initialize();
             }
 
-            if (!empty($this->arg) && isset($this->commands[$this->arg])) {
-                $function = $this->commands[$this->arg];
+            if (!empty($this->arg) && isset($this->commands[$this->arg]['function'])) {
+                $function = $this->commands[$this->arg]['function'];
                 $this->$function();
             } else {
                 $this->showHelp();
+
                 if (!empty($this->arg)) {
                     print PHP_EOL . 'Invalid parameter specified!' . PHP_EOL;
                 } else {
@@ -143,6 +238,34 @@ class Bot
     }
 
     /**
+     * Display usage help
+     */
+    private function showHelp()
+    {
+        print 'Bot Console' . ($this->config['bot_username'] ? ' (@' . $this->config['bot_username'] . ')' : '') . PHP_EOL . PHP_EOL;
+        print 'Available commands:' . PHP_EOL;
+
+        $commands = '';
+        foreach ($this->commands as $command => $data) {
+            if (!empty($commands)) {
+                $commands .= PHP_EOL;
+            }
+
+			if (isset($data['hidden']) && $data['hidden'] === true) {
+				continue;
+			}
+
+			if (!isset($data['description'])) {
+				$data['description'] = 'No description available';
+			}
+
+            $commands .= ' ' . $command . str_repeat(' ', 10 - strlen($command)) . '- ' . $data['description'];
+        }
+
+        print $commands . PHP_EOL;
+    }
+
+    /**
      * Initialize Telegram object
      */
     private function initialize(): void
@@ -150,6 +273,18 @@ class Bot
         Debug::print('DEBUG MODE');
 
         $this->telegram = new Telegram($this->config['api_key'], $this->config['bot_username']);
+
+        if (isset($this->config['logging']['error'])) {
+            TelegramLog::initErrorLog($this->config['logging']['error']);
+        }
+
+        if (isset($this->config['logging']['debug'])) {
+            TelegramLog::initDebugLog($this->config['logging']['debug']);
+        }
+
+        if (isset($this->config['logging']['update'])) {
+            TelegramLog::initUpdateLog($this->config['logging']['update']);
+        }
 
         if (isset($this->config['admins']) && !empty($this->config['admins'][0])) {
             $this->telegram->enableAdmins($this->config['admins']);
@@ -162,18 +297,6 @@ class Bot
             }
 
             TelegramLog::initialize($monolog);
-        }
-
-        if (isset($config['logging']['error'])) {
-            TelegramLog::initErrorLog($this->config['logging']['error']);
-        }
-
-        if (isset($this->config['logging']['debug'])) {
-            TelegramLog::initDebugLog($this->config['logging']['debug']);
-        }
-
-        if (isset($this->config['logging']['update'])) {
-            TelegramLog::initUpdateLog($this->config['logging']['update']);
         }
 
         if (isset($this->config['commands']['paths'])) {
@@ -344,6 +467,14 @@ class Bot
     {
         $commands = [];
 
+        $lockfile = new LockFile('cron');
+        $file = $lockfile->getFile();
+
+        if (!$file || !flock(fopen($file, "a+"), LOCK_EX)) {
+            if(defined('STDIN')) echo "There is already another cron task running in the background!\n";
+            exit;
+        }
+
         if (!empty($this->config['cron']['groups'])) {
             foreach ($this->config['cron']['groups'] as $command_group => $commands_in_group) {
                 foreach ($commands_in_group as $command) {
@@ -357,6 +488,10 @@ class Bot
         }
 
         $this->telegram->runCommands($commands);
+
+        if (flock(fopen($file, "a+"), LOCK_UN)) {
+            unlink($file);
+        }
     }
 
     /**
@@ -364,7 +499,7 @@ class Bot
      */
     private function handleLongPolling(): void
     {
-        print '[' . date('Y-m-d H:i:s', time()) . '] Running in loop...' . PHP_EOL;
+        print '[' . date('Y-m-d H:i:s', time()) . '] Running with getUpdates method...' . PHP_EOL;
 
         while (true) {
             set_time_limit(0);
@@ -379,7 +514,7 @@ class Bot
                 }
             } else {
                 print '[' . date('Y-m-d H:i:s', time()) . '] Failed to process updates!' . PHP_EOL;
-                print $server_response->printError() . PHP_EOL;
+                print 'Error: ' . $server_response->getDescription() . PHP_EOL;
             }
 
             if (function_exists('gc_collect_cycles')) {
@@ -395,7 +530,7 @@ class Bot
      */
     private function handleWorker(): void
     {
-        print 'Initializing worker...' . PHP_EOL;
+        print '[' . date('Y-m-d H:i:s', time()) . '] Initializing worker...' . PHP_EOL;
 
         $interval = 60;
         $sleep_time = 10;
@@ -416,7 +551,7 @@ class Bot
                     $sleep_time_this = $next_run;
                 }
 
-                print 'Next run in ' . $next_run . ' seconds, sleeping for ' . $sleep_time_this . ' seconds...' . PHP_EOL;
+                print '[' . date('Y-m-d H:i:s', time()) . '] Next run in ' . $next_run . ' seconds, sleeping for ' . $sleep_time_this . ' seconds...' . PHP_EOL;
 
                 if (function_exists('gc_collect_cycles')) {
                     gc_collect_cycles();
@@ -427,20 +562,20 @@ class Bot
                 continue;
             }
 
-            print 'Running...' . PHP_EOL;
+            print '[' . date('Y-m-d H:i:s', time()) . '] Running...' . PHP_EOL;
 
             $last_run = time();
 
             $this->handleCron();
 
-            print 'Finished!' . PHP_EOL;
+            print '[' . date('Y-m-d H:i:s', time()) . '] Finished!' . PHP_EOL;
         }
     }
 
     /**
      * Handle installing database structure
      */
-    private function handleInstall()
+    private function installDb()
     {
         $storage = Storage::getClass();
 
@@ -451,25 +586,5 @@ class Bot
         } else {
             print 'Error!' . PHP_EOL;
         }
-    }
-
-    /**
-     * Display usage help
-     */
-    private function showHelp()
-    {
-        print 'Bot Console' . ($this->config['bot_username'] ? ' (@' . $this->config['bot_username'] . ')' : '') . PHP_EOL . PHP_EOL;
-        print 'Available commands:' . PHP_EOL . ' ';
-
-        $commands = '';
-        foreach ($this->commands as $command => $function) {
-            if (!empty($commands)) {
-                $commands .= ', ';
-            }
-
-            $commands .= $command;
-        }
-
-        print $commands . PHP_EOL;
     }
 }
