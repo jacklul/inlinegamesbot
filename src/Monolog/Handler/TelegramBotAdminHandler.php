@@ -109,8 +109,6 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
             return false;
         }
 
-        Debug::print('Sending report: ' . $message);
-
         if ($message === $this->last_message) {
             Debug::print('Log report prevented - message is a duplicate (session)');
 
@@ -127,6 +125,8 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
                 }
             }
         }
+
+        Debug::print('Sending report: ' . $message);
 
         $success = false;
         foreach ($this->telegram->getAdminList() as $admin) {
