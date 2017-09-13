@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "3baef6296b6340ed619faa51b8e0b5c7",
+    "content-hash": "cb4dfbba03ddf8598508f91378090ca8",
     "packages": [
         {
             "name": "ad7six/dsn",
@@ -734,50 +734,6 @@
         }
     ],
     "packages-dev": [
-        {
-            "name": "heroku/heroku-buildpack-php",
-            "version": "v122",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/heroku/heroku-buildpack-php.git",
-                "reference": "82b6fbf8d6a9693ec2f01ccf993202bfc1bc528a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/heroku/heroku-buildpack-php/zipball/82b6fbf8d6a9693ec2f01ccf993202bfc1bc528a",
-                "reference": "82b6fbf8d6a9693ec2f01ccf993202bfc1bc528a",
-                "shasum": ""
-            },
-            "bin": [
-                "bin/heroku-hhvm-apache2",
-                "bin/heroku-hhvm-nginx",
-                "bin/heroku-php-apache2",
-                "bin/heroku-php-nginx"
-            ],
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "David Zuelke",
-                    "email": "dz@heroku.com"
-                }
-            ],
-            "description": "Toolkit for starting a PHP application locally, with or without foreman, using the same config for PHP/HHVM and Apache2/Nginx as on Heroku",
-            "homepage": "https://github.com/heroku/heroku-buildpack-php",
-            "keywords": [
-                "apache",
-                "apache2",
-                "foreman",
-                "heroku",
-                "hhvm",
-                "nginx",
-                "php"
-            ],
-            "time": "2017-08-03T22:13:11+00:00"
-        },
         {
             "name": "squizlabs/php_codesniffer",
             "version": "2.9.1",

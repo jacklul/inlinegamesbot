@@ -1,4 +1,16 @@
+# PHPStorm
 .idea/
+
+# Composer
 lib/
+
+# Configuration files
+bot/config.php
+.env*
+!.env.example
+
+# Bot data directory
 data/
-.env
+
+# Other
+/.htaccess

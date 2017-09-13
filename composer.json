@@ -25,7 +25,6 @@
     "vlucas/phpdotenv": "^2.4.0"
   },
   "require-dev": {
-    "heroku/heroku-buildpack-php": "*",
     "squizlabs/php_codesniffer": "^2.8"
   },
   "autoload": {
