@@ -10,4 +10,4 @@ See [CONTRIBUTING](CONTRIBUTING.md) for more information.
 
 ## License
 
-See [LICENSE](LICENSE.md).
+See [LICENSE](LICENSE).
