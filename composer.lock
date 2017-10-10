@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "cb4dfbba03ddf8598508f91378090ca8",
+    "content-hash": "70eb2c5f05670468f7650d2dabeee404",
     "packages": [
         {
             "name": "ad7six/dsn",
@@ -410,16 +410,16 @@
         },
         {
             "name": "longman/telegram-bot",
-            "version": "0.47.1",
+            "version": "0.49.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-telegram-bot/core.git",
-                "reference": "e7303ed0702a3340b6344eb47270a8801bb564d6"
+                "reference": "04de592d06843e05f200dff4fa77360123343580"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-telegram-bot/core/zipball/e7303ed0702a3340b6344eb47270a8801bb564d6",
-                "reference": "e7303ed0702a3340b6344eb47270a8801bb564d6",
+                "url": "https://api.github.com/repos/php-telegram-bot/core/zipball/04de592d06843e05f200dff4fa77360123343580",
+                "reference": "04de592d06843e05f200dff4fa77360123343580",
                 "shasum": ""
             },
             "require": {
@@ -459,7 +459,7 @@
                 "bot",
                 "telegram"
             ],
-            "time": "2017-08-06T15:28:26+00:00"
+            "time": "2017-09-17T14:44:32+00:00"
         },
         {
             "name": "monolog/monolog",
