@@ -20,7 +20,7 @@
     "ad7six/dsn": "^0.4.0",
     "gettext/gettext": "^4.3.0",
     "longman/ip-tools": "^1.2",
-    "longman/telegram-bot": "^0.47.1",
+    "longman/telegram-bot": "^0.49.0",
     "spatie/emoji": "^1.0.5",
     "vlucas/phpdotenv": "^2.4.0"
   },

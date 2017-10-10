@@ -87,7 +87,7 @@ class Language
      *
      * @param $language
      */
-    private static function compileToArray($language)
+    private static function compileToArray(string $language): void
     {
         if (!file_exists(DATA_PATH . '/language/messages.' . $language . '/.php')) {
             $translation = Translations::fromPoFile(APP_PATH . '/language/messages.' . $language . '.po');
