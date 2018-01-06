@@ -52,45 +52,45 @@ class Bot
      * @var array
      */
     private $commands = [
-        'help'    => [
-                'function'         => 'showHelp',
-                'description'     => 'Shows this help message',
+        'help'       => [
+            'function'    => 'showHelp',
+            'description' => 'Shows this help message',
         ],
-        'set'     => [
-        'function'         => 'setWebhook',
-        'description'     => 'Sets the webhook',
+        'set'        => [
+            'function'    => 'setWebhook',
+            'description' => 'Sets the webhook',
         ],
-        'unset'   => [
-        'function'         => 'deleteWebhook',
-        'description'     => 'Deletes the webhook',
+        'unset'      => [
+            'function'    => 'deleteWebhook',
+            'description' => 'Deletes the webhook',
         ],
-        'info'    => [
-        'function'         => 'webhookInfo',
-        'description'     => 'Prints webhookInfo request result',
+        'info'       => [
+            'function'    => 'webhookInfo',
+            'description' => 'Prints webhookInfo request result',
         ],
-        'install' => [
-        'function'         => 'installDb',
-        'description'     => 'Executes database creation script',
+        'install'    => [
+            'function'    => 'installDb',
+            'description' => 'Executes database creation script',
         ],
-        'handle'  => [
-        'function'         => 'handleWebhook',
-        'description'     => 'Handles incoming webhook update',
+        'handle'     => [
+            'function'    => 'handleWebhook',
+            'description' => 'Handles incoming webhook update',
         ],
-        'cron'    => [
-        'function'         => 'handleCron',
-        'description'     => 'Runs scheduled commands once',
+        'cron'       => [
+            'function'    => 'handleCron',
+            'description' => 'Runs scheduled commands once',
         ],
-        'loop'    => [
-        'function'         => 'handleLongPolling',
-        'description'     => 'Runs using getUpdates in a loop',
+        'loop'       => [
+            'function'    => 'handleLongPolling',
+            'description' => 'Runs using getUpdates in a loop',
         ],
-        'worker'  => [
-        'function'         => 'handleWorker',
-        'description'     => 'Runs scheduled commands every minute',
+        'worker'     => [
+            'function'    => 'handleWorker',
+            'description' => 'Runs scheduled commands every minute',
         ],
-        'getupdates'    => [
-        'function'         => 'handleLongPolling',
-        'hidden'        => true
+        'getupdates' => [
+            'function' => 'handleLongPolling',
+            'hidden'   => true,
         ],
     ];
 
@@ -159,53 +159,53 @@ class Bot
     private function loadDefaultConfig()
     {
         $this->config = [
-        'api_key'          => getenv('BOT_TOKEN'),
-        'bot_username'     => getenv('BOT_USERNAME'),
-        'secret'           => getenv('BOT_SECRET'),
-        'admins'           => [(integer)getenv('BOT_ADMIN') ?: 0],
-        'commands'         => [
-         'paths'   => [
-          SRC_PATH . '/Command',
-         ],
-         'configs' => [
-          'clean' => [
-           'clean_interval' => 21600,
-          ],
-         ],
-        ],
-        'webhook'          => [
-         'url'             => getenv('BOT_WEBHOOK'),
-         'max_connections' => 100,
-         'allowed_updates' => [
-          'message',
-          'inline_query',
-          'chosen_inline_result',
-          'callback_query',
-         ],
-        ],
-        'mysql'            => [
-         'host'     => getenv('DB_HOST'),
-         'user'     => getenv('DB_USER'),
-         'password' => getenv('DB_PASS'),
-         'database' => getenv('DB_NAME'),
-        ],
-        'validate_request' => true,
-        'valid_ips'        => [
-         '149.154.167.197-149.154.167.233',
-        ],
-        'botan'            => [
-         'token'   => getenv('BOTAN_TOKEN'),
-         'options' => [
-          'timeout' => 5,
-         ],
-        ],
-        'cron'             => [
-         'groups' => [
-          'default' => [
-                          '/clean',
-          ],
-         ],
-        ],
+            'api_key'          => getenv('BOT_TOKEN'),
+            'bot_username'     => getenv('BOT_USERNAME'),
+            'secret'           => getenv('BOT_SECRET'),
+            'admins'           => [(integer)getenv('BOT_ADMIN') ?: 0],
+            'commands'         => [
+                'paths'   => [
+                    SRC_PATH . '/Command',
+                ],
+                'configs' => [
+                    'clean' => [
+                        'clean_interval' => 21600,
+                    ],
+                ],
+            ],
+            'webhook'          => [
+                'url'             => getenv('BOT_WEBHOOK'),
+                'max_connections' => 100,
+                'allowed_updates' => [
+                    'message',
+                    'inline_query',
+                    'chosen_inline_result',
+                    'callback_query',
+                ],
+            ],
+            'mysql'            => [
+                'host'     => getenv('DB_HOST'),
+                'user'     => getenv('DB_USER'),
+                'password' => getenv('DB_PASS'),
+                'database' => getenv('DB_NAME'),
+            ],
+            'validate_request' => true,
+            'valid_ips'        => [
+                '149.154.167.197-149.154.167.233',
+            ],
+            'botan'            => [
+                'token'   => getenv('BOTAN_TOKEN'),
+                'options' => [
+                    'timeout' => 5,
+                ],
+            ],
+            'cron'             => [
+                'groups' => [
+                    'default' => [
+                        '/clean',
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -235,34 +235,6 @@ class Bot
             TelegramLog::error($e);
             throw $e;
         }
-    }
-
-    /**
-     * Display usage help
-     */
-    private function showHelp()
-    {
-        print 'Bot Console' . ($this->config['bot_username'] ? ' (@' . $this->config['bot_username'] . ')' : '') . PHP_EOL . PHP_EOL;
-        print 'Available commands:' . PHP_EOL;
-
-        $commands = '';
-        foreach ($this->commands as $command => $data) {
-            if (!empty($commands)) {
-                $commands .= PHP_EOL;
-            }
-
-            if (isset($data['hidden']) && $data['hidden'] === true) {
-                continue;
-            }
-
-            if (!isset($data['description'])) {
-                $data['description'] = 'No description available';
-            }
-
-            $commands .= ' ' . $command . str_repeat(' ', 10 - strlen($command)) . '- ' . $data['description'];
-        }
-
-        print $commands . PHP_EOL;
     }
 
     /**
@@ -339,6 +311,44 @@ class Bot
     }
 
     /**
+     * Display usage help
+     */
+    private function showHelp()
+    {
+        print 'Bot Console' . ($this->config['bot_username'] ? ' (@' . $this->config['bot_username'] . ')' : '') . PHP_EOL . PHP_EOL;
+        print 'Available commands:' . PHP_EOL;
+
+        $commands = '';
+        foreach ($this->commands as $command => $data) {
+            if (!empty($commands)) {
+                $commands .= PHP_EOL;
+            }
+
+            if (isset($data['hidden']) && $data['hidden'] === true) {
+                continue;
+            }
+
+            if (!isset($data['description'])) {
+                $data['description'] = 'No description available';
+            }
+
+            $commands .= ' ' . $command . str_repeat(' ', 10 - strlen($command)) . '- ' . $data['description'];
+        }
+
+        print $commands . PHP_EOL;
+    }
+
+    /**
+     * Handle webhook method request
+     */
+    private function handleWebhook(): void
+    {
+        if ($this->validateRequest()) {
+            $this->telegram->handle();
+        }
+    }
+
+    /**
      * Validate request to check if it comes from the Telegram servers
      * and also does it contain a secret string
      *
@@ -367,16 +377,6 @@ class Bot
         }
 
         return true;
-    }
-
-    /**
-     * Handle webhook method request
-     */
-    private function handleWebhook(): void
-    {
-        if ($this->validateRequest()) {
-            $this->telegram->handle();
-        }
     }
 
     /**
@@ -459,44 +459,6 @@ class Bot
     }
 
     /**
-     * Run scheduled commands
-     *
-     * @throws BotException
-     */
-    private function handleCron(): void
-    {
-        $commands = [];
-
-        $lockfile = new LockFile('cron');
-        $file = $lockfile->getFile();
-
-        if (!$file || !flock(fopen($file, "a+"), LOCK_EX)) {
-            if (defined('STDIN')) {
-                echo "There is already another cron task running in the background!\n";
-            }
-            exit;
-        }
-
-        if (!empty($this->config['cron']['groups'])) {
-            foreach ($this->config['cron']['groups'] as $command_group => $commands_in_group) {
-                foreach ($commands_in_group as $command) {
-                    array_push($commands, $command);
-                }
-            }
-        }
-
-        if (empty($commands)) {
-            throw new BotException('No commands to run!');
-        }
-
-        $this->telegram->runCommands($commands);
-
-        if (flock(fopen($file, "a+"), LOCK_UN)) {
-            unlink($file);
-        }
-    }
-
-    /**
      * Handle getUpdates method
      */
     private function handleLongPolling(): void
@@ -571,6 +533,44 @@ class Bot
             $this->handleCron();
 
             print '[' . date('Y-m-d H:i:s', time()) . '] Finished!' . PHP_EOL;
+        }
+    }
+
+    /**
+     * Run scheduled commands
+     *
+     * @throws BotException
+     */
+    private function handleCron(): void
+    {
+        $commands = [];
+
+        $lockfile = new LockFile('cron');
+        $file = $lockfile->getFile();
+
+        if (!$file || !flock(fopen($file, "a+"), LOCK_EX)) {
+            if (defined('STDIN')) {
+                echo "There is already another cron task running in the background!\n";
+            }
+            exit;
+        }
+
+        if (!empty($this->config['cron']['groups'])) {
+            foreach ($this->config['cron']['groups'] as $command_group => $commands_in_group) {
+                foreach ($commands_in_group as $command) {
+                    array_push($commands, $command);
+                }
+            }
+        }
+
+        if (empty($commands)) {
+            throw new BotException('No commands to run!');
+        }
+
+        $this->telegram->runCommands($commands);
+
+        if (flock(fopen($file, "a+"), LOCK_UN)) {
+            unlink($file);
         }
     }
 
