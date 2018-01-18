@@ -24,8 +24,8 @@ use Longman\TelegramBot\TelegramLog;
 use Monolog\Logger;
 
 define("ROOT_PATH", realpath(dirname(__DIR__)));
-define("APP_PATH", ROOT_PATH . '/bot');
-define("SRC_PATH", ROOT_PATH . '/src');
+define("APP_PATH", ROOT_PATH . '/bot/');
+define("SRC_PATH", ROOT_PATH . '/src/');
 
 /**
  * Class Bot
@@ -114,17 +114,21 @@ class Bot
             throw new BotException('Root path not defined!');
         }
 
-        // Set custom data path if variable exists, otherwise use 'data' directory
-        if (!empty($data_path = getenv('DATA_PATH'))) {
-            define("DATA_PATH", $data_path);
-        } else {
-            define("DATA_PATH", ROOT_PATH . '/data');
-        }
-
         // Load environment variables from file if it exists
         if (file_exists(ROOT_PATH . '/.env')) {
             $env = new Dotenv(ROOT_PATH);
             $env->load();
+        }
+
+        // Set custom data path if variable exists, otherwise use 'data' directory
+        if (!empty($data_path = getenv('DATA_PATH'))) {
+            define("DATA_PATH", $data_path);
+        } else {
+            define("DATA_PATH", ROOT_PATH . '/data/');
+        }
+
+        if (getenv('DEBUG')) {
+            Debug::setEnabled(true);
         }
 
         // gettext '__()' function must be initialized as all public messages are using it
@@ -263,10 +267,6 @@ class Bot
 
             $monolog = new Logger($this->config['bot_username']);
             $monolog->pushHandler(new TelegramBotAdminHandler($this->telegram, Logger::ERROR));
-
-            if (getenv('DEBUG')) {
-                Debug::setEnabled(true);
-            }
 
             TelegramLog::initialize($monolog);
         }
@@ -550,8 +550,9 @@ class Bot
 
         if (!$file || !flock(fopen($file, "a+"), LOCK_EX)) {
             if (defined('STDIN')) {
-                echo "There is already another cron task running in the background!\n";
+                echo "There is already another cron task running in the background!" . PHP_EOL;
             }
+
             exit;
         }
 
