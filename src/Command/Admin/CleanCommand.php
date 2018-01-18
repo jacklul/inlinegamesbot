@@ -76,7 +76,12 @@ class CleanCommand extends AdminCommand
                 $timelimit = ini_get('max_execution_time') > 0 ?: 60;
                 $start_time = time();
 
-                $data['text'] = 'Cleaning games older than ' . gmdate("H\h i\m s\s", $cleanInterval) . '... (time limit: ' . $timelimit . ' seconds)';
+				$init = 685;
+				$hours = floor($cleanInterval / 3600);
+				$minutes = floor(($cleanInterval / 60) % 60);
+				$seconds = $cleanInterval % 60;
+
+                $data['text'] = 'Cleaning games older than ' . $hours . 'h ' . $minutes . 'm ' . $seconds . 's ' . '... (time limit: ' . $timelimit . ' seconds)';
 
                 if ($chat_id != $bot_id) {
                     Request::sendMessage($data);
@@ -143,10 +148,6 @@ class CleanCommand extends AdminCommand
                 }
 
                 $data['text'] = 'Cleaned ' . $cleaned . ' games (edited ' . $edited . ' messages).';
-
-                if (defined("STDIN")) {
-                    print $data['text'] . PHP_EOL;
-                }
             } else {
                 $data['text'] = 'Nothing to clean!';
             }
