@@ -52,9 +52,9 @@ class LockFile
             $this->file = null;
         }
 
-        Debug::print('Lock file: ' . $this->file);
-
         touch($this->file);
+
+        Debug::print('Lock file: ' . realpath($this->file));
     }
 
     /**
