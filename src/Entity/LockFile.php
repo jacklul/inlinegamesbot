@@ -41,23 +41,15 @@ class LockFile
      */
     public function __construct($name, $delete = true)
     {
-        $this->file = sys_get_temp_dir() . '/' . md5(ROOT_PATH) . '/' . $name . '.tmp';
+        $this->file = DATA_PATH . '/tmp/' . $name . '.tmp';
         $this->delete = $delete;
 
         if (!is_dir(dirname($this->file))) {
-            mkdir(dirname($this->file));
+            mkdir(dirname($this->file), 0755, true);
         }
 
         if (!is_writable(dirname($this->file))) {
-            if (!is_dir(DATA_PATH . '/tmp')) {
-                mkdir(DATA_PATH . '/tmp', 0755, true);
-            }
-
-            $this->file = DATA_PATH . '/tmp/' . $name . '.tmp';
-
-            if (!is_writable(dirname($this->file))) {
-                $this->file = null;
-            }
+            $this->file = null;
         }
 
         Debug::print('Lock file: ' . $this->file);
