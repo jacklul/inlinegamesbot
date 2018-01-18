@@ -165,10 +165,10 @@ class Bot
             'admins'           => [(integer)getenv('BOT_ADMIN') ?: 0],
             'commands'         => [
                 'paths'   => [
-                    SRC_PATH . '/Command',
+                    SRC_PATH . '/Command/',
                 ],
                 'configs' => [
-                    'clean' => [
+                    'cleansessions' => [
                         'clean_interval' => 21600,
                     ],
                 ],
@@ -202,7 +202,7 @@ class Bot
             'cron'             => [
                 'groups' => [
                     'default' => [
-                        '/clean',
+                        '/cleansessions',
                     ],
                 ],
             ],

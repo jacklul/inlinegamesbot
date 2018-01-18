@@ -19,15 +19,15 @@ use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Request;
 
 /**
- * Class CleanCommand
+ * Class CleansessionsCommand
  *
  * @package Longman\TelegramBot\Commands\AdminCommands
  */
-class CleanCommand extends AdminCommand
+class CleansessionsCommand extends AdminCommand
 {
-    protected $name = 'clean';
+    protected $name = 'cleansessions';
     protected $description = 'Clean old game messages and set them as empty';
-    protected $usage = '/clean';
+    protected $usage = '/cleansessions';
     protected $private_only = true;
 
     /**
