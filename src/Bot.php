@@ -230,9 +230,9 @@ class Bot
                 $this->showHelp();
 
                 if (!empty($this->arg)) {
-                    print PHP_EOL . 'Invalid parameter specified!' . PHP_EOL;
+                    print 'ERROR: Invalid parameter specified!' . PHP_EOL . PHP_EOL;
                 } else {
-                    print PHP_EOL . 'No parameter specified!' . PHP_EOL;
+                    print 'ERROR: No parameter specified!' . PHP_EOL . PHP_EOL;
                 }
             }
         } catch (\Throwable $e) {
