@@ -548,7 +548,13 @@ class Bot
         $lockfile = new LockFile('cron');
         $file = $lockfile->getFile();
 
-        if (!$file || !flock(fopen($file, "a+"), LOCK_EX)) {
+        if ($file === null) {
+            echo "Couldn't obtain lockfile!" . PHP_EOL;
+            exit;
+        }
+
+        $fh = fopen($file, 'w');
+        if (!$fh || !flock($fh, LOCK_EX | LOCK_NB)) {
             if (defined('STDIN')) {
                 echo "There is already another cron task running in the background!" . PHP_EOL;
             }
@@ -570,7 +576,8 @@ class Bot
 
         $this->telegram->runCommands($commands);
 
-        if (flock(fopen($file, "a+"), LOCK_UN)) {
+        if (flock($fh, LOCK_UN)) {
+            fclose($fh);
             unlink($file);
         }
     }

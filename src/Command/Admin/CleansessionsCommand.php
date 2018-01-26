@@ -73,7 +73,7 @@ class CleansessionsCommand extends AdminCommand
             if (is_array($inactive) && count($inactive) > 0) {
                 $chat_action_start = 0;
                 $last_request_time = 0;
-                $timelimit = ini_get('max_execution_time') > 0 ?: 60;
+                $timelimit = ini_get('max_execution_time') > 0 ?: 59;
                 $start_time = time();
 
 				$init = 685;
