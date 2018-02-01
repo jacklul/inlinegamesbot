@@ -36,8 +36,7 @@
     ]
   },
   "config": {
-    "sort-packages": true,
-    "vendor-dir": "lib/"
+    "sort-packages": true
   },
   "scripts": {
     "check-code": [

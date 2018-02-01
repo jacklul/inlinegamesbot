@@ -2,7 +2,7 @@
 .idea/
 
 # Composer
-lib/
+vendor/
 
 # Configuration files
 bot/config.php

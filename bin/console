@@ -14,7 +14,7 @@ use Bot\Bot;
 /**
  * Composer autoloader
  */
-require __DIR__ . ' /../lib/autoload.php';
+require __DIR__ . ' /../vendor/autoload.php';
 
 /**
  * Run console interface

@@ -13,7 +13,7 @@ use Bot\Bot;
 /**
  * Composer autoloader
  */
-require __DIR__ . ' /../lib/autoload.php';
+require __DIR__ . ' /../vendor/autoload.php';
 
 /**
  * Handle webhook request only when it's a POST request
