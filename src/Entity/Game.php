@@ -300,7 +300,16 @@ class Game
      */
     protected function getUserMention($user)
     {
-        return $this->getUser($user) ? strip_tags($this->getUser($user)->tryMention()) : false;
+        if ($user = $this->getUser($user)) {
+            $mention = $user->tryMention();
+            if (substr($mention, 0, 1) !== '@') {
+                $mention = '<a href="tg://user?id=' . $user->getId() . '">' . htmlentities($user->getFirstName()) . '</a>';
+            }
+
+            return $mention;
+        }
+
+        return false;
     }
 
     /**
@@ -311,7 +320,16 @@ class Game
      */
     protected function getCurrentUserMention()
     {
-        return $this->getCurrentUser() ? strip_tags($this->getCurrentUser()->tryMention()) : false;
+        if ($user = $this->getCurrentUser()) {
+            $mention = $user->tryMention();
+            if (substr($mention, 0, 1) !== '@') {
+                $mention = '<a href="tg://user?id=' . $user->getId() . '">' . htmlentities($user->getFirstName()) . '</a>';
+            }
+
+            return $mention;
+        }
+
+        return false;
     }
 
     /**
