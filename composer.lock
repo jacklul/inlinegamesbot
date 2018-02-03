@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "7e4e8a12acb7d62611eefba536f16b9f",
+    "content-hash": "d6427bfe5e9ee18340b9b66d80d61d05",
     "packages": [
         {
             "name": "ad7six/dsn",
@@ -410,16 +410,16 @@
         },
         {
             "name": "longman/telegram-bot",
-            "version": "0.49.0",
+            "version": "0.52.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-telegram-bot/core.git",
-                "reference": "04de592d06843e05f200dff4fa77360123343580"
+                "reference": "f7cac58dcf4efd766f4737f40bba473ced0d4cc8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-telegram-bot/core/zipball/04de592d06843e05f200dff4fa77360123343580",
-                "reference": "04de592d06843e05f200dff4fa77360123343580",
+                "url": "https://api.github.com/repos/php-telegram-bot/core/zipball/f7cac58dcf4efd766f4737f40bba473ced0d4cc8",
+                "reference": "f7cac58dcf4efd766f4737f40bba473ced0d4cc8",
                 "shasum": ""
             },
             "require": {
@@ -452,14 +452,14 @@
                     "role": "Developer"
                 }
             ],
-            "description": "PHP telegram bot",
+            "description": "PHP Telegram bot",
             "homepage": "https://github.com/php-telegram-bot/core",
             "keywords": [
                 "api",
                 "bot",
                 "telegram"
             ],
-            "time": "2017-09-17T14:44:32+00:00"
+            "time": "2018-01-07T23:39:21+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -823,8 +823,7 @@
         "ext-curl": "*",
         "ext-gettext": "*",
         "ext-mbstring": "*",
-        "ext-pdo": "*",
-        "ext-zip": "*"
+        "ext-pdo": "*"
     },
     "platform-dev": []
 }

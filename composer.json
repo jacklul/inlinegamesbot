@@ -4,8 +4,7 @@
   "authors": [
     {
       "name": "Jack'lul",
-      "email": "jacklulcat@gmail.com",
-      "homepage": "https://jacklul.com"
+      "email": "jacklulcat@gmail.com"
     }
   ],
   "type": "project",
@@ -15,12 +14,11 @@
     "ext-gettext": "*",
     "ext-mbstring": "*",
     "ext-pdo": "*",
-    "ext-zip": "*",
     "ad7six/dsn": "^0.4.0",
     "gettext/gettext": "^4.3.0",
     "longman/ip-tools": "^1.2",
-    "longman/telegram-bot": "^0.49.0",
-    "spatie/emoji": "^1.0.5",
+    "longman/telegram-bot": "^0.52.0",
+    "spatie/emoji": "^1.0.6",
     "vlucas/phpdotenv": "^2.4.0"
   },
   "require-dev": {
