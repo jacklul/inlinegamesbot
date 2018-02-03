@@ -5,13 +5,16 @@ cache:
     - "$HOME/.composer/cache"
 
 php:
-  - 7.1
+  - '7.1'
+  - '7.2'
   - nightly
+  - hhvm
 
 matrix:
+  fast_finish: true
   allow_failures:
     - php: nightly
-  fast_finish: true
+    - php: hhvm
 
 notifications:
   email: false
