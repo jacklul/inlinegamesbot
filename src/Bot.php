@@ -452,7 +452,7 @@ class Bot
         $result = Request::getWebhookInfo();
 
         if ($result->isOk()) {
-            print_r($result->getResult()) . PHP_EOL;
+            print print_r($result->getResult(), true) . PHP_EOL;
         } else {
             print 'Request failed: ' . $result->getDescription() . PHP_EOL;
         }
