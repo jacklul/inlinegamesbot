@@ -76,10 +76,10 @@ class CleansessionsCommand extends AdminCommand
                 $timelimit = ini_get('max_execution_time') > 0 ?: 59;
                 $start_time = time();
 
-				$init = 685;
-				$hours = floor($cleanInterval / 3600);
-				$minutes = floor(($cleanInterval / 60) % 60);
-				$seconds = $cleanInterval % 60;
+                $init = 685;
+                $hours = floor($cleanInterval / 3600);
+                $minutes = floor(($cleanInterval / 60) % 60);
+                $seconds = $cleanInterval % 60;
 
                 $data['text'] = 'Cleaning games older than ' . $hours . 'h ' . $minutes . 'm ' . $seconds . 's ' . '... (time limit: ' . $timelimit . ' seconds)';
 

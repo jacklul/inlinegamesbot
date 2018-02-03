@@ -15,7 +15,6 @@
     "ext-gettext": "*",
     "ext-mbstring": "*",
     "ext-pdo": "*",
-    "ext-pgsql": "*",
     "ext-zip": "*",
     "ad7six/dsn": "^0.4.0",
     "gettext/gettext": "^4.3.0",
@@ -40,7 +39,7 @@
   },
   "scripts": {
     "check-code": [
-      "php lib/squizlabs/php_codesniffer/scripts/phpcs --standard=PSR2 -snp --encoding=utf-8 src/ --report-width=120"
+      "./vendor/bin/phpcs --standard=PSR2 -snp --encoding=utf-8 src/ --report-width=120"
     ]
   }
 }
