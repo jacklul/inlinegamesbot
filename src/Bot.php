@@ -116,7 +116,7 @@ class Bot
 
         // Load environment variables from file if it exists
         if (file_exists(ROOT_PATH . '/.env')) {
-            $env = new Dotenv(ROOT_PATH);
+            $env = new Dotenv(ROOT_PATH, file_exists(ROOT_PATH . '/.env_dev') ? '.env_dev' : '.env');
             $env->load();
         }
 
