@@ -291,8 +291,7 @@ class Game
     }
 
     /**
-     * Get user mention safely (prevent tryMention() on null)
-     *  Additionally removes HTML tags from the returned string
+     * Get user mention
      *
      * @param $user
      *
@@ -300,36 +299,17 @@ class Game
      */
     protected function getUserMention($user)
     {
-        if ($user = $this->getUser($user)) {
-            $mention = $user->tryMention();
-            if (substr($mention, 0, 1) !== '@') {
-                $mention = '<a href="tg://user?id=' . $user->getId() . '">' . htmlentities($user->getFirstName()) . '</a>';
-            }
-
-            return $mention;
-        }
-
-        return false;
+        return $this->getUser($user) ? '<a href="tg://user?id=' . $this->getUser($user)->getId() . '">' . htmlentities($this->getUser($user)->getFirstName()) . '</a>' : false;
     }
 
     /**
-     * Get current user mention safely (prevent tryMention() on null)
-     *  Additionally removes HTML tags from the returned string
+     * Get current user mention
      *
      * @return bool|int
      */
     protected function getCurrentUserMention()
     {
-        if ($user = $this->getCurrentUser()) {
-            $mention = $user->tryMention();
-            if (substr($mention, 0, 1) !== '@') {
-                $mention = '<a href="tg://user?id=' . $user->getId() . '">' . htmlentities($user->getFirstName()) . '</a>';
-            }
-
-            return $mention;
-        }
-
-        return false;
+        return $this->getCurrentUser() ? '<a href="tg://user?id=' . $this->getCurrentUser()->getId() . '">' . htmlentities($this->getCurrentUser()->getFirstName()) . '</a>' : false;
     }
 
     /**
