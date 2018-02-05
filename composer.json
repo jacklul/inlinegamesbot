@@ -22,7 +22,7 @@
     "vlucas/phpdotenv": "^2.4.0"
   },
   "require-dev": {
-    "squizlabs/php_codesniffer": "^2.8"
+    "squizlabs/php_codesniffer": "*"
   },
   "autoload": {
     "psr-4": {
