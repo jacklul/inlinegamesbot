@@ -52,13 +52,6 @@ class Game
     protected $manager;
 
     /**
-     * Game related variables
-     */
-    protected $max_x;
-    protected $max_y;
-    protected $symbols = [];
-
-    /**
      * Game constructor.
      *
      * @param GameManager $manager
@@ -116,7 +109,7 @@ class Game
         $result = $this->$action();
 
         if ($result instanceof ServerResponse) {
-            if ($result->isOk() || strpos($result->getDescription(), 'message is not modified') !== false) {
+            if ($result->isOk() || $this->strposa($result->getDescription(), $this->allowedAPIErrors) !== false) {
                 Debug::isEnabled() && Debug::print('Server response is ok');
                 $this->answerCallbackQuery();
 
@@ -170,6 +163,7 @@ class Game
 
         /** @var \Bot\Storage\Database\MySQL $storage */
         $storage = $this->manager->getStorage();
+
         return $storage::insertToGame($this->manager->getId(), $data);
     }
 
@@ -778,12 +772,16 @@ class Game
      * @param array $board
      * @param string $winner
      *
-     * @return InlineKeyboard
+     * @return bool|InlineKeyboard
      *
      * @throws BotException
      */
     protected function gameKeyboard($board, $winner = '')
     {
+        if (!isset($this->max_x) && !isset($this->max_y) && !isset($this->symbols)) {
+            return false;
+        }
+
         for ($x = 0; $x <= $this->max_x; $x++) {
             $tmp_array = [];
 
@@ -930,4 +928,23 @@ class Game
         return $this->answerCallbackQuery(__('Error!'), true);
     }
 
+    /**
+     * strpos() with array needle
+     * https://stackoverflow.com/a/9220624
+     *
+     * @param $haystack
+     * @param $needle
+     * @param int $offset
+     *
+     * @return bool|mixed
+     */
+    private function strposa($haystack, $needle, $offset = 0)
+    {
+        if (!is_array($needle)) $needle = [$needle];
+        foreach ($needle as $query) {
+            if (strpos($haystack, $query, $offset) !== false) return true; // stop on first true result
+        }
+
+        return false;
+    }
 }
