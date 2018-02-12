@@ -123,7 +123,7 @@ class Game
             Debug::isEnabled() && Debug::print('Server response is not ok');
             Debug::isEnabled() && Debug::print($result->getErrorCode() . ': ' . $result->getDescription());
 
-            TelegramLog::error('Telegram API error: ' . $result->getErrorCode() . ': ' . $result->getDescription());
+            TelegramLog::error('Telegram API error: ' . $result->getErrorCode() . ': ' . $result->getDescription() . PHP_EOL . 'Game data: ' . json_encode($this->data));
 
             return $this->answerCallbackQuery(__('Telegram API error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."), true);
         }
