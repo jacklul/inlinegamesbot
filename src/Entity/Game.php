@@ -109,22 +109,26 @@ class Game
         $result = $this->$action();
 
         if ($result instanceof ServerResponse) {
-            if ($result->isOk() || $this->strposa($result->getDescription(), $this->allowedAPIErrors) !== false) {
-                Debug::isEnabled() && Debug::print('Server response is ok');
-                $this->answerCallbackQuery();
+            $allowedAPIErrors = [
+                'message is not modified',     // Trying to edit a message with exactly same content it already has
+                'QUERY_ID_INVALID',     // Callback queries expire after some time, replying after that time will end up with this
+            ];
 
-                return $result;
+            if ($result->isOk() || $this->strposa($result->getDescription(), $allowedAPIErrors) !== false) {
+                Debug::isEnabled() && Debug::print('Server response is ok');
+
+                return $this->answerCallbackQuery();
             }
 
             Debug::isEnabled() && Debug::print('Server response is not ok');
             Debug::isEnabled() && Debug::print($result->getErrorCode() . ': ' . $result->getDescription());
 
-            $this->answerCallbackQuery(__('Telegram API error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."), true);
+            TelegramLog::error('Telegram API error: ' . $result->getErrorCode() . ': ' . $result->getDescription());
 
-            throw new BotException('Telegram API error: ' . $result->getErrorCode() . ': ' . $result->getDescription());
+            return $this->answerCallbackQuery(__('Telegram API error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."), true);
         }
 
-        Debug::isEnabled() && Debug::print('CRASHED');
+        Debug::isEnabled() && Debug::print('CRASHED! (Game result is not ServerResponse object!)');
 
         TelegramLog::error(
             $this->crashDump(
