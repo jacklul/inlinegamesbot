@@ -229,8 +229,15 @@ class Rockpaperscissors extends Game
         } else {
             $gameOutput .= '<b>' . __("Round {ROUND} - make your picks!", ['{ROUND}' => $data['round']]) . '</b>';
 
-            $data['host_pick'] = '';
-            $data['guest_pick'] = '';
+            if ($data['host_pick'] != '' && $data['guest_pick'] === '') {
+                $gameOutput .= PHP_EOL . '<b>' . __("Waiting for:") . '</b> ' . $this->getUserMention('guest');
+            } elseif ($data['guest_pick'] != '' && $data['host_pick'] === '') {
+                $gameOutput .= PHP_EOL . '<b>' . __("Waiting for:") . '</b> ' . $this->getUserMention('host');
+            } else {
+                $data['host_pick'] = '';
+                $data['guest_pick'] = '';
+            }
+
             $isOver = false;
         }
 

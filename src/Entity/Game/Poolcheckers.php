@@ -348,7 +348,7 @@ class Poolcheckers extends Game
                 $gameOutput .= '<b>' . __("{PLAYER} voted to draw!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL . PHP_EOL;
             }
 
-            $gameOutput .= __("Current turn:") . ' ' . $this->symbols[$data['current_turn']];
+            $gameOutput .= __("Current turn:") . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
 
             if ($data['current_selection'] == '') {
                 $gameOutput .= "\n" . __("(Select the piece you want to move)");

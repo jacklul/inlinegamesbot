@@ -223,7 +223,7 @@ class Connectfour extends Game
         if (!empty($isOver) && in_array($isOver, ['X', 'O', 'T'])) {
             $data['current_turn'] = 'E';
         } else {
-            $gameOutput = __("Current turn:") . ' ' . $this->symbols[$data['current_turn']];
+            $gameOutput = __("Current turn:") . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
         }
 
         if ($this->saveData($this->data)) {
