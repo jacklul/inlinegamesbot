@@ -61,10 +61,6 @@ class Storage
             $storage = 'Bot\Storage\File';
         }
 
-        if ($env_storage = getenv('DEBUG_STORAGE')) {
-            $storage = $env_storage;
-        }
-
         if (!class_exists($storage)) {
             throw new StorageException('Storage class doesn\'t exist: ' . $storage);
         }
