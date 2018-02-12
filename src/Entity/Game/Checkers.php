@@ -379,9 +379,9 @@ class Checkers extends Game
     /**
      * Keyboard for game in progress
      *
-     * @param array $board
+     * @param array  $board
      * @param string $winner
-     * @param int $moveCounter
+     * @param int    $moveCounter
      *
      * @return InlineKeyboard
      *
@@ -510,8 +510,8 @@ class Checkers extends Game
      *
      * @param $board
      * @param $selection
-     * @param bool $onlykill
-     * @param string $char
+     * @param bool      $onlykill
+     * @param string    $char
      *
      * @return array|bool
      */

@@ -381,9 +381,9 @@ class Poolcheckers extends Game
     /**
      * Keyboard for game in progress
      *
-     * @param array $board
+     * @param array  $board
      * @param string $winner
-     * @param int $moveCounter
+     * @param int    $moveCounter
      *
      * @return InlineKeyboard
      * @throws \Bot\Exception\BotException
@@ -511,9 +511,9 @@ class Poolcheckers extends Game
      *
      * @param $board
      * @param $selection
-     * @param bool $onlykill
-     * @param string $char
-     * @param string $backmultijumpblock
+     * @param bool      $onlykill
+     * @param string    $char
+     * @param string    $backmultijumpblock
      *
      * @return array|bool
      */

@@ -39,7 +39,7 @@ class LockFile
      * LockFile constructor
      *
      * @param string $name
-     * @param bool $delete
+     * @param bool   $delete
      *
      * @throws \Bot\Exception\BotException
      */

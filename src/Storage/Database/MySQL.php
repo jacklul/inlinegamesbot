@@ -54,7 +54,7 @@ class MySQL
     /**
      * Initialize PDO connection
      *
-     * @param  $pdo
+     * @param $pdo
      *
      * @return bool
      *

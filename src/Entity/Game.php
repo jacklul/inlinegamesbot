@@ -153,7 +153,7 @@ class Game
     /**
      * Save game data
      *
-     * @param  $data
+     * @param $data
      *
      * @return bool
      *
@@ -175,7 +175,7 @@ class Game
      * Answer to callback query helper
      *
      * @param string $text
-     * @param bool $alert
+     * @param bool   $alert
      *
      * @return ServerResponse|mixed
      *
@@ -773,7 +773,7 @@ class Game
     /**
      * Keyboard for game in progress
      *
-     * @param array $board
+     * @param array  $board
      * @param string $winner
      *
      * @return bool|InlineKeyboard
@@ -894,7 +894,7 @@ class Game
     /**
      * Make a debug dump of crashed game session
      *
-     * @param array $data
+     * @param array  $data
      *
      * @param  string $id
      * @return string
@@ -938,15 +938,19 @@ class Game
      *
      * @param $haystack
      * @param $needle
-     * @param int $offset
+     * @param int      $offset
      *
      * @return bool|mixed
      */
     private function strposa($haystack, $needle, $offset = 0)
     {
-        if (!is_array($needle)) $needle = [$needle];
+        if (!is_array($needle)) {
+            $needle = [$needle];
+        }
         foreach ($needle as $query) {
-            if (strpos($haystack, $query, $offset) !== false) return true; // stop on first true result
+            if (strpos($haystack, $query, $offset) !== false) {
+                return true; // stop on first true result
+            }
         }
 
         return false;

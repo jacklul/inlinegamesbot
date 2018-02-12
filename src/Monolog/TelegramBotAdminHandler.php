@@ -67,7 +67,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
      *
      * @param Telegram $telegram
      * @param bool|int $level
-     * @param bool $bubble
+     * @param bool     $bubble
      *
      * @throws \Bot\Exception\BotException
      */
@@ -89,7 +89,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
     /**
      * Send log message to bot admins
      *
-     * @param  array $record
+     * @param array $record
      *
      * @return bool
      *

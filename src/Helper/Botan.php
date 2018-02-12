@@ -48,8 +48,8 @@ class Botan
     /**
      * Track function
      *
-     * @param Update $update
-     * @param string $event_name
+     * @param Update  $update
+     * @param string  $event_name
      * @param integer $timeout
      *
      * @return bool

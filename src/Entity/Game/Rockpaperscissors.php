@@ -258,7 +258,7 @@ class Rockpaperscissors extends Game
     /**
      * Keyboard for game in progress
      *
-     * @param bool $isOver
+     * @param bool   $isOver
      * @param string $winner
      *
      * @return InlineKeyboard
