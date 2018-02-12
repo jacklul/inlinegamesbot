@@ -13,15 +13,11 @@ namespace Bot\Storage\Database;
 use AD7six\Dsn\Dsn;
 use Bot\Entity\LockFile;
 use Bot\Exception\StorageException;
-use Bot\Helper\Debug;
-use Longman\TelegramBot\TelegramLog;
 use PDO;
 use PDOException;
 
 /**
  * Class PostgreSQL
- *
- * @TODO needs database-powered locking
  *
  * @package Bot\Storage\Driver
  */
@@ -57,6 +53,8 @@ class PostgreSQL
 
     /**
      * Initialize PDO connection
+     *
+     * @throws StorageException
      */
     public static function initializeStorage(): bool
     {
@@ -68,20 +66,18 @@ class PostgreSQL
             define('TB_GAME', 'game');
         }
 
-        $dsn = Dsn::parse(getenv('DATABASE_URL'));
-        $dsn = $dsn->toArray();
+        try {
+            $dsn = Dsn::parse(getenv('DATABASE_URL'));
+            $dsn = $dsn->toArray();
+        } catch (\Exception $e) {
+            throw new StorageException($e);
+        }
 
         try {
             self::$pdo = new PDO('pgsql:' . 'host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
             self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
         } catch (PDOException $e) {
-            if ($e->getCode() != 7) {   // ignore connection failure
-                TelegramLog::error($e->getMessage());
-            }
-
-            Debug::print('Connection to the database failed');
-
-            return false;
+            throw new StorageException('Connection to the database failed: ' . $e->getMessage());
         }
 
         return true;
@@ -245,7 +241,9 @@ class PostgreSQL
      * @param $id
      *
      * @return bool
+     *
      * @throws StorageException
+     * @throws \Bot\Exception\BotException
      */
     public static function lockGame($id): bool
     {
@@ -274,6 +272,7 @@ class PostgreSQL
      * @param $id
      *
      * @return bool
+     *
      * @throws StorageException
      */
     public static function unlockGame($id): bool

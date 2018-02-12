@@ -15,15 +15,19 @@ use Longman\TelegramBot\Commands\SystemCommand;
 /**
  * Class StartCommand
  *
+ * Start command...
+ *
  * @package Longman\TelegramBot\Commands\SystemCommands
  */
 class StartCommand extends SystemCommand
 {
     /**
      * @return mixed
+     *
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function execute()
     {
-        return $this->getTelegram()->executeCommand("help");    //redirect to /help
+        return $this->getTelegram()->executeCommand("help");
     }
 }

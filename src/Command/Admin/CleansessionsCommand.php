@@ -21,6 +21,8 @@ use Longman\TelegramBot\Request;
 /**
  * Class CleansessionsCommand
  *
+ * This command will clean games that were inactive for a longer period and edit their message to indicate that they expired
+ *
  * @package Longman\TelegramBot\Commands\AdminCommands
  */
 class CleansessionsCommand extends AdminCommand
@@ -32,6 +34,10 @@ class CleansessionsCommand extends AdminCommand
 
     /**
      * @return \Longman\TelegramBot\Entities\ServerResponse
+     *
+     * @throws \Bot\Exception\BotException
+     * @throws \Bot\Exception\StorageException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function execute()
     {
@@ -64,6 +70,7 @@ class CleansessionsCommand extends AdminCommand
             set_time_limit(10);
         }
 
+        /** @var \Bot\Storage\Database\MySQL $storage */
         $storage = Storage::getClass();
 
         if (class_exists($storage)) {
@@ -76,7 +83,6 @@ class CleansessionsCommand extends AdminCommand
                 $timelimit = ini_get('max_execution_time') > 0 ?: 59;
                 $start_time = time();
 
-                $init = 685;
                 $hours = floor($cleanInterval / 3600);
                 $minutes = floor(($cleanInterval / 60) % 60);
                 $seconds = $cleanInterval % 60;
@@ -94,7 +100,7 @@ class CleansessionsCommand extends AdminCommand
 
                 foreach ($inactive as $inactive_game) {
                     if (time() >= $start_time + $timelimit - 1) {
-                        Debug::print('Time limit reached');
+                        Debug::isEnabled() && Debug::print('Time limit reached');
                         break;
                     }
 
@@ -116,7 +122,7 @@ class CleansessionsCommand extends AdminCommand
 
                         if ($game->canRun()) {
                             while (time() <= $last_request_time) {
-                                Debug::print('Delaying next request');
+                                Debug::isEnabled() && Debug::print('Delaying next request');
                                 sleep(1);
                             }
 
@@ -134,16 +140,16 @@ class CleansessionsCommand extends AdminCommand
 
                             if (isset($result) && $result->isOk()) {
                                 $edited++;
-                                Debug::print('Message edited successfully');
+                                Debug::isEnabled() && Debug::print('Message edited successfully');
                             } else {
-                                Debug::print('Failed to edit message: ' . (isset($result) ? $result->getDescription() : '<unknown error>'));
+                                Debug::isEnabled() && Debug::print('Failed to edit message: ' . (isset($result) ? $result->getDescription() : '<unknown error>'));
                             }
                         }
                     }
 
                     if ($storage::deleteFromGame($inactive_game['id'])) {
                         $cleaned++;
-                        Debug::print('Record removed from the database');
+                        Debug::isEnabled() && Debug::print('Record removed from the database');
                     }
                 }
 

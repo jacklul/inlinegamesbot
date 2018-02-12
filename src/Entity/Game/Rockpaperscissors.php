@@ -120,6 +120,10 @@ class Rockpaperscissors extends Game
      * Game handler
      *
      * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     *
+     * @throws \Bot\Exception\BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \Bot\Exception\StorageException
      */
     protected function gameAction()
     {
@@ -148,9 +152,9 @@ class Rockpaperscissors extends Game
             $data['round'] = 1;
             $data['current_turn'] = '';
 
-            Debug::print('Game initialization');
+            Debug::isEnabled() && Debug::print('Game initialization');
         } elseif (!isset($arg)) {
-            Debug::print('No move data received');
+            Debug::isEnabled() && Debug::print('No move data received');
         }
 
         if (empty($data)) {
@@ -161,7 +165,7 @@ class Rockpaperscissors extends Game
             return $this->answerCallbackQuery(__("This game has ended!"), true);
         }
 
-        Debug::print('Argument: ' . $arg);
+        Debug::isEnabled() && Debug::print('Argument: ' . $arg);
 
         if (isset($arg)) {
             if (in_array($arg, ['R', 'P', 'S'])) {
@@ -172,16 +176,16 @@ class Rockpaperscissors extends Game
                 }
 
                 if ($this->saveData($this->data)) {
-                    Debug::print($this->getCurrentUserMention() . ' picked ' . $arg);
+                    Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' picked ' . $arg);
 
-                    if ($data['host_pick'] == '' || $data['guest_pick'] == '') {
+                    /*if ($data['host_pick'] == '' || $data['guest_pick'] == '') {
                         return $this->answerCallbackQuery();
-                    }
+                    }*/
                 } else {
                     return $this->returnStorageFailure();
                 }
             } else {
-                Debug::print('Invalid move data: ' . $arg);
+                Debug::isEnabled() && Debug::print('Invalid move data: ' . $arg);
 
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
@@ -254,7 +258,7 @@ class Rockpaperscissors extends Game
     /**
      * Keyboard for game in progress
      *
-     * @param string $isOver
+     * @param bool $isOver
      * @param string $winner
      *
      * @return InlineKeyboard
@@ -361,5 +365,7 @@ class Rockpaperscissors extends Game
         if ($y == $x) {
             return 'T';
         }
+
+        return null;
     }
 }

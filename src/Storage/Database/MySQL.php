@@ -13,15 +13,11 @@ namespace Bot\Storage\Database;
 use AD7six\Dsn\Dsn;
 use Bot\Entity\LockFile;
 use Bot\Exception\StorageException;
-use Bot\Helper\Debug;
-use Longman\TelegramBot\TelegramLog;
 use PDO;
 use PDOException;
 
 /**
  * Class MySQL
- *
- * @TODO needs database-powered locking
  *
  * @package Bot\Storage\Driver
  */
@@ -58,8 +54,11 @@ class MySQL
     /**
      * Initialize PDO connection
      *
-     * @param  null $pdo
+     * @param  $pdo
+     *
      * @return bool
+     *
+     * @throws StorageException
      */
     public static function initializeStorage($pdo = null): bool
     {
@@ -72,20 +71,18 @@ class MySQL
         }
 
         if ($pdo === null) {
-            $dsn = Dsn::parse(getenv('DATABASE_URL'));
-            $dsn = $dsn->toArray();
+            try {
+                $dsn = Dsn::parse(getenv('DATABASE_URL'));
+                $dsn = $dsn->toArray();
+            } catch (\Exception $e) {
+                throw new StorageException($e);
+            }
 
             try {
                 self::$pdo = new PDO('mysql:' . 'host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
                 self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
             } catch (PDOException $e) {
-                if ($e->getCode() != 7) {   // ignore connection failure
-                    TelegramLog::error($e->getMessage());
-                }
-
-                Debug::print('Connection to the database failed');
-
-                return false;
+                throw new StorageException('Connection to the database failed: ' . $e->getMessage());
             }
         } else {
             self::$pdo = $pdo;
@@ -252,7 +249,9 @@ class MySQL
      * @param $id
      *
      * @return bool
+     *
      * @throws StorageException
+     * @throws \Bot\Exception\BotException
      */
     public static function lockGame($id): bool
     {

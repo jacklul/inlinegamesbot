@@ -15,15 +15,18 @@ use Longman\TelegramBot\Commands\SystemCommand;
 /**
  * Class GenericCommand
  *
+ * Handle unknown commands, basically redirect to /help
+ *
  * @package Longman\TelegramBot\Commands\SystemCommands
  */
 class GenericCommand extends SystemCommand
 {
     /**
      * @return mixed
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function execute()
     {
-        return $this->getTelegram()->executeCommand('start');
+        return $this->getTelegram()->executeCommand('help');
     }
 }

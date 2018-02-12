@@ -18,6 +18,8 @@ use Longman\TelegramBot\Request;
 /**
  * Class CallbackqueryCommand
  *
+ * Handle button presses
+ *
  * @package Longman\TelegramBot\Commands\SystemCommands
  */
 class CallbackqueryCommand extends SystemCommand
@@ -33,13 +35,17 @@ class CallbackqueryCommand extends SystemCommand
 
     /**
      * @return bool|\Longman\TelegramBot\Entities\ServerResponse|mixed
+     *
+     * @throws \Bot\Exception\BotException
+     * @throws \Bot\Exception\StorageException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function execute()
     {
         $callback_query = $this->getUpdate()->getCallbackQuery();
         $data = $callback_query->getData();
 
-        Debug::print('Data: ' . $data);
+        Debug::isEnabled() && Debug::print('Data: ' . $data);
 
         $command = explode(';', $data)[0];
 

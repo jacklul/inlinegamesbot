@@ -20,18 +20,23 @@ use Longman\TelegramBot\Request;
 /**
  * Class InlinequeryCommand
  *
+ * Handle incoming inline queries, shows game list no matter what user enters
+ *
  * @package Longman\TelegramBot\Commands\SystemCommands
  */
 class InlinequeryCommand extends SystemCommand
 {
     /**
      * @return \Longman\TelegramBot\Entities\ServerResponse
+     *
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function execute()
     {
         $articles = [];
 
         foreach ($this->getGamesList() as $game) {
+            /** @var \Bot\Entity\Game\Tictactoe $game_class */
             if (class_exists($game_class = $game['class'])) {
                 $articles[] = [
                     'id'                    => $game_class::getCode(),
@@ -77,6 +82,7 @@ class InlinequeryCommand extends SystemCommand
         if (is_dir(SRC_PATH . '/Entity/Game')) {
             foreach (new \DirectoryIterator(SRC_PATH . '/Entity/Game') as $file) {
                 if (!$file->isDir() && !$file->isDot()) {
+                    /** @var \Bot\Entity\Game\Tictactoe $game_class */
                     $game_class = '\Bot\Entity\Game\\' . basename($file->getFilename(), '.php');
 
                     $games[] = [

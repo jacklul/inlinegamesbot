@@ -15,6 +15,8 @@ use Bot\Helper\Debug;
 /**
  * Class LockFile
  *
+ * A 'lock' file handler, with removal after handling
+ *
  * @package Bot\Entity
  */
 class LockFile
@@ -37,7 +39,9 @@ class LockFile
      * LockFile constructor
      *
      * @param string $name
-     * @param bool   $delete
+     * @param bool $delete
+     *
+     * @throws \Bot\Exception\BotException
      */
     public function __construct($name, $delete = true)
     {
@@ -54,7 +58,7 @@ class LockFile
 
         touch($this->file);
 
-        Debug::print('Lock file: ' . realpath($this->file));
+        Debug::isEnabled() && Debug::print('Lock file: ' . realpath($this->file));
     }
 
     /**

@@ -16,7 +16,7 @@ use Longman\TelegramBot\DB;
 /**
  * Class BotDB
  *
- * Uses database from Longman\TelegramBot\DB
+ * Pulls PDO connection from \Longman\TelegramBot\DB and redirects all calls to \Bot\Storage\MySQL
  *
  * @package Bot\Storage\Driver
  */
@@ -26,6 +26,8 @@ class BotDB extends DB
      * Initialize PDO connection
      *
      * @return bool
+     *
+     * @throws \Bot\Exception\StorageException
      */
     public static function initializeStorage(): bool
     {
@@ -36,6 +38,8 @@ class BotDB extends DB
      * Create table structure
      *
      * @return bool
+     *
+     * @throws \Bot\Exception\StorageException
      */
     public static function createStructure(): bool
     {
@@ -50,6 +54,8 @@ class BotDB extends DB
      * @param $id
      *
      * @return array|bool
+     *
+     * @throws \Bot\Exception\StorageException
      */
     public static function selectFromGame($id)
     {
@@ -63,6 +69,8 @@ class BotDB extends DB
      * @param $data
      *
      * @return bool
+     *
+     * @throws \Bot\Exception\StorageException
      */
     public static function insertToGame($id, $data): bool
     {
@@ -75,6 +83,8 @@ class BotDB extends DB
      * @param $id
      *
      * @return bool
+     *
+     * @throws \Bot\Exception\StorageException
      */
     public static function deleteFromGame($id): bool
     {
@@ -87,6 +97,9 @@ class BotDB extends DB
      * @param $id
      *
      * @return bool
+     *
+     * @throws \Bot\Exception\BotException
+     * @throws \Bot\Exception\StorageException
      */
     public static function lockGame($id): bool
     {
@@ -99,6 +112,8 @@ class BotDB extends DB
      * @param $id
      *
      * @return bool
+     *
+     * @throws \Bot\Exception\StorageException
      */
     public static function unlockGame($id): bool
     {
@@ -111,6 +126,8 @@ class BotDB extends DB
      * @param $time
      *
      * @return array|bool
+     *
+     * @throws \Bot\Exception\StorageException
      */
     public static function listFromGame($time = 0)
     {

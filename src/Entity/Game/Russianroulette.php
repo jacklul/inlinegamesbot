@@ -120,6 +120,10 @@ class Russianroulette extends Game
      * Game handler
      *
      * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     *
+     * @throws \Bot\Exception\BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \Bot\Exception\StorageException
      */
     protected function gameAction()
     {
@@ -153,9 +157,9 @@ class Russianroulette extends Game
             $data['cylinder'] = ['', '', '', '', '', ''];
             $data['cylinder'][mt_rand(0, 5)] = 'X';
 
-            Debug::print('Game initialization');
+            Debug::isEnabled() && Debug::print('Game initialization');
         } elseif (!isset($arg)) {
-            Debug::print('No move data received');
+            Debug::isEnabled() && Debug::print('No move data received');
         }
 
         if (empty($data)) {
@@ -179,15 +183,15 @@ class Russianroulette extends Game
             }
 
             if (!isset($data['cylinder'][$arg - 1])) {
-                Debug::print('Bad move data received: ' . $arg);
+                Debug::isEnabled() && Debug::print('Bad move data received: ' . $arg);
 
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
 
-            Debug::print('Chamber selected: ' . $arg);
+            Debug::isEnabled() && Debug::print('Chamber selected: ' . $arg);
 
             if ($data['cylinder'][$arg - 1] === 'X') {
-                Debug::print('Chamber contains bullet, player is dead');
+                Debug::isEnabled() && Debug::print('Chamber contains bullet, player is dead');
 
                 if ($data['current_turn'] == 'X') {
                     $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['O']) . '<b>']) . '</b>' . PHP_EOL;
@@ -237,7 +241,7 @@ class Russianroulette extends Game
 
         $gameOutput .= __("Current turn:") . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]);
 
-        Debug::print('Cylinder: |' . implode('|', $data['cylinder']) . '|');
+        Debug::isEnabled() && Debug::print('Cylinder: |' . implode('|', $data['cylinder']) . '|');
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(

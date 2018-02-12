@@ -27,17 +27,14 @@
   "autoload": {
     "psr-4": {
       "Bot\\": "src/"
-    },
-    "classmap": [
-      "src/Bot.php"
-    ]
+    }
   },
   "config": {
     "sort-packages": true
   },
   "scripts": {
     "check-code": [
-      "\"vendor/bin/phpcs\" -snp --standard=PSR2 --encoding=utf-8 --report-width=150 src/ bin/ bot/ public/"
+      "\"vendor/bin/phpcs\" -snp --standard=PSR2 --encoding=utf-8 --report-width=150 src/ public/ bin/ bot/"
     ]
   }
 }

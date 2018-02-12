@@ -17,22 +17,28 @@ use Longman\TelegramBot\Request;
 /**
  * Class GenericmessageCommand
  *
+ * Handle text messages
+ *
  * @package Longman\TelegramBot\Commands\SystemCommands
  */
 class GenericmessageCommand extends SystemCommand
 {
     /**
      * @return mixed
+     *
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function executeNoDb()
     {
         $this->leaveGroupChat();
 
-        return $this->getTelegram()->executeCommand('start');
+        return $this->getTelegram()->executeCommand('help');
     }
 
     /**
      * @return mixed
+     *
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function execute()
     {
@@ -47,7 +53,11 @@ class GenericmessageCommand extends SystemCommand
             return $this->telegram->executeCommand($command);
         }
 
-        return $this->getTelegram()->executeCommand('start');
+        if (strpos($this->getMessage()->getText(true), 'This game session is empty.') !== false) {
+            return Request::emptyResponse();
+        }
+
+        return $this->getTelegram()->executeCommand('help');
     }
 
     /**

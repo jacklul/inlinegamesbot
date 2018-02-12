@@ -8,7 +8,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Monolog\Handler;
+namespace Bot\Monolog;
 
 use Bot\Entity\LockFile;
 use Bot\Helper\Debug;
@@ -20,6 +20,8 @@ use Monolog\Logger;
 
 /**
  * Class TelegramBotAdminHandler
+ *
+ * Custom handler sending reports directly to bot admins
  *
  * @package Bot\Monolog\Handler
  */
@@ -65,7 +67,9 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
      *
      * @param Telegram $telegram
      * @param bool|int $level
-     * @param bool     $bubble
+     * @param bool $bubble
+     *
+     * @throws \Bot\Exception\BotException
      */
     public function __construct(Telegram $telegram, $level = Logger::ERROR, $bubble = true)
     {
@@ -86,7 +90,10 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
      * Send log message to bot admins
      *
      * @param  array $record
+     *
      * @return bool
+     *
+     * @throws \Bot\Exception\BotException
      */
     protected function write(array $record): bool
     {
@@ -102,7 +109,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
         }
 
         if ($message === $this->last_message) {
-            Debug::print('Log report prevented - message is a duplicate (session)');
+            Debug::isEnabled() && Debug::print('Log report prevented - message is a duplicate (session)');
 
             return false;
         }
@@ -111,14 +118,14 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
         if (isset($reports) && is_array($reports) && count($reports) > 0) {
             foreach ($reports as $report) {
                 if ($report['message'] === $message && $report['time'] + 86400 > $record['datetime']->format('U')) {
-                    Debug::print('Log report prevented - message is a duplicate (last 24 hours)');
+                    Debug::isEnabled() && Debug::print('Log report prevented - message is a duplicate (last 24 hours)');
 
                     return false;
                 }
             }
         }
 
-        Debug::print('Sending report: ' . $message);
+        Debug::isEnabled() && Debug::print('Sending report: ' . $message);
 
         $success = false;
         foreach ($this->telegram->getAdminList() as $admin) {
@@ -126,13 +133,13 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
                 try {
                     $result = Request::sendMessage(
                         [
-                        'chat_id'    => $admin,
-                        'text'       => '<b>' . $record['level_name'] . ' (' . $record['datetime']->format('H:i:s d-m-Y') . ')</b>' . PHP_EOL . '<code>' . htmlentities(utf8_decode($record['message'])) . '</code>',
-                        'parse_mode' => 'HTML',
+                            'chat_id'    => $admin,
+                            'text'       => '<b>' . $record['level_name'] . ' (' . $record['datetime']->format('H:i:s d-m-Y') . ')</b>' . PHP_EOL . '<code>' . htmlentities(utf8_decode($record['message'])) . '</code>',
+                            'parse_mode' => 'HTML',
                         ]
                     );
                 } catch (TelegramException $e) {
-                    print($e->getMessage());
+                    error_log($e->getMessage());
                 }
 
                 if (isset($result) && $result->isOk()) {
@@ -142,7 +149,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
         }
 
         if (!$success) {
-            print($record['message']);  // log error to console instead
+            error_log($record['message']);
         }
 
         $this->addReport(['message' => $message, 'time' => $record['datetime']->format('U')]);

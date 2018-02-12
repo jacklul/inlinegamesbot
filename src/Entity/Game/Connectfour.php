@@ -124,6 +124,10 @@ class Connectfour extends Game
      * Game handler
      *
      * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     *
+     * @throws \Bot\Exception\BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \Bot\Exception\StorageException
      */
     protected function gameAction()
     {
@@ -163,9 +167,9 @@ class Connectfour extends Game
                 ['', '', '', '', '', '', ''],
             ];
 
-            Debug::print('Game initialization');
+            Debug::isEnabled() && Debug::print('Game initialization');
         } elseif (!isset($args)) {
-            Debug::print('No move data received');
+            Debug::isEnabled() && Debug::print('No move data received');
         }
 
         if (empty($data)) {
@@ -183,7 +187,7 @@ class Connectfour extends Game
         $this->max_y = count($data['board']);
         $this->max_x = count($data['board'][0]);
 
-        Debug::print('BOARD: ' . $this->max_x . ' - ' . $this->max_y);
+        Debug::isEnabled() && Debug::print('BOARD: ' . $this->max_x . ' - ' . $this->max_y);
 
         if (isset($args)) {
             for ($y = $this->max_y - 1; $y >= 0; $y--) {
@@ -202,13 +206,13 @@ class Connectfour extends Game
                         return $this->answerCallbackQuery(__("Invalid move!"), true);
                     }
                 } else {
-                    Debug::print('Invalid move data: ' . ($args[0]) . ' - ' . ($y));
+                    Debug::isEnabled() && Debug::print('Invalid move data: ' . ($args[0]) . ' - ' . ($y));
 
                     return $this->answerCallbackQuery(__("Invalid move!"), true);
                 }
             }
 
-            Debug::print($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($y));
+            Debug::isEnabled() && Debug::print($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($y));
         }
 
         $isOver = $this->isGameOver($data['board']);
@@ -305,5 +309,7 @@ class Connectfour extends Game
         if ($empty == 0) {
             return 'T';
         }
+
+        return null;
     }
 }

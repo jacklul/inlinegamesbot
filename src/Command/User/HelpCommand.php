@@ -19,12 +19,16 @@ use Spatie\Emoji\Emoji;
 /**
  * Class HelpCommand
  *
+ * Shows the starting "help" message
+ *
  * @package Longman\TelegramBot\Commands\UserCommands
  */
 class HelpCommand extends UserCommand
 {
     /**
      * @return \Longman\TelegramBot\Entities\ServerResponse
+     *
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function execute()
     {

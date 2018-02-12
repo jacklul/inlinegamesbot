@@ -17,18 +17,24 @@ use Longman\TelegramBot\Commands\SystemCommand;
 /**
  * Class ChoseninlineresultCommand
  *
+ * Handle event when inline message is pasted into chat, instantly put a player into game
+ *
  * @package Longman\TelegramBot\Commands\SystemCommands
  */
 class ChoseninlineresultCommand extends SystemCommand
 {
     /**
      * @return bool|\Longman\TelegramBot\Entities\ServerResponse
+     *
+     * @throws \Bot\Exception\BotException
+     * @throws \Bot\Exception\StorageException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function execute()
     {
         $chosen_inline_result = $this->getUpdate()->getChosenInlineResult();
 
-        Debug::print('Data: ' . $chosen_inline_result->getResultId());
+        Debug::isEnabled() && Debug::print('Data: ' . $chosen_inline_result->getResultId());
 
         $game = new GameManager($chosen_inline_result->getInlineMessageId(), $chosen_inline_result->getResultId(), $this);
 

@@ -18,6 +18,8 @@ use Longman\TelegramBot\Entities\Update;
 /**
  * Class Botan
  *
+ * Custom class for pushing stats to botan.io
+ *
  * @package Bot\Helper
  */
 class Botan
@@ -46,8 +48,8 @@ class Botan
     /**
      * Track function
      *
-     * @param Update  $update
-     * @param string  $event_name
+     * @param Update $update
+     * @param string $event_name
      * @param integer $timeout
      *
      * @return bool
@@ -100,7 +102,7 @@ class Botan
         $responseData = json_decode($result, true);
 
         if (!$responseData || $responseData['status'] !== 'accepted') {
-            Debug::print('Botan.io stats report failed: ' . $result ?: 'empty response');
+            Debug::isEnabled() && Debug::print('Botan.io stats report failed: ' . $result ?: 'empty response');
 
             return false;
         }

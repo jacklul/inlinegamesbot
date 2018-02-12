@@ -16,6 +16,8 @@ use Longman\TelegramBot\TelegramLog;
 /**
  * Class Debug
  *
+ * Class for printing debug information into console
+ *
  * @package Bot\Helper
  */
 class Debug
@@ -69,5 +71,13 @@ class Debug
     public static function setEnabled(bool $enabled): void
     {
         self::$enabled = $enabled;
+    }
+
+    /**
+     * Check if debug print is enabled
+     */
+    public static function isEnabled(): bool
+    {
+        return self::$enabled;
     }
 }

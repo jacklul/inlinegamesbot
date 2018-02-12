@@ -17,6 +17,8 @@ use Longman\TelegramBot\DB;
 /**
  * Class Storage
  *
+ * This class selects storage driver and returns it as a string
+ *
  * @package Bot\Storage
  */
 class Storage
@@ -34,17 +36,27 @@ class Storage
      * Return which driver class to use
      *
      * @return string
+     *
      * @throws StorageException
+     * @throws \Bot\Exception\BotException
      */
     public static function getClass(): string
     {
         if (DB::isDbConnected() && !getenv('DEBUG_NO_BOTDB')) {
             $storage = 'Bot\Storage\BotDB';
         } elseif (getenv('DATABASE_URL')) {
-            $dsn = Dsn::parse(getenv('DATABASE_URL'));
-            $dsn = $dsn->toArray();
+            try {
+                $dsn = Dsn::parse(getenv('DATABASE_URL'));
+                $dsn = $dsn->toArray();
+            } catch (\Exception $e) {
+                throw new StorageException($e);
+            }
 
-            $storage = 'Bot\Storage\Database\\' . (self::$drivers[$dsn['engine']]) ?: '';
+            if (!isset(self::$drivers[$dsn['engine']])) {
+                throw new StorageException('Unsupported database type!');
+            }
+
+            $storage = 'Bot\Storage\Database\\' . self::$drivers[$dsn['engine']] ?: '';
         } else {
             $storage = 'Bot\Storage\File';
         }
@@ -57,7 +69,7 @@ class Storage
             throw new StorageException('Storage class doesn\'t exist: ' . $storage);
         }
 
-        Debug::print('Using storage: \'' . $storage . '\'');
+        Debug::isEnabled() && Debug::print('Using storage: \'' . $storage . '\'');
 
         return $storage;
     }

@@ -12,9 +12,10 @@ namespace Bot;
 
 use Bot\Entity\LockFile;
 use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
 use Bot\Helper\Debug;
 use Bot\Helper\Storage;
-use Bot\Monolog\Handler\TelegramBotAdminHandler;
+use Bot\Monolog\TelegramBotAdminHandler;
 use Dotenv\Dotenv;
 use Gettext\Translator;
 use Longman\IPTools\Ip;
@@ -28,9 +29,11 @@ define("APP_PATH", ROOT_PATH . '/bot/');
 define("SRC_PATH", ROOT_PATH . '/src/');
 
 /**
- * Class Bot
+ * Class BotKernel
+ *
+ * This is the master loader kernel class, contains console commands and essential code for bootstrapping the bot
  */
-class Bot
+class BotKernel
 {
     /**
      * Argument passed
@@ -215,6 +218,8 @@ class Bot
 
     /**
      * Run the bot
+     *
+     * @throws \Throwable
      */
     public function run()
     {
@@ -243,10 +248,16 @@ class Bot
 
     /**
      * Initialize Telegram object
+     *
+     * @throws BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \Longman\TelegramBot\Exception\TelegramLogException
+     * @throws \InvalidArgumentException
+     * @throws \Exception
      */
     private function initialize(): void
     {
-        Debug::print('DEBUG MODE');
+        Debug::isEnabled() && Debug::print('DEBUG MODE');
 
         $this->telegram = new Telegram($this->config['api_key'], $this->config['bot_username']);
 
@@ -340,6 +351,8 @@ class Bot
 
     /**
      * Handle webhook method request
+     *
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     private function handleWebhook(): void
     {
@@ -383,6 +396,7 @@ class Bot
      * Set webhook
      *
      * @throws BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     private function setWebhook(): void
     {
@@ -435,6 +449,8 @@ class Bot
 
     /**
      * Delete webhook
+     *
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     private function deleteWebhook(): void
     {
@@ -460,6 +476,8 @@ class Bot
 
     /**
      * Handle getUpdates method
+     *
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     private function handleLongPolling(): void
     {
@@ -491,6 +509,9 @@ class Bot
 
     /**
      * Handle worker process
+     *
+     * @throws BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     private function handleWorker(): void
     {
@@ -540,6 +561,7 @@ class Bot
      * Run scheduled commands
      *
      * @throws BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     private function handleCron(): void
     {
@@ -584,9 +606,13 @@ class Bot
 
     /**
      * Handle installing database structure
+     *
+     * @throws BotException
+     * @throws StorageException
      */
     private function installDb()
     {
+        /** @var \Bot\Storage\Database\MySQL $storage */
         $storage = Storage::getClass();
 
         print 'Installing storage structure (' . end(explode('\\', $storage)) . ')...' . PHP_EOL;

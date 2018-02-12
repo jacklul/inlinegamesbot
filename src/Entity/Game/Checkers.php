@@ -19,8 +19,6 @@ use Spatie\Emoji\Emoji;
 /**
  * Class Checkers
  *
- * @TODO direct port from the old version, could be improved, potential bugs may appear
- *
  * @package Bot\Entity\Game
  */
 class Checkers extends Game
@@ -121,6 +119,7 @@ class Checkers extends Game
     protected $max_x;
     protected $max_y;
     protected $symbols = [];
+    protected $selection;
 
     /**
      * Define game symbols (emojis)
@@ -139,6 +138,10 @@ class Checkers extends Game
      * Game handler
      *
      * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     *
+     * @throws \Bot\Exception\BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \Bot\Exception\StorageException
      */
     protected function gameAction()
     {
@@ -188,9 +191,9 @@ class Checkers extends Game
                 ['X', '', 'X', '', '', '', 'O', ''],
             ];
 
-            Debug::print('Game initialization');
+            Debug::isEnabled() && Debug::print('Game initialization');
         } elseif (!isset($args) && $command === 'game') {
-            Debug::print('No move data received');
+            Debug::isEnabled() && Debug::print('No move data received');
         }
 
         if (empty($data)) {
@@ -213,7 +216,7 @@ class Checkers extends Game
         if ($command === 'game') {
             if ($this->getCurrentUserId() === $this->getUserId($data['settings'][$data['current_turn']])) {
                 if ($data['current_selection'] != '') {
-                    Debug::print('Current selection: ' . $data['current_selection']);
+                    Debug::isEnabled() && Debug::print('Current selection: ' . $data['current_selection']);
 
                     if ($data['current_selection'] == $args[0] . $args[1]) {
                         if ($data['current_selection_lock'] == false) {
@@ -222,7 +225,7 @@ class Checkers extends Game
                             return $this->answerCallbackQuery(__("You must make a jump when possible!"), true);
                         }
                     } else {
-                        Debug::print('Listing possible moves');
+                        Debug::isEnabled() && Debug::print('Listing possible moves');
 
                         $possibleMoves = $this->possibleMoves($data['board'], $data['current_selection']);
 
@@ -315,7 +318,7 @@ class Checkers extends Game
             }
         }
 
-        Debug::print('Checking if game is over');
+        Debug::isEnabled() && Debug::print('Checking if game is over');
 
         $isOver = $this->isGameOver($data['board']);
 
@@ -336,7 +339,7 @@ class Checkers extends Game
             $data['current_turn'] = 'E';
             $data['current_selection'] = '';
 
-            Debug::print('Game ended');
+            Debug::isEnabled() && Debug::print('Game ended');
         } else {
             $this->selection = $data['current_selection'];
 
@@ -360,7 +363,7 @@ class Checkers extends Game
                 }
             }
 
-            Debug::print('Game is still in progress');
+            Debug::isEnabled() && Debug::print('Game is still in progress');
         }
 
         if ($this->saveData($this->data)) {
@@ -376,11 +379,13 @@ class Checkers extends Game
     /**
      * Keyboard for game in progress
      *
-     * @param array  $board
+     * @param array $board
      * @param string $winner
-     * @param int    $moveCounter
+     * @param int $moveCounter
      *
      * @return InlineKeyboard
+     *
+     * @throws \Bot\Exception\BotException
      */
     protected function gameKeyboard($board, $winner = '', $moveCounter = 0)
     {
@@ -505,8 +510,8 @@ class Checkers extends Game
      *
      * @param $board
      * @param $selection
-     * @param bool      $onlykill
-     * @param string    $char
+     * @param bool $onlykill
+     * @param string $char
      *
      * @return array|bool
      */
@@ -640,7 +645,7 @@ class Checkers extends Game
             foreach ($kill as $thismove => $thiskill) {
                 $thismove = (string)$thismove;
 
-                if (preg_match('/\-/', $thismove) || $thismove[0] >= $this->max_x || $thismove[1] >= $this->max_y || $thismove[0] < 0 || $thismove[1] < 0) {
+                if (preg_match('/-/', $thismove) || $thismove[0] >= $this->max_x || $thismove[1] >= $this->max_y || $thismove[0] < 0 || $thismove[1] < 0) {
                     continue;
                 }
 
@@ -658,7 +663,7 @@ class Checkers extends Game
 
             if (strlen($value) > 2) {
                 unset($valid_moves[$key]);
-            } elseif ($x < 0 || $y < 0 || $x >= $this->max_x || $y >= $this->max_y || preg_match('/\-/', $value)) {
+            } elseif ($x < 0 || $y < 0 || $x >= $this->max_x || $y >= $this->max_y || preg_match('/-/', $value)) {
                 unset($valid_moves[$key]);
                 unset($kill[$value]);
             } elseif ($board[$x][$y] != '') {
@@ -671,6 +676,7 @@ class Checkers extends Game
             if (is_array($v)) {
                 return array_filter($v) != [];
             }
+            return false;
         };
 
         array_filter($valid_moves, $c);
@@ -761,6 +767,8 @@ class Checkers extends Game
         } elseif ($noMovesX) {
             return 'O';
         }
+
+        return null;
     }
 
     /**
@@ -781,6 +789,10 @@ class Checkers extends Game
      * Handle user surrender
      *
      * @return bool|\Longman\TelegramBot\Entities\ServerResponse|mixed
+     *
+     * @throws \Bot\Exception\BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \Bot\Exception\StorageException
      */
     protected function forfeitAction()
     {
@@ -795,7 +807,7 @@ class Checkers extends Game
 
         if ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host')) {
             if ($this->data['data']['vote']['host']['surrender']) {
-                Debug::print($this->getCurrentUserMention() . ' surrendered');
+                Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' surrendered');
 
                 $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
                 $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
@@ -812,7 +824,7 @@ class Checkers extends Game
                 }
             }
 
-            Debug::print($this->getCurrentUserMention() . ' voted to surrender');
+            Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' voted to surrender');
             $this->data['data']['vote']['host']['surrender'] = true;
 
             if ($this->saveData($this->data)) {
@@ -822,7 +834,7 @@ class Checkers extends Game
             }
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
             if ($this->data['data']['vote']['guest']['surrender']) {
-                Debug::print($this->getCurrentUserMention() . ' surrendered');
+                Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' surrendered');
 
                 $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
                 $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
@@ -839,7 +851,7 @@ class Checkers extends Game
                 }
             }
 
-            Debug::print($this->getCurrentUserMention() . ' voted to surrender');
+            Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' voted to surrender');
             $this->data['data']['vote']['guest']['surrender'] = true;
 
             if ($this->saveData($this->data)) {
@@ -848,7 +860,7 @@ class Checkers extends Game
                 return $this->returnStorageFailure();
             }
         } else {
-            Debug::print('Someone else executed forfeit action');
+            Debug::isEnabled() && Debug::print('Someone else executed forfeit action');
 
             return $this->answerCallbackQuery();
         }
@@ -858,6 +870,10 @@ class Checkers extends Game
      * Handle votes for draw
      *
      * @return bool|\Longman\TelegramBot\Entities\ServerResponse|mixed
+     *
+     * @throws \Bot\Exception\BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \Bot\Exception\StorageException
      */
     protected function drawAction()
     {
@@ -874,7 +890,7 @@ class Checkers extends Game
             $this->data['data']['vote']['host']['draw'] = true;
 
             if ($this->saveData($this->data)) {
-                Debug::print($this->getCurrentUserMention() . ' voted to draw');
+                Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
             } else {
@@ -884,7 +900,7 @@ class Checkers extends Game
             $this->data['data']['vote']['guest']['draw'] = true;
 
             if ($this->saveData($this->data)) {
-                Debug::print($this->getCurrentUserMention() . ' voted to draw');
+                Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
             } else {

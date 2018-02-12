@@ -124,6 +124,10 @@ class Tictactoe extends Game
      * Game handler
      *
      * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     *
+     * @throws \Bot\Exception\BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \Bot\Exception\StorageException
      */
     protected function gameAction()
     {
@@ -160,9 +164,9 @@ class Tictactoe extends Game
                 ['', '', ''],
             ];
 
-            Debug::print('Game initialization');
+            Debug::isEnabled() && Debug::print('Game initialization');
         } elseif (!isset($args)) {
-            Debug::print('No move data received');
+            Debug::isEnabled() && Debug::print('No move data received');
         }
 
         if (empty($data)) {
@@ -192,12 +196,12 @@ class Tictactoe extends Game
                 $data['board'][$args[0]][$args[1]] = 'O';
                 $data['current_turn'] = 'X';
             } else {
-                Debug::print('Invalid move data: ' . ($args[0]) . ' - ' . ($args[1]));
+                Debug::isEnabled() && Debug::print('Invalid move data: ' . ($args[0]) . ' - ' . ($args[1]));
 
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
 
-            Debug::print($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($args[0]));
+            Debug::isEnabled() && Debug::print($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($args[0]));
         }
 
         $isOver = $this->isGameOver($data['board']);
@@ -292,5 +296,7 @@ class Tictactoe extends Game
         if ($empty == 0) {
             return 'T';
         }
+
+        return null;
     }
 }

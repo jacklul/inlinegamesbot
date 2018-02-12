@@ -16,12 +16,14 @@ use Gettext\Translator;
 /**
  * Class Language
  *
+ * Simple localization class
+ *
  * @package Bot\Helper
  */
 class Language
 {
     /**
-     * Default language
+     * Default strings language
      *
      * @var string
      */

@@ -9,18 +9,18 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use Bot\Bot;
+use Bot\BotKernel;
 
 /**
  * Composer autoloader
  */
-require __DIR__ . ' /../vendor/autoload.php';
+require_once __DIR__ . ' /../vendor/autoload.php';
 
 /**
  * Run console interface
  */
 try {
-    $app = new Bot();
+    $app = new BotKernel();
     $app->run();
 } catch (\Throwable $e) {
     print $e;

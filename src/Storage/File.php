@@ -17,8 +17,6 @@ use Bot\Exception\StorageException;
  *
  * Stores data in json formatted text files
  *
- * @TODO prevent running this on multi-dyno instances (heroku)
- *
  * @package Bot\Storage\Driver
  */
 class File

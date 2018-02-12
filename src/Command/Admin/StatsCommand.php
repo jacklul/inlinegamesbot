@@ -20,6 +20,8 @@ use Longman\TelegramBot\Request;
 /**
  * Class StatsCommand
  *
+ * Extremely simple stats command
+ *
  * @package Longman\TelegramBot\Commands\AdminCommands
  */
 class StatsCommand extends AdminCommand
@@ -31,6 +33,10 @@ class StatsCommand extends AdminCommand
 
     /**
      * @return \Longman\TelegramBot\Entities\ServerResponse
+     *
+     * @throws \Bot\Exception\BotException
+     * @throws \Bot\Exception\StorageException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function execute()
     {
@@ -51,6 +57,7 @@ class StatsCommand extends AdminCommand
             $data_query['callback_query_id'] = $callback_query->getId();
         }
 
+        /** @var \Bot\Storage\Database\MySQL $storage */
         $storage = Storage::getClass();
         $storage::initializeStorage();
 
