@@ -11,7 +11,7 @@
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
 use Bot\Helper\Storage;
-use Bot\Manager\Game as GameManager;
+use Bot\Entity\GameManager;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;

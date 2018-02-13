@@ -11,7 +11,7 @@
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
 use Bot\Helper\Debug;
-use Bot\Manager\Game as GameManager;
+use Bot\Entity\GameManager;
 use Longman\TelegramBot\Commands\SystemCommand;
 
 /**

@@ -13,13 +13,13 @@ namespace Bot\Entity;
 use Bot\Helper\Debug;
 
 /**
- * Class LockFile
+ * Class TempFile
  *
- * A 'lock' file handler, with removal after handling
+ * A temporary file handler, with removal after it's not used
  *
  * @package Bot\Entity
  */
-class LockFile
+class TempFile
 {
     /**
      * The temporary file, or false
@@ -36,7 +36,7 @@ class LockFile
     private $delete = true;
 
     /**
-     * LockFile constructor
+     * TempFile constructor
      *
      * @param string $name
      * @param bool   $delete

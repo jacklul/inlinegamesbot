@@ -65,7 +65,7 @@ class File
             return json_decode(file_get_contents(STORAGE_GAME_PATH . '/' . $id . '.json'), true);
         }
 
-        return false;
+        return [];
     }
 
     /**

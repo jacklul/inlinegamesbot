@@ -8,9 +8,9 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Manager;
+namespace Bot\Entity;
 
-use Bot\Entity\Game as GameEntity;
+use Bot\Entity\Game;
 use Bot\Exception\BotException;
 use Bot\Exception\StorageException;
 use Bot\Helper\Botan;
@@ -23,13 +23,13 @@ use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
 
 /**
- * Class Game
+ * Class GameManager
  *
  * This the 'manager', it does everything what's required before running a game
  *
  * @package Bot\Manager
  */
-class Game
+class GameManager
 {
     /**
      * Game ID (inline_message_id)
@@ -41,7 +41,7 @@ class Game
     /**
      * Game object
      *
-     * @var GameEntity
+     * @var Game
      */
     private $game;
 
@@ -111,7 +111,7 @@ class Game
      *
      * @param $game_code
      *
-     * @return GameEntity|bool
+     * @return Game|bool
      */
     private function findGame($game_code)
     {
@@ -138,7 +138,7 @@ class Game
      */
     public function canRun(): bool
     {
-        if ($this->game instanceof GameEntity) {
+        if ($this->game instanceof Game) {
             return true;
         }
 
@@ -164,19 +164,7 @@ class Game
         }
 
         if (!$this->storage::lockGame($this->id)) {
-            Debug::isEnabled() && Debug::print('Storage for this game is locked');
-
-            if ($callback_query = $this->update->getCallbackQuery()) {
-                return Request::answerCallbackQuery(
-                    [
-                        'callback_query_id' => $callback_query->getId(),
-                        'text'              => __('Process for this game is busy!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."),
-                        'show_alert'        => true,
-                    ]
-                );
-            }
-
-            return Request::emptyResponse();
+            return $this->notifyAboutStorageLock();
         }
 
         Debug::isEnabled() && Debug::print('BEGIN HANDLING THE GAME');
@@ -238,6 +226,31 @@ class Game
     }
 
     /**
+     * Returns notice about storage lock
+     *
+     * @return ServerResponse
+     *
+     * @throws BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     */
+    protected function notifyAboutStorageLock()
+    {
+        Debug::isEnabled() && Debug::print('Storage for this game is locked');
+
+        if ($callback_query = $this->update->getCallbackQuery()) {
+            return Request::answerCallbackQuery(
+                [
+                    'callback_query_id' => $callback_query->getId(),
+                    'text'              => __('Process for this game is busy!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."),
+                    'show_alert'        => true,
+                ]
+            );
+        }
+
+        return Request::emptyResponse();
+    }
+
+    /**
      * Returns notice about bot failure
      *
      * @return ServerResponse
@@ -275,9 +288,9 @@ class Game
     /**
      * Get game object
      *
-     * @return mixed
+     * @return Game|mixed
      */
-    public function getGame(): GameEntity
+    public function getGame(): Game
     {
         return $this->game;
     }

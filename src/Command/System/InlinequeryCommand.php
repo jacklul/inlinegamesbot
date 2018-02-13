@@ -60,7 +60,7 @@ class InlinequeryCommand extends SystemCommand
             $array_article[] = new InlineQueryResultArticle($article);
         }
 
-        return Request::answerInlineQuery(
+        $result = Request::answerInlineQuery(
             [
                 'inline_query_id'     => $this->getUpdate()->getInlineQuery()->getId(),
                 'cache_time'          => 60,
@@ -69,6 +69,8 @@ class InlinequeryCommand extends SystemCommand
                 'switch_pm_parameter' => 'start',
             ]
         );
+
+        return $result;
     }
 
     /**

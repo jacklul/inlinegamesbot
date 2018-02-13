@@ -13,10 +13,11 @@ namespace Bot\Entity;
 use Bot\Exception\BotException;
 use Bot\Helper\Debug;
 use Bot\Helper\Language;
-use Bot\Manager\Game as GameManager;
+use Bot\Entity\GameManager;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;
+use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Entities\User;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\TelegramLog;
@@ -62,6 +63,13 @@ class Game
     }
 
     /**
+     * Was the reply to callback query already sent?
+     *
+     * @var bool
+     */
+    protected $query_answered = false;
+
+    /**
      * Handle game action
      *
      * @param $action
@@ -76,12 +84,12 @@ class Game
     public function handleAction($action)
     {
         if (class_exists($storage = $this->manager->getStorage()) && empty($this->data)) {
-            Debug::isEnabled() && Debug::print('Reading game data from database');
+            Debug::isEnabled() && Debug::print('Reading game data from the database');
             /** @var \Bot\Storage\Database\MySQL $storage */
             $this->data = $storage::selectFromGame($this->manager->getId());
         }
 
-        if (!$this->data && !is_array($this->data)) {
+        if ($this->data === null || $this->data === false) {
             return $this->returnStorageFailure();
         }
 
@@ -89,6 +97,7 @@ class Game
         $action = strtolower(preg_replace("/[^a-zA-Z]+/", "", $action));
         $action = $action . 'Action';
 
+        // Do not throw exception on method not found as users can potentialy manipulate callback data
         if (!method_exists($this, $action)) {
             Debug::isEnabled() && Debug::print('Method \'' . $action . '\' doesn\'t exist');
 
@@ -110,8 +119,10 @@ class Game
 
         if ($result instanceof ServerResponse) {
             $allowedAPIErrors = [
-                'message is not modified',     // Trying to edit a message with exactly same content it already has
-                'QUERY_ID_INVALID',     // Callback queries expire after some time, replying after that time will end up with this
+                'message is not modified',          // Editing a message with exactly same content
+                'QUERY_ID_INVALID',                 // Callback query after it expired, or trying to reply to a callback that was already answered
+                'MESSAGE_ID_INVALID',               // Callback query from deleted message, or choses inline result on message that is no yet delivered to Telegram servers
+                //'ENTITY_MENTION_USER_INVALID',      // User mention ended up somehow invalid
             ];
 
             if ($result->isOk() || $this->strposa($result->getDescription(), $allowedAPIErrors) !== false) {
@@ -123,28 +134,41 @@ class Game
             Debug::isEnabled() && Debug::print('Server response is not ok');
             Debug::isEnabled() && Debug::print($result->getErrorCode() . ': ' . $result->getDescription());
 
-            TelegramLog::error('Telegram API error: ' . $result->getErrorCode() . ': ' . $result->getDescription() . PHP_EOL . 'Game data: ' . json_encode($this->data));
+            TelegramLog::error(
+                $this->debugDump(
+                    'Telegram API error: ' . $result->getErrorCode() . ': ' . $result->getDescription(),
+                    [
+                        'Game data'     => json_encode($this->data),
+                        'Update object' => json_encode($this->updateToArray($this->manager->getUpdate())),
+                    ]
+                )
+            );
 
             return $this->answerCallbackQuery(__('Telegram API error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."), true);
         }
 
-        Debug::isEnabled() && Debug::print('CRASHED! (Game result is not ServerResponse object!)');
+        Debug::isEnabled() && Debug::print('CRASHED (Game result is not a ServerResponse object!)');
 
         TelegramLog::error(
-            $this->crashDump(
+            $this->debugDump(
+                'CRASH' . (isset($id) ? ' (ID: ' . $id . ')' : '') . ':',
                 [
                     'Game'               => $this->manager->getGame()::getTitle(),
                     'Game data (before)' => json_encode($data_before),
                     'Game data (after)'  => json_encode($this->data),
                     'Callback data'      => $this->manager->getUpdate()->getCallbackQuery() ? $this->manager->getUpdate()->getCallbackQuery()->getData() : '<not a callback query>',
+                    'Update object'      => json_encode($this->updateToArray($this->manager->getUpdate())),
                     'Result'             => $result,
-                ],
-                $this->manager->getId()
+                ]
             )
         );
 
         if ($this->saveData([])) {
-            $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
+            $result = $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
+
+            if (!$result->isOk()) {
+                return $result;
+            }
         }
 
         return $this->answerCallbackQuery(__('Critical error!', true));
@@ -183,7 +207,8 @@ class Game
      */
     protected function answerCallbackQuery($text = '', $alert = false)
     {
-        if ($callback_query = $this->manager->getUpdate()->getCallbackQuery()) {
+        if (!$this->query_answered && $callback_query = $this->manager->getUpdate()->getCallbackQuery()) {
+            $this->query_answered = true;
             return Request::answerCallbackQuery(
                 [
                     'callback_query_id' => $callback_query->getId(),
@@ -206,7 +231,7 @@ class Game
      */
     protected function editMessage($text, $reply_markup)
     {
-        return Request::editMessageText(
+         return Request::editMessageText(
             [
                 'inline_message_id'        => $this->manager->getId(),
                 'text'                     => '<b>' . $this->manager->getGame()::getTitle() . '</b>' . PHP_EOL . PHP_EOL . $text,
@@ -231,7 +256,7 @@ class Game
     }
 
     /**
-     * Get player user object
+     * Get player's user object
      *
      * @param $user
      * @param bool $as_json
@@ -261,7 +286,7 @@ class Game
     }
 
     /**
-     * Get current user object
+     * Get current player's user object
      *
      * @param bool $as_json
      *
@@ -515,7 +540,11 @@ class Game
     protected function startAction()
     {
         if (!$this->getUser('host')) {
-            $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
+            $result = $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
+
+            if (!$result->isOk()) {
+                return $result;
+            }
 
             return $this->answerCallbackQuery();
         }
@@ -573,6 +602,10 @@ class Game
      */
     protected function languageAction()
     {
+        if ($this->getCurrentUserId() !== $this->getUserId('host')) {
+            return $this->answerCallbackQuery(__("You're not the host!"), true);
+        }
+
         $current_languge = Language::getCurrentLanguage();
 
         $this->languages;
@@ -599,16 +632,20 @@ class Game
         }
 
         if ($this->getUser('host') && !$this->getUser('guest')) {
-            $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+            $result = $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
         } elseif ($this->getUser('host') && $this->getUser('guest')) {
-            $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
+            $result = $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
+        }
+
+        if (!$result->isOk()) {
+            return $result;
         }
 
         return $this->answerCallbackQuery();
     }
 
     /**
-     * This will force a crash
+     * This will force a crash (for testing purposes)
      *
      * @return ServerResponse|mixed
      *
@@ -892,16 +929,21 @@ class Game
     }
 
     /**
-     * Make a debug dump of crashed game session
+     * Make a debug dump from array of debug data
      *
+     * @param string $message
      * @param array  $data
      *
-     * @param  string $id
      * @return string
      */
-    private function crashDump($data = [], $id = '')
+    private function debugDump($message = '', $data = [])
     {
-        $output = 'CRASH' . (isset($id) ? ' (ID: ' . $id . ')' : '') . ':' . PHP_EOL;
+        if (!empty($message)) {
+            $output = $message . PHP_EOL;
+        } else {
+            $output = PHP_EOL;
+        }
+
         foreach ($data as $var => $val) {
             $output .= $var . ': ' . (is_array($val) ? print_r($val, true) : (is_bool($val) ? ($val ? 'true' : 'false') : $val)) . PHP_EOL;
         }
@@ -922,14 +964,18 @@ class Game
         Debug::isEnabled() && Debug::print('Empty game data');
 
         if ($this->getUser('host') && !$this->getUser('guest')) {
-            $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+            $result = $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
         } elseif ($this->getUser('host') && $this->getUser('guest')) {
-            $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
+            $result = $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
         } else {
-            $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
+            $result = $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
         }
 
-        return $this->answerCallbackQuery(__('Error!'), true);
+        if (!$result->isOk()) {
+            return $result;
+        }
+
+        return $this->answerCallbackQuery();
     }
 
     /**
@@ -954,5 +1000,20 @@ class Game
         }
 
         return false;
+    }
+
+    /**
+     * Convert update object to array then remove 'raw_data' and 'bot_username' from it
+     *
+     * @param Update $update
+     *
+     * @return Update
+     */
+    private function updateToArray(Update $update)
+    {
+        $update_array = json_decode(json_encode($update), true);
+        unset($update_array['raw_data']);
+        unset($update_array['bot_username']);
+        return $update_array;
     }
 }

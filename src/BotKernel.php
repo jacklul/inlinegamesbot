@@ -10,7 +10,7 @@
 
 namespace Bot;
 
-use Bot\Entity\LockFile;
+use Bot\Entity\TempFile;
 use Bot\Exception\BotException;
 use Bot\Exception\StorageException;
 use Bot\Helper\Debug;
@@ -567,12 +567,11 @@ class BotKernel
     {
         $commands = [];
 
-        $lockfile = new LockFile('cron');
-        $file = $lockfile->getFile();
+        $cronlock = new TempFile('cron');
+        $file = $cronlock->getFile();
 
         if ($file === null) {
-            echo "Couldn't obtain lockfile!" . PHP_EOL;
-            exit;
+            exit("Couldn't obtain lockfile!" . PHP_EOL);
         }
 
         $fh = fopen($file, 'w');

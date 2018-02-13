@@ -11,7 +11,7 @@
 namespace Bot\Storage\Database;
 
 use AD7six\Dsn\Dsn;
-use Bot\Entity\LockFile;
+use Bot\Entity\TempFile;
 use Bot\Exception\StorageException;
 use PDO;
 use PDOException;
@@ -33,7 +33,7 @@ class MySQL
     /**
      * Lock file object
      *
-     * @var LockFile
+     * @var TempFile
      */
     private static $lock;
 
@@ -151,10 +151,10 @@ class MySQL
             if ($result = $sth->execute()) {
                 $result = $sth->fetchAll(PDO::FETCH_ASSOC);
 
-                return isset($result[0]) ? json_decode($result[0]['data'], true) : $result;
-            } else {
-                return $result;
+                return isset($result[0]) ? json_decode($result[0]['data'], true) : [];
             }
+
+            return false;
         } catch (PDOException $e) {
             throw new StorageException($e->getMessage());
         }
@@ -263,7 +263,7 @@ class MySQL
             throw new StorageException('Id is empty!');
         }
 
-        self::$lock = new LockFile($id);
+        self::$lock = new TempFile($id);
 
         $file = self::$lock->getFile();
 
@@ -340,9 +340,9 @@ class MySQL
 
             if ($result = $sth->execute()) {
                 return $sth->fetchAll(PDO::FETCH_ASSOC);
-            } else {
-                return $result;
             }
+
+            return false;
         } catch (PDOException $e) {
             throw new StorageException($e->getMessage());
         }

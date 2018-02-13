@@ -10,7 +10,7 @@
 
 namespace Bot\Monolog;
 
-use Bot\Entity\LockFile;
+use Bot\Entity\TempFile;
 use Bot\Helper\Debug;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
@@ -76,8 +76,8 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
         $this->telegram = $telegram;
         $this->bot_id = $telegram->getBotId();
 
-        $lockfile = new LockFile($this->bot_id . '_reports', false);
-        $this->reports_file = $lockfile->getFile();
+        $reports_file = new TempFile('error_reports', false);
+        $this->reports_file = $reports_file->getFile();
 
         if (!is_writable(dirname($this->reports_file))) {
             $this->reports_file = null;
