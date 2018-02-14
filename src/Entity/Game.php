@@ -202,7 +202,7 @@ class Game
             $allowedAPIErrors = [
                 'message is not modified',          // Editing a message with exactly same content
                 'QUERY_ID_INVALID',                 // Callback query after it expired, or trying to reply to a callback that was already answered
-                'MESSAGE_ID_INVALID',               // Callback query from deleted message, or choses inline result on message that is no yet delivered to Telegram servers
+                'MESSAGE_ID_INVALID',               // Callback query from deleted message, or chooses inline result on message that is no yet delivered to Telegram servers
                 //'ENTITY_MENTION_USER_INVALID',      // User mention ended up somehow invalid
             ];
 
@@ -311,10 +311,14 @@ class Game
      * @param InlineKeyboard $reply_markup
      *
      * @return ServerResponse|mixed
+     *
+     * @throws BotException
+     * @throws \Bot\Exception\StorageException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function editMessage(string $text, InlineKeyboard $reply_markup)
     {
-        return Request::editMessageText(
+        $result = Request::editMessageText(
             [
                 'inline_message_id'        => $this->manager->getId(),
                 'text'                     => '<b>' . static::getTitle() . '</b>' . PHP_EOL . PHP_EOL . $text,
@@ -323,6 +327,26 @@ class Game
                 'disable_web_page_preview' => true,
             ]
         );
+
+        if (strpos($result->getDescription(), 'ENTITY_MENTION_USER_INVALID') !== false) {
+            $this->data['settings']['use_old_mentions'] = true;
+
+            if ($this->saveData($this->data)) {
+                if (preg_match_all("/\<a\shref\=\"tg\:\/\/user\?id\=(.*)\"\>.*\<\/a\>/Us", $text, $matches)) {
+                    for ($i = 0; $i < count($matches[1]); $i++) {
+                        if ($matches[1][$i] == $this->getUserId('host')) {
+                            $text = str_replace($matches[0][$i], $this->getUser('host')->tryMention(), $text);
+                        } elseif ($matches[1][$i] == $this->getUserId('guest')) {
+                            $text = str_replace($matches[0][$i], $this->getUser('guest')->tryMention(), $text);
+                        }
+                    }
+
+                    return $this->editMessage($text, $reply_markup);
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -447,6 +471,10 @@ class Game
      */
     protected function getUserMention(string $user = null)
     {
+        if (isset($this->data['settings']['use_old_mentions']) && $this->data['settings']['use_old_mentions'] === true) {
+            return $this->getUser($user) ? filter_var($this->getUser($user)->tryMention(), FILTER_SANITIZE_SPECIAL_CHARS) : false;
+        }
+
         return $this->getUser($user) ? '<a href="tg://user?id=' . $this->getUser($user)->getId() . '">' . filter_var($this->getUser($user)->getFirstName(), FILTER_SANITIZE_SPECIAL_CHARS) . '</a>' : false;
     }
 
@@ -456,10 +484,17 @@ class Game
      * @return bool|int
      *
      * @throws BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function getCurrentUserMention()
     {
-        return $this->getCurrentUser() ? '<a href="tg://user?id=' . $this->getCurrentUser()->getId() . '">' . filter_var($this->getCurrentUser()->getFirstName(), FILTER_SANITIZE_SPECIAL_CHARS) . '</a>' : false;
+        if ($this->getCurrentUserId() === $this->getUserId('host')) {
+            return $this->getUserMention('host');
+        } elseif ($this->getCurrentUserId() === $this->getUserId('guest')) {
+            return $this->getUserMention('guest');
+        }
+
+        return false;
     }
 
     /**
@@ -559,6 +594,7 @@ class Game
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Quit (host): ' . $this->getCurrentUserMention());
 
                 $this->data['players']['host'] = null;
+                $this->data['settings']['use_old_mentions'] = false;
 
                 if ($this->saveData($this->data)) {
                     return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
