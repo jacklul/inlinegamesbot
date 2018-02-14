@@ -11,7 +11,7 @@
 namespace Bot\Entity\Game;
 
 use Bot\Entity\Game;
-use Bot\Helper\Debug;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Spatie\Emoji\Emoji;
@@ -28,90 +28,42 @@ class Poolcheckers extends Game
      *
      * @var string
      */
-    private static $code = 'pck';
+    protected static $code = 'pck';
 
     /**
      * Game name
      *
      * @var string
      */
-    private static $title = 'Pool Checkers';
+    protected static $title = 'Pool Checkers';
 
     /**
      * Game name
      *
      * @var string
      */
-    private static $title_extra = '(flying kings, men can capture backwards)';
+    protected static $title_extra = '(flying kings, men can capture backwards)';
 
     /**
      * Game description
      *
      * @var string
      */
-    private static $description = 'Checkers is game in which the goal is to capture the other player\'s checkers or make them impossible to move.';
+    protected static $description = 'Checkers is game in which the goal is to capture the other player\'s checkers or make them impossible to move.';
 
     /**
      * Game image (for inline query result)
      *
      * @var string
      */
-    private static $image = 'https://i.imgur.com/mYuCwKA.jpg';
+    protected static $image = 'https://i.imgur.com/mYuCwKA.jpg';
 
     /**
      * Order on the game list (inline query result)
      *
      * @var int
      */
-    private static $order = 6;
-
-    /**
-     * @return string
-     */
-    public static function getCode(): string
-    {
-        return self::$code;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getTitle(): string
-    {
-        return self::$title;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getTitleExtra(): string
-    {
-        return self::$title_extra;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getDescription(): string
-    {
-        return self::$description;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getImage(): string
-    {
-        return self::$image;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getOrder(): string
-    {
-        return self::$order;
-    }
+    protected static $order = 6;
 
     /**
      * Game related variables
@@ -158,6 +110,7 @@ class Poolcheckers extends Game
 
         $command = $callbackquery_data[1];
 
+        $args = null;
         if (isset($callbackquery_data[2])) {
             $args = explode('-', $callbackquery_data[2]);
         }
@@ -191,9 +144,9 @@ class Poolcheckers extends Game
                 ['X', '', 'X', '', '', '', 'O', ''],
             ];
 
-            Debug::isEnabled() && Debug::print('Game initialization');
-        } elseif (!isset($args) && $command === 'game') {
-            Debug::isEnabled() && Debug::print('No move data received');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game initialization');
+        } elseif ($args === null && $command === 'game') {
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('No move data received');
         }
 
         if (empty($data)) {
@@ -211,11 +164,12 @@ class Poolcheckers extends Game
         $forcedJump = false;
         $moveLimit = 25;
         $moveLimitReached = false;
+        $piecesLeft = null;
 
         if ($command === 'game') {
             if ($this->getCurrentUserId() === $this->getUserId($data['settings'][$data['current_turn']])) {
                 if ($data['current_selection'] != '') {
-                    Debug::isEnabled() && Debug::print('Current selection: ' . $data['current_selection']);
+                    Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Current selection: ' . $data['current_selection']);
 
                     if ($data['current_selection'] == $args[0] . $args[1]) {
                         if ($data['current_selection_lock'] == false) {
@@ -224,7 +178,7 @@ class Poolcheckers extends Game
                             return $this->answerCallbackQuery(__("You must make a jump when possible!"), true);
                         }
                     } else {
-                        Debug::isEnabled() && Debug::print('Listing possible moves');
+                        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Listing possible moves');
 
                         $possibleMoves = $this->possibleMoves($data['board'], $data['current_selection']);
 
@@ -251,6 +205,7 @@ class Poolcheckers extends Game
                             $data['board'][$data['current_selection'][0]][$data['current_selection'][1]] = '';
 
                             $data['vote'][$data['settings'][$data['current_turn']]]['surrender'] = false;
+                            $data['vote'][$data['settings'][$data['current_turn']]]['draw'] = false;
 
                             if (strpos($data['board'][$args[0]][$args[1]], 'K') === false && (($data['current_turn'] == 'X' && $args[1] == 7) || ($data['current_turn'] == 'O' && $args[1] == 0))) {
                                 $data['board'][$args[0]][$args[1]] .= 'K';
@@ -320,7 +275,7 @@ class Poolcheckers extends Game
             }
         }
 
-        Debug::isEnabled() && Debug::print('Checking if game is over');
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Checking if game is over');
 
         $isOver = $this->isGameOver($data['board']);
 
@@ -341,7 +296,7 @@ class Poolcheckers extends Game
             $data['current_turn'] = 'E';
             $data['current_selection'] = '';
 
-            Debug::isEnabled() && Debug::print('Game ended');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game ended');
         } else {
             $this->selection = $data['current_selection'];
 
@@ -365,7 +320,7 @@ class Poolcheckers extends Game
                 }
             }
 
-            Debug::isEnabled() && Debug::print('Game is still in progress');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game is still in progress');
         }
 
         if ($this->saveData($this->data)) {
@@ -381,15 +336,17 @@ class Poolcheckers extends Game
     /**
      * Keyboard for game in progress
      *
-     * @param array  $board
+     * @param array $board
      * @param string $winner
-     * @param int    $moveCounter
+     * @param int $moveCounter
      *
      * @return InlineKeyboard
      * @throws \Bot\Exception\BotException
      */
-    protected function gameKeyboard($board, $winner = '', $moveCounter = 0)
+    protected function gameKeyboard(array $board, string $winner = null, int $moveCounter = 0)
     {
+        $inline_keyboard = [];
+
         for ($x = 0; $x <= $this->max_x; $x++) {
             $tmp_array = [];
 
@@ -405,16 +362,16 @@ class Poolcheckers extends Game
                         $field = ($this->symbols['empty']) ?: ' ';
                     }
 
-                    /*if (isset($this->selection) && $this->selection == $x.$y) {
+                    if (isset($this->selection) && $this->selection == $x . $y) {
                         $field = '[' . $field . ']';
-                    }*/
+                    }
 
                     array_push(
                         $tmp_array,
                         new InlineKeyboardButton(
                             [
                                 'text'          => $field,
-                                'callback_data' => $this->manager->getGame()::getCode() . ';game;' . $x . '-' . $y,
+                                'callback_data' => self::getCode() . ';game;' . $x . '-' . $y,
                             ]
                         )
                     );
@@ -426,7 +383,7 @@ class Poolcheckers extends Game
             }
         }
 
-        $inline_keyboard = $this->transpose($inline_keyboard);
+        $inline_keyboard = $this->invertBoard($inline_keyboard);
 
         $piecesLeft = $this->piecesLeft($board);
 
@@ -435,7 +392,7 @@ class Poolcheckers extends Game
                 new InlineKeyboardButton(
                     [
                         'text'          => __('Play again!'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';start',
+                        'callback_data' => self::getCode() . ';start',
                     ]
                 ),
             ];
@@ -445,7 +402,7 @@ class Poolcheckers extends Game
                     new InlineKeyboardButton(
                         [
                             'text'          => __('Surrender'),
-                            'callback_data' => $this->manager->getGame()::getCode() . ';forfeit',
+                            'callback_data' => self::getCode() . ';forfeit',
                         ]
                     ),
                 ];
@@ -454,7 +411,7 @@ class Poolcheckers extends Game
                     new InlineKeyboardButton(
                         [
                             'text'          => __('Vote to draw'),
-                            'callback_data' => $this->manager->getGame()::getCode() . ';draw',
+                            'callback_data' => self::getCode() . ';draw',
                         ]
                     ),
                 ];
@@ -465,13 +422,13 @@ class Poolcheckers extends Game
             new InlineKeyboardButton(
                 [
                     'text'          => __('Quit'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ';quit',
+                    'callback_data' => self::getCode() . ';quit',
                 ]
             ),
             new InlineKeyboardButton(
                 [
                     'text'          => __('Kick'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ';kick',
+                    'callback_data' => self::getCode() . ';kick',
                 ]
             ),
         ];
@@ -483,19 +440,19 @@ class Poolcheckers extends Game
                 new InlineKeyboardButton(
                     [
                         'text'          => 'DEBUG: ' . 'Restart',
-                        'callback_data' => $this->manager->getGame()::getCode() . ';start',
+                        'callback_data' => self::getCode() . ';start',
                     ]
                 ),
                 new InlineKeyboardButton(
                     [
                         'text'          => 'DEBUG: ' . 'Surrender',
-                        'callback_data' => $this->manager->getGame()::getCode() . ';forfeit',
+                        'callback_data' => self::getCode() . ';forfeit',
                     ]
                 ),
                 new InlineKeyboardButton(
                     [
                         'text'          => 'DEBUG: ' . 'Draw',
-                        'callback_data' => $this->manager->getGame()::getCode() . ';draw',
+                        'callback_data' => self::getCode() . ';draw',
                     ]
                 ),
             ];
@@ -509,16 +466,16 @@ class Poolcheckers extends Game
     /**
      * Generate list of possible moves
      *
-     * @param $board
-     * @param $selection
-     * @param bool      $onlykill
-     * @param string    $char
-     * @param string    $backmultijumpblock
+     * @param array $board
+     * @param string $selection
+     * @param bool $onlykill
+     * @param string $char
+     * @param string $backmultijumpblock
      *
      * @return array|bool
      */
 
-    private function possibleMoves($board, $selection, $onlykill = false, $char = '', $backmultijumpblock = null)
+    private function possibleMoves(array $board, string $selection, bool $onlykill = false, string $char = '', string $backmultijumpblock = null)
     {
         $valid_moves = [];
         $kill = [];
@@ -813,6 +770,7 @@ class Poolcheckers extends Game
             if (is_array($v)) {
                 return array_filter($v) != [];
             }
+
             return false;
         };
 
@@ -828,11 +786,11 @@ class Poolcheckers extends Game
     /**
      * Check how many pieces is left
      *
-     * @param $board
+     * @param array $board
      *
      * @return array
      */
-    private function piecesLeft($board)
+    private function piecesLeft(array $board)
     {
         $xs = 0;
         $ys = 0;
@@ -866,11 +824,11 @@ class Poolcheckers extends Game
     /**
      * Check whenever game is over
      *
-     * @param $board
+     * @param array $board
      *
      * @return string
      */
-    protected function isGameOver($board)
+    protected function isGameOver(array $board)
     {
         $array = $this->piecesLeft($board);
 
@@ -923,15 +881,15 @@ class Poolcheckers extends Game
     /**
      * Invert the array table for display
      *
-     * @param $array
+     * @param array $board
      *
      * @return mixed
      */
-    private function transpose($array)
+    private function invertBoard(array $board)
     {
-        array_unshift($array, null);
+        array_unshift($board, null);
 
-        return call_user_func_array('array_map', $array);
+        return call_user_func_array('array_map', $board);
     }
 
     /**
@@ -949,14 +907,18 @@ class Poolcheckers extends Game
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
         }
 
+        if (isset($this->data['data']['current_turn']) && $this->data['data']['current_turn'] == 'E') {
+            return $this->answerCallbackQuery(__("This game has ended!", true));
+        }
+
         $this->defineSymbols();
 
         $this->max_y = count($this->data['data']['board']);
         $this->max_x = count($this->data['data']['board'][0]);
 
-        if ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host')) {
+        if ($this->getUser('host') && $this->getCurrentUserId() === $this->getUserId('host')) {
             if ($this->data['data']['vote']['host']['surrender']) {
-                Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' surrendered');
+                Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' surrendered');
 
                 $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
                 $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
@@ -973,7 +935,7 @@ class Poolcheckers extends Game
                 }
             }
 
-            Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' voted to surrender');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to surrender');
             $this->data['data']['vote']['host']['surrender'] = true;
 
             if ($this->saveData($this->data)) {
@@ -981,9 +943,9 @@ class Poolcheckers extends Game
             } else {
                 return $this->returnStorageFailure();
             }
-        } elseif ($this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
+        } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
             if ($this->data['data']['vote']['guest']['surrender']) {
-                Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' surrendered');
+                Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' surrendered');
 
                 $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
                 $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
@@ -1000,7 +962,7 @@ class Poolcheckers extends Game
                 }
             }
 
-            Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' voted to surrender');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to surrender');
             $this->data['data']['vote']['guest']['surrender'] = true;
 
             if ($this->saveData($this->data)) {
@@ -1009,7 +971,7 @@ class Poolcheckers extends Game
                 return $this->returnStorageFailure();
             }
         } else {
-            Debug::isEnabled() && Debug::print('Someone else executed forfeit action');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Someone else executed forfeit action');
 
             return $this->answerCallbackQuery();
         }
@@ -1030,32 +992,36 @@ class Poolcheckers extends Game
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
         }
 
+        if (isset($this->data['data']['current_turn']) && $this->data['data']['current_turn'] == 'E') {
+            return $this->answerCallbackQuery(__("This game has ended!", true));
+        }
+
         $this->defineSymbols();
 
         $this->max_y = count($this->data['data']['board']);
         $this->max_x = count($this->data['data']['board'][0]);
 
-        if ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host') && !$this->data['data']['vote']['host']['draw']) {
+        if ($this->getUser('host') && $this->getCurrentUserId() === $this->getUserId('host') && !$this->data['data']['vote']['host']['draw']) {
             $this->data['data']['vote']['host']['draw'] = true;
 
             if ($this->saveData($this->data)) {
-                Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' voted to draw');
+                Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
             } else {
                 return $this->returnStorageFailure();
             }
-        } elseif ($this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest') && !$this->data['data']['vote']['guest']['draw']) {
+        } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest') && !$this->data['data']['vote']['guest']['draw']) {
             $this->data['data']['vote']['guest']['draw'] = true;
 
             if ($this->saveData($this->data)) {
-                Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' voted to draw');
+                Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
             } else {
                 return $this->returnStorageFailure();
             }
-        } elseif ($this->getUser('host') && $this->getCurrentUserId() == $this->getUserId('host') || $this->getUser('guest') && $this->getCurrentUserId() == $this->getUserId('guest')) {
+        } elseif ($this->getUser('host') && $this->getCurrentUserId() === $this->getUserId('host') || $this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You already voted!"), true);
         } else {
             return $this->answerCallbackQuery();

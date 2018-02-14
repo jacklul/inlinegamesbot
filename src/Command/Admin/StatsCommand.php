@@ -10,8 +10,8 @@
 
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
-use Bot\Helper\Storage;
 use Bot\Entity\GameManager;
+use Bot\Helper\Storage;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
@@ -57,11 +57,11 @@ class StatsCommand extends AdminCommand
             $data_query['callback_query_id'] = $callback_query->getId();
         }
 
-        /** @var \Bot\Storage\Database\MySQL $storage */
-        $storage = Storage::getClass();
-        $storage::initializeStorage();
+        /** @var \Bot\Storage\File $storage_class */
+        $storage_class = Utilities::getStorageClass();
+        $storage_class::initializeStorage();
 
-        $games = $storage::listFromGame(0);
+        $games = $storage_class::listFromGame(0);
         $stats = [
             'games'      => [],
             'games_5min' => [],
@@ -72,7 +72,8 @@ class StatsCommand extends AdminCommand
         foreach ($games as $game) {
             $data = json_decode($game['data'], true);
             $game_obj = new GameManager($game['id'], $data['game_code'], $this);
-            $game_title = $game_obj->getGame()::getTitle();
+            $game_class = $game->getGame();
+            $game_title = $game_class::getTitle();
 
             if (isset($stats['games'][$game_title])) {
                 $stats['games'][$game_title] = $stats['games'][$game_title] + 1;

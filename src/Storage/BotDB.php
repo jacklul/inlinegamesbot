@@ -51,13 +51,13 @@ class BotDB extends DB
     /**
      * Select data from database
      *
-     * @param $id
+     * @param string $id
      *
      * @return array|bool
      *
      * @throws \Bot\Exception\StorageException
      */
-    public static function selectFromGame($id)
+    public static function selectFromGame(string $id)
     {
         return MySQL::selectFromGame($id);
     }
@@ -65,14 +65,14 @@ class BotDB extends DB
     /**
      * Insert data to database
      *
-     * @param $id
-     * @param $data
+     * @param string $id
+     * @param array $data
      *
      * @return bool
      *
      * @throws \Bot\Exception\StorageException
      */
-    public static function insertToGame($id, $data): bool
+    public static function insertToGame(string $id, array $data): bool
     {
         return MySQL::insertToGame($id, $data);
     }
@@ -80,13 +80,13 @@ class BotDB extends DB
     /**
      * Delete data from storage
      *
-     * @param $id
+     * @param string $id
      *
      * @return bool
      *
      * @throws \Bot\Exception\StorageException
      */
-    public static function deleteFromGame($id): bool
+    public static function deleteFromGame(string $id): bool
     {
         return MySQL::deleteFromGame($id);
     }
@@ -94,14 +94,14 @@ class BotDB extends DB
     /**
      * Lock the row to prevent another process modifying it
      *
-     * @param $id
+     * @param string $id
      *
      * @return bool
      *
      * @throws \Bot\Exception\BotException
      * @throws \Bot\Exception\StorageException
      */
-    public static function lockGame($id): bool
+    public static function lockGame(string $id): bool
     {
         return MySQL::lockGame($id);
     }
@@ -109,13 +109,13 @@ class BotDB extends DB
     /**
      * Unlock the row after
      *
-     * @param $id
+     * @param string $id
      *
      * @return bool
      *
      * @throws \Bot\Exception\StorageException
      */
-    public static function unlockGame($id): bool
+    public static function unlockGame(string $id): bool
     {
         return MySQL::unlockGame($id);
     }
@@ -123,13 +123,13 @@ class BotDB extends DB
     /**
      * Select multiple data from the database
      *
-     * @param $time
+     * @param int $time
      *
      * @return array|bool
      *
      * @throws \Bot\Exception\StorageException
      */
-    public static function listFromGame($time = 0)
+    public static function listFromGame(int $time = 0)
     {
         return MySQL::listFromGame($time);
     }

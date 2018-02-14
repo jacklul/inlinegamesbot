@@ -48,21 +48,17 @@ class Botan
     /**
      * Track function
      *
-     * @param Update  $update
-     * @param string  $event_name
-     * @param integer $timeout
+     * @param Update $update
+     * @param string $event_name
+     * @param int $timeout
      *
      * @return bool
      * @throws BotException
      */
-    public static function track(Update $update, $event_name = '', $timeout = 5): bool
+    public static function track(Update $update, string $event_name = '', int $timeout = 5): bool
     {
         if (empty(self::$token)) {
             self::$token = getenv('BOTAN_TOKEN');
-        }
-
-        if (!self::$client instanceof Client) {
-            self::$client = new Client(['base_uri' => self::$api_base_uri, 'timeout' => $timeout]);
         }
 
         if (empty(self::$token) || empty($event_name)) {
@@ -71,6 +67,10 @@ class Botan
 
         if ($update === null) {
             throw new BotException('Update object is empty!');
+        }
+
+        if (!self::$client instanceof Client) {
+            self::$client = new Client(['base_uri' => self::$api_base_uri, 'timeout' => $timeout]);
         }
 
         $update_data = (array)$update;
@@ -102,7 +102,7 @@ class Botan
         $responseData = json_decode($result, true);
 
         if (!$responseData || $responseData['status'] !== 'accepted') {
-            Debug::isEnabled() && Debug::print('Botan.io stats report failed: ' . $result ?: 'empty response');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Botan.io stats report failed: ' . $result ?: 'empty response');
 
             return false;
         }

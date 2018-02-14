@@ -11,7 +11,7 @@
 namespace Bot\Entity\Game;
 
 use Bot\Entity\Game;
-use Bot\Helper\Debug;
+use Bot\Helper\Utilities;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -26,75 +26,35 @@ class Connectfour extends Game
      *
      * @var string
      */
-    private static $code = 'c4';
+    protected static $code = 'c4';
 
     /**
      * Game name
      *
      * @var string
      */
-    private static $title = 'Connect Four';
+    protected static $title = 'Connect Four';
 
     /**
      * Game description
      *
      * @var string
      */
-    private static $description = 'Connect Four is a connection game in which the players take turns dropping colored discs from the top into a seven-column, six-row vertically suspended grid.';
+    protected static $description = 'Connect Four is a connection game in which the players take turns dropping colored discs from the top into a seven-column, six-row vertically suspended grid.';
 
     /**
      * Game image (for inline query result)
      *
      * @var string
      */
-    private static $image = 'http://i.imgur.com/KgH8blx.jpg';
+    protected static $image = 'http://i.imgur.com/KgH8blx.jpg';
 
     /**
      * Order on the game list (inline query result)
      *
      * @var int
      */
-    private static $order = 2;
-
-    /**
-     * @return string
-     */
-    public static function getCode(): string
-    {
-        return self::$code;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getTitle(): string
-    {
-        return self::$title;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getDescription(): string
-    {
-        return self::$description;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getImage(): string
-    {
-        return self::$image;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getOrder(): string
-    {
-        return self::$order;
-    }
+    protected static $order = 2;
 
     /**
      * Game related variables
@@ -167,9 +127,9 @@ class Connectfour extends Game
                 ['', '', '', '', '', '', ''],
             ];
 
-            Debug::isEnabled() && Debug::print('Game initialization');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game initialization');
         } elseif (!isset($args)) {
-            Debug::isEnabled() && Debug::print('No move data received');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('No move data received');
         }
 
         if (empty($data)) {
@@ -187,7 +147,7 @@ class Connectfour extends Game
         $this->max_y = count($data['board']);
         $this->max_x = count($data['board'][0]);
 
-        Debug::isEnabled() && Debug::print('BOARD: ' . $this->max_x . ' - ' . $this->max_y);
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('BOARD: ' . $this->max_x . ' - ' . $this->max_y);
 
         if (isset($args)) {
             for ($y = $this->max_y - 1; $y >= 0; $y--) {
@@ -206,13 +166,13 @@ class Connectfour extends Game
                         return $this->answerCallbackQuery(__("Invalid move!"), true);
                     }
                 } else {
-                    Debug::isEnabled() && Debug::print('Invalid move data: ' . ($args[0]) . ' - ' . ($y));
+                    Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Invalid move data: ' . ($args[0]) . ' - ' . ($y));
 
                     return $this->answerCallbackQuery(__("Invalid move!"), true);
                 }
             }
 
-            Debug::isEnabled() && Debug::print($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($y));
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($y));
         }
 
         $isOver = $this->isGameOver($data['board']);
@@ -243,11 +203,11 @@ class Connectfour extends Game
     /**
      * Check whenever game is over
      *
-     * @param $board
+     * @param array $board
      *
      * @return string
      */
-    private function isGameOver(&$board)
+    private function isGameOver(array &$board)
     {
         $empty = 0;
         for ($x = 0; $x < $this->max_x; $x++) {

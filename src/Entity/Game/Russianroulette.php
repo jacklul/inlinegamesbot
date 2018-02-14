@@ -11,7 +11,7 @@
 namespace Bot\Entity\Game;
 
 use Bot\Entity\Game;
-use Bot\Helper\Debug;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Spatie\Emoji\Emoji;
@@ -28,75 +28,35 @@ class Russianroulette extends Game
      *
      * @var string
      */
-    private static $code = 'rr';
+    protected static $code = 'rr';
 
     /**
      * Game name
      *
      * @var string
      */
-    private static $title = 'Russian Roulette';
+    protected static $title = 'Russian Roulette';
 
     /**
      * Game description
      *
      * @var string
      */
-    private static $description = 'Russian roulette is a game of chance in which a player places a single round in a revolver, spins the cylinder, places the muzzle against their head, and pulls the trigger.';
+    protected static $description = 'Russian roulette is a game of chance in which a player places a single round in a revolver, spins the cylinder, places the muzzle against their head, and pulls the trigger.';
 
     /**
      * Game image (for inline query result)
      *
      * @var string
      */
-    private static $image = 'https://i.imgur.com/LffxQLK.jpg';
+    protected static $image = 'https://i.imgur.com/LffxQLK.jpg';
 
     /**
      * Order on the game list (inline query result)
      *
      * @var int
      */
-    private static $order = 4;
-
-    /**
-     * @return string
-     */
-    public static function getCode(): string
-    {
-        return self::$code;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getTitle(): string
-    {
-        return self::$title;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getDescription(): string
-    {
-        return self::$description;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getImage(): string
-    {
-        return self::$image;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getOrder(): string
-    {
-        return self::$order;
-    }
+    protected static $order = 4;
 
     /**
      * Game related variables
@@ -140,6 +100,7 @@ class Russianroulette extends Game
 
         $command = $callbackquery_data[1];
 
+        $arg = null;
         if (isset($callbackquery_data[2])) {
             $arg = $callbackquery_data[2];
         }
@@ -157,9 +118,9 @@ class Russianroulette extends Game
             $data['cylinder'] = ['', '', '', '', '', ''];
             $data['cylinder'][mt_rand(0, 5)] = 'X';
 
-            Debug::isEnabled() && Debug::print('Game initialization');
-        } elseif (!isset($arg)) {
-            Debug::isEnabled() && Debug::print('No move data received');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game initialization');
+        } elseif ($arg === null) {
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('No move data received');
         }
 
         if (empty($data)) {
@@ -183,15 +144,15 @@ class Russianroulette extends Game
             }
 
             if (!isset($data['cylinder'][$arg - 1])) {
-                Debug::isEnabled() && Debug::print('Bad move data received: ' . $arg);
+                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Bad move data received: ' . $arg);
 
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
 
-            Debug::isEnabled() && Debug::print('Chamber selected: ' . $arg);
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Chamber selected: ' . $arg);
 
             if ($data['cylinder'][$arg - 1] === 'X') {
-                Debug::isEnabled() && Debug::print('Chamber contains bullet, player is dead');
+                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Chamber contains bullet, player is dead');
 
                 if ($data['current_turn'] == 'X') {
                     $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['O']) . '<b>']) . '</b>' . PHP_EOL;
@@ -221,7 +182,7 @@ class Russianroulette extends Game
                 $hit = $arg;
 
                 if ($this->saveData($this->data)) {
-                    return $this->editMessage($gameOutput . PHP_EOL . PHP_EOL . __('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->gameKeyboard($hit));
+                    return $this->editMessage($gameOutput . PHP_EOL . PHP_EOL . __('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->customGameKeyboard($hit));
                 } else {
                     return $this->returnStorageFailure();
                 }
@@ -241,12 +202,12 @@ class Russianroulette extends Game
 
         $gameOutput .= __("Current turn:") . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]);
 
-        Debug::isEnabled() && Debug::print('Cylinder: |' . implode('|', $data['cylinder']) . '|');
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Cylinder: |' . implode('|', $data['cylinder']) . '|');
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(
                 $this->getUserMention('host') . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . PHP_EOL . PHP_EOL . $gameOutput,
-                $this->gameKeyboard($hit)
+                $this->customGameKeyboard($hit)
             );
         } else {
             return $this->returnStorageFailure();
@@ -257,35 +218,34 @@ class Russianroulette extends Game
      * Keyboard for game in progress
      *
      * @param string $hit
-     * @param string $winner
      *
      * @return InlineKeyboard
      */
-    protected function gameKeyboard($hit = '', $winner = '')
+    protected function customGameKeyboard(string $hit = '')
     {
         $inline_keyboard[] = [
             new InlineKeyboardButton(
                 [
                     'text'          => $this->symbols['empty'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null',
+                    'callback_data' => self::getCode() . ';game;null',
                 ]
             ),
             new InlineKeyboardButton(
                 [
                     'text'          => ($hit == 1) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;1',
+                    'callback_data' => self::getCode() . ';game;1',
                 ]
             ),
             new InlineKeyboardButton(
                 [
                     'text'          => ($hit == 2) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;2',
+                    'callback_data' => self::getCode() . ';game;2',
                 ]
             ),
             new InlineKeyboardButton(
                 [
                     'text'          => $this->symbols['empty'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null',
+                    'callback_data' => self::getCode() . ';game;null',
                 ]
             ),
         ];
@@ -294,19 +254,19 @@ class Russianroulette extends Game
             new InlineKeyboardButton(
                 [
                     'text'          => ($hit == 6) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;6',
+                    'callback_data' => self::getCode() . ';game;6',
                 ]
             ),
             new InlineKeyboardButton(
                 [
                     'text'          => $this->symbols['empty'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null',
+                    'callback_data' => self::getCode() . ';game;null',
                 ]
             ),
             new InlineKeyboardButton(
                 [
                     'text'          => ($hit == 3) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;3',
+                    'callback_data' => self::getCode() . ';game;3',
                 ]
             ),
         ];
@@ -315,25 +275,25 @@ class Russianroulette extends Game
             new InlineKeyboardButton(
                 [
                     'text'          => $this->symbols['empty'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null',
+                    'callback_data' => self::getCode() . ';game;null',
                 ]
             ),
             new InlineKeyboardButton(
                 [
                     'text'          => ($hit == 5) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;5',
+                    'callback_data' => self::getCode() . ';game;5',
                 ]
             ),
             new InlineKeyboardButton(
                 [
                     'text'          => ($hit == 4) ? $this->symbols['chamber_hit'] : $this->symbols['chamber'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;4',
+                    'callback_data' => self::getCode() . ';game;4',
                 ]
             ),
             new InlineKeyboardButton(
                 [
                     'text'          => $this->symbols['empty'],
-                    'callback_data' => $this->manager->getGame()::getCode() . ';game;null',
+                    'callback_data' => self::getCode() . ';game;null',
                 ]
             ),
         ];
@@ -343,13 +303,13 @@ class Russianroulette extends Game
                 new InlineKeyboardButton(
                     [
                         'text'          => __('Quit'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';quit',
+                        'callback_data' => self::getCode() . ';quit',
                     ]
                 ),
                 new InlineKeyboardButton(
                     [
                         'text'          => __('Kick'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';kick',
+                        'callback_data' => self::getCode() . ';kick',
                     ]
                 ),
             ];
@@ -358,13 +318,13 @@ class Russianroulette extends Game
                 new InlineKeyboardButton(
                     [
                         'text'          => __('Quit'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';quit',
+                        'callback_data' => self::getCode() . ';quit',
                     ]
                 ),
                 new InlineKeyboardButton(
                     [
                         'text'          => __('Join'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';join',
+                        'callback_data' => self::getCode() . ';join',
                     ]
                 ),
             ];
@@ -375,7 +335,7 @@ class Russianroulette extends Game
                 new InlineKeyboardButton(
                     [
                         'text'          => 'DEBUG: ' . 'Restart',
-                        'callback_data' => $this->manager->getGame()::getCode() . ';start',
+                        'callback_data' => self::getCode() . ';start',
                     ]
                 ),
             ];

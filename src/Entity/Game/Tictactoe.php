@@ -11,7 +11,7 @@
 namespace Bot\Entity\Game;
 
 use Bot\Entity\Game;
-use Bot\Helper\Debug;
+use Bot\Helper\Utilities;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -26,75 +26,35 @@ class Tictactoe extends Game
      *
      * @var string
      */
-    private static $code = 'xo';
+    protected static $code = 'xo';
 
     /**
      * Game name
      *
      * @var string
      */
-    private static $title = 'Tic-Tac-Toe';
+    protected static $title = 'Tic-Tac-Toe';
 
     /**
      * Game description
      *
      * @var string
      */
-    private static $description = 'Tic-tac-toe is a game for two players, X and O, who take turns marking the spaces in a 3×3 grid.';
+    protected static $description = 'Tic-tac-toe is a game for two players, X and O, who take turns marking the spaces in a 3×3 grid.';
 
     /**
      * Game image (for inline query result)
      *
      * @var string
      */
-    private static $image = 'http://i.imgur.com/yU2uexr.png';
+    protected static $image = 'http://i.imgur.com/yU2uexr.png';
 
     /**
      * Order on the game list (inline query result)
      *
      * @var int
      */
-    private static $order = 1;
-
-    /**
-     * @return string
-     */
-    public static function getCode(): string
-    {
-        return self::$code;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getTitle(): string
-    {
-        return self::$title;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getDescription(): string
-    {
-        return self::$description;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getImage(): string
-    {
-        return self::$image;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getOrder(): string
-    {
-        return self::$order;
-    }
+    protected static $order = 1;
 
     /**
      * Game related variables
@@ -144,6 +104,7 @@ class Tictactoe extends Game
 
         $command = $callbackquery_data[1];
 
+        $args = null;
         if (isset($callbackquery_data[2])) {
             $args = explode('-', $callbackquery_data[2]);
         }
@@ -164,9 +125,9 @@ class Tictactoe extends Game
                 ['', '', ''],
             ];
 
-            Debug::isEnabled() && Debug::print('Game initialization');
-        } elseif (!isset($args)) {
-            Debug::isEnabled() && Debug::print('No move data received');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game initialization');
+        } elseif ($args === null) {
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('No move data received');
         }
 
         if (empty($data)) {
@@ -196,12 +157,12 @@ class Tictactoe extends Game
                 $data['board'][$args[0]][$args[1]] = 'O';
                 $data['current_turn'] = 'X';
             } else {
-                Debug::isEnabled() && Debug::print('Invalid move data: ' . ($args[0]) . ' - ' . ($args[1]));
+                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Invalid move data: ' . ($args[0]) . ' - ' . ($args[1]));
 
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
 
-            Debug::isEnabled() && Debug::print($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($args[0]));
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($args[0]));
         }
 
         $isOver = $this->isGameOver($data['board']);
@@ -232,11 +193,11 @@ class Tictactoe extends Game
     /**
      * Check whenever game is over
      *
-     * @param $board
+     * @param array $board
      *
      * @return string
      */
-    private function isGameOver(&$board)
+    private function isGameOver(array &$board)
     {
         $empty = 0;
         for ($x = 0; $x < $this->max_x; $x++) {

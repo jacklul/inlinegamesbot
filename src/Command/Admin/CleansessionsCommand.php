@@ -10,9 +10,9 @@
 
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
-use Bot\Helper\Debug;
-use Bot\Helper\Storage;
 use Bot\Entity\GameManager;
+use Bot\Helper\Storage;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
@@ -70,12 +70,12 @@ class CleansessionsCommand extends AdminCommand
             set_time_limit(10);
         }
 
-        /** @var \Bot\Storage\Database\MySQL $storage */
-        $storage = Storage::getClass();
+        /** @var \Bot\Storage\File $storage_class */
+        $storage_class = Utilities::getStorageClass();
 
-        if (class_exists($storage)) {
-            $storage::initializeStorage();
-            $inactive = $storage::listFromGame($cleanInterval);
+        if (class_exists($storage_class)) {
+            $storage_class::initializeStorage();
+            $inactive = $storage_class::listFromGame($cleanInterval);
 
             if (is_array($inactive) && count($inactive) > 0) {
                 $chat_action_start = 0;
@@ -100,7 +100,7 @@ class CleansessionsCommand extends AdminCommand
 
                 foreach ($inactive as $inactive_game) {
                     if (time() >= $start_time + $timelimit - 1) {
-                        Debug::isEnabled() && Debug::print('Time limit reached');
+                        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Time limit reached');
                         break;
                     }
 
@@ -115,21 +115,23 @@ class CleansessionsCommand extends AdminCommand
                         print 'Cleaning: \'' . $inactive_game['id'] . '\'' . PHP_EOL;
                     }
 
-                    $game_data = $storage::selectFromGame($inactive_game['id']);
+                    $game_data = $storage_class::selectFromGame($inactive_game['id']);
 
                     if (isset($game_data['game_code'])) {
                         $game = new GameManager($inactive_game['id'], $game_data['game_code'], $this);
 
                         if ($game->canRun()) {
                             while (time() <= $last_request_time) {
-                                Debug::isEnabled() && Debug::print('Delaying next request');
+                                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Delaying next request');
                                 sleep(1);
                             }
+
+                            $game_class = $game->getGame();
 
                             $result = Request::editMessageText(
                                 [
                                     'inline_message_id'        => $inactive_game['id'],
-                                    'text'                     => '<b>' . $game->getGame()::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __("This game session has expired.") . '</i>',
+                                    'text'                     => '<b>' . $game_class::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __("This game session has expired.") . '</i>',
                                     'reply_markup'             => $this->createInlineKeyboard($game_data['game_code']),
                                     'parse_mode'               => 'HTML',
                                     'disable_web_page_preview' => true,
@@ -140,16 +142,16 @@ class CleansessionsCommand extends AdminCommand
 
                             if (isset($result) && $result->isOk()) {
                                 $edited++;
-                                Debug::isEnabled() && Debug::print('Message edited successfully');
+                                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Message edited successfully');
                             } else {
-                                Debug::isEnabled() && Debug::print('Failed to edit message: ' . (isset($result) ? $result->getDescription() : '<unknown error>'));
+                                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Failed to edit message: ' . (isset($result) ? $result->getDescription() : '<unknown error>'));
                             }
                         }
                     }
 
-                    if ($storage::deleteFromGame($inactive_game['id'])) {
+                    if ($storage_class::deleteFromGame($inactive_game['id'])) {
                         $cleaned++;
-                        Debug::isEnabled() && Debug::print('Record removed from the database');
+                        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Record removed from the database');
                     }
                 }
 
@@ -173,11 +175,11 @@ class CleansessionsCommand extends AdminCommand
     /**
      * Create inline keyboard with button that creates the game session
      *
-     * @param $game_code
+     * @param string $game_code
      *
      * @return InlineKeyboard
      */
-    private function createInlineKeyboard($game_code)
+    private function createInlineKeyboard(string $game_code)
     {
         $inline_keyboard = [
             [

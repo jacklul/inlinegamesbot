@@ -13,8 +13,8 @@ namespace Bot;
 use Bot\Entity\TempFile;
 use Bot\Exception\BotException;
 use Bot\Exception\StorageException;
-use Bot\Helper\Debug;
 use Bot\Helper\Storage;
+use Bot\Helper\Utilities;
 use Bot\Monolog\TelegramBotAdminHandler;
 use Dotenv\Dotenv;
 use Gettext\Translator;
@@ -111,7 +111,7 @@ class BotKernel
      *
      * @throws BotException
      */
-    public function __construct($web = false)
+    public function __construct(bool $web = false)
     {
         if (!defined('ROOT_PATH')) {
             throw new BotException('Root path not defined!');
@@ -125,13 +125,13 @@ class BotKernel
 
         // Set custom data path if variable exists, otherwise use 'data' directory
         if (!empty($data_path = getenv('DATA_PATH'))) {
-            define("DATA_PATH", $data_path);
+            define("DATA_PATH", str_replace('"', '', $data_path));
         } else {
             define("DATA_PATH", ROOT_PATH . '/data/');
         }
 
         if (getenv('DEBUG')) {
-            Debug::setEnabled(true);
+            Utilities::setDebugPrint(true);
         }
 
         // gettext '__()' function must be initialized as all public messages are using it
@@ -151,7 +151,7 @@ class BotKernel
         }
 
         // Get passed parameter
-        if ($web) {
+        if (is_bool($web) && $web) {
             $this->arg = 'handle';    // from webspace allow only handling webhook
         } elseif (isset($_SERVER['argv'][1])) {
             $this->arg = strtolower(trim($_SERVER['argv'][1]));
@@ -169,7 +169,7 @@ class BotKernel
             'api_key'          => getenv('BOT_TOKEN'),
             'bot_username'     => getenv('BOT_USERNAME'),
             'secret'           => getenv('BOT_SECRET'),
-            'admins'           => [(integer)getenv('BOT_ADMIN') ?: 0],
+            'admins'           => [(int)getenv('BOT_ADMIN') ?: 0],
             'commands'         => [
                 'paths'   => [
                     SRC_PATH . '/Command/',
@@ -249,7 +249,6 @@ class BotKernel
     /**
      * Initialize Telegram object
      *
-     * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \Longman\TelegramBot\Exception\TelegramLogException
      * @throws \InvalidArgumentException
@@ -257,7 +256,7 @@ class BotKernel
      */
     private function initialize(): void
     {
-        Debug::isEnabled() && Debug::print('DEBUG MODE');
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('DEBUG MODE');
 
         $this->telegram = new Telegram($this->config['api_key'], $this->config['bot_username']);
 
@@ -376,9 +375,9 @@ class BotKernel
 
             if (!empty($this->config['valid_ip'] && is_array($this->config['valid_ip']))) {
                 if ($this->config['validate_request'] && !defined('STDIN')) {
-                    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+                    $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
                     foreach (['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR'] as $key) {
-                        if (filter_var($_SERVER[$key] ?? null, FILTER_VALIDATE_IP)) {
+                        if (filter_var(isset($_SERVER[$key]) ? $_SERVER[$key] : null, FILTER_VALIDATE_IP)) {
                             $ip = $_SERVER[$key];
                             break;
                         }
@@ -492,7 +491,7 @@ class BotKernel
                 $update_count = count($server_response->getResult());
 
                 if ($update_count > 0) {
-                    print '[' . date('Y-m-d H:i:s', time()) . '] Processed ' . $update_count . ' updates!' . PHP_EOL;
+                    print '[' . date('Y-m-d H:i:s', time()) . '] Processed ' . $update_count . ' updates!' . ' (peak memory usage: ' . Utilities::formatBytes(memory_get_peak_usage()) . ')' . PHP_EOL;
                 }
             } else {
                 print '[' . date('Y-m-d H:i:s', time()) . '] Failed to process updates!' . PHP_EOL;
@@ -611,12 +610,12 @@ class BotKernel
      */
     private function installDb()
     {
-        /** @var \Bot\Storage\Database\MySQL $storage */
-        $storage = Storage::getClass();
+        /** @var \Bot\Storage\File $storage_class */
+        $storage_class = Utilities::getStorageClass();
 
-        print 'Installing storage structure (' . end(explode('\\', $storage)) . ')...' . PHP_EOL;
+        print 'Installing storage structure (' . end(explode('\\', $storage_class)) . ')...' . PHP_EOL;
 
-        if ($storage::createStructure()) {
+        if ($storage_class::createStructure()) {
             print 'Ok!' . PHP_EOL;
         } else {
             print 'Error!' . PHP_EOL;

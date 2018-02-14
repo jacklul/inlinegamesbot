@@ -10,7 +10,7 @@
 
 namespace Bot\Entity;
 
-use Bot\Helper\Debug;
+use Bot\Helper\Utilities;
 
 /**
  * Class TempFile
@@ -39,7 +39,7 @@ class TempFile
      * TempFile constructor
      *
      * @param string $name
-     * @param bool   $delete
+     * @param bool $delete
      *
      * @throws \Bot\Exception\BotException
      */
@@ -58,7 +58,7 @@ class TempFile
 
         touch($this->file);
 
-        Debug::isEnabled() && Debug::print('Lock file: ' . realpath($this->file));
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('File: ' . realpath($this->file));
     }
 
     /**

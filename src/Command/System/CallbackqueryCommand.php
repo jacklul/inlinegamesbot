@@ -10,8 +10,8 @@
 
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
-use Bot\Helper\Debug;
 use Bot\Entity\GameManager;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Request;
 
@@ -45,7 +45,7 @@ class CallbackqueryCommand extends SystemCommand
         $callback_query = $this->getUpdate()->getCallbackQuery();
         $data = $callback_query->getData();
 
-        Debug::isEnabled() && Debug::print('Data: ' . $data);
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Data: ' . $data);
 
         $command = explode(';', $data)[0];
 
@@ -73,11 +73,11 @@ class CallbackqueryCommand extends SystemCommand
     /**
      * Validate callback data
      *
-     * @param $data
+     * @param string $data
      *
      * @return bool
      */
-    private function isDataValid($data)
+    private function isDataValid(string $data)
     {
         $data = explode(';', $data);
 

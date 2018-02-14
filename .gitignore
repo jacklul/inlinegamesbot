@@ -13,4 +13,4 @@ bot/config.php
 data/
 
 # Other
-/.htaccess
+.htaccess

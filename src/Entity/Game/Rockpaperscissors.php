@@ -11,7 +11,7 @@
 namespace Bot\Entity\Game;
 
 use Bot\Entity\Game;
-use Bot\Helper\Debug;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Spatie\Emoji\Emoji;
@@ -28,75 +28,35 @@ class Rockpaperscissors extends Game
      *
      * @var string
      */
-    private static $code = 'rps';
+    protected static $code = 'rps';
 
     /**
      * Game name
      *
      * @var string
      */
-    private static $title = 'Rock-Paper-Scissors';
+    protected static $title = 'Rock-Paper-Scissors';
 
     /**
      * Game description
      *
      * @var string
      */
-    private static $description = 'Rock-paper-scissors is game in which each player simultaneously forms one of three shapes with an outstretched hand.';
+    protected static $description = 'Rock-paper-scissors is game in which each player simultaneously forms one of three shapes with an outstretched hand.';
 
     /**
      * Game image (for inline query result)
      *
      * @var string
      */
-    private static $image = 'https://i.imgur.com/1H8HI7n.png';
+    protected static $image = 'https://i.imgur.com/1H8HI7n.png';
 
     /**
      * Order on the game list (inline query result)
      *
      * @var int
      */
-    private static $order = 3;
-
-    /**
-     * @return string
-     */
-    public static function getCode(): string
-    {
-        return self::$code;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getTitle(): string
-    {
-        return self::$title;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getDescription(): string
-    {
-        return self::$description;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getImage(): string
-    {
-        return self::$image;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getOrder(): string
-    {
-        return self::$order;
-    }
+    protected static $order = 3;
 
     /**
      * Game related variables
@@ -140,6 +100,7 @@ class Rockpaperscissors extends Game
 
         $command = $callbackquery_data[1];
 
+        $arg = null;
         if (isset($callbackquery_data[2])) {
             $arg = $callbackquery_data[2];
         }
@@ -152,9 +113,9 @@ class Rockpaperscissors extends Game
             $data['round'] = 1;
             $data['current_turn'] = '';
 
-            Debug::isEnabled() && Debug::print('Game initialization');
-        } elseif (!isset($arg)) {
-            Debug::isEnabled() && Debug::print('No move data received');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game initialization');
+        } elseif ($arg === null) {
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('No move data received');
         }
 
         if (empty($data)) {
@@ -165,18 +126,18 @@ class Rockpaperscissors extends Game
             return $this->answerCallbackQuery(__("This game has ended!"), true);
         }
 
-        Debug::isEnabled() && Debug::print('Argument: ' . $arg);
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Argument: ' . $arg);
 
         if (isset($arg)) {
             if (in_array($arg, ['R', 'P', 'S'])) {
-                if ($this->getCurrentUserId() == $this->getUserId('host') && $data['host_pick'] == '') {
+                if ($this->getCurrentUserId() === $this->getUserId('host') && $data['host_pick'] == '') {
                     $data['host_pick'] = $arg;
-                } elseif ($this->getCurrentUserId() == $this->getUserId('guest') && $data['guest_pick'] == '') {
+                } elseif ($this->getCurrentUserId() === $this->getUserId('guest') && $data['guest_pick'] == '') {
                     $data['guest_pick'] = $arg;
                 }
 
                 if ($this->saveData($this->data)) {
-                    Debug::isEnabled() && Debug::print($this->getCurrentUserMention() . ' picked ' . $arg);
+                    Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' picked ' . $arg);
 
                     /*if ($data['host_pick'] == '' || $data['guest_pick'] == '') {
                         return $this->answerCallbackQuery();
@@ -185,7 +146,7 @@ class Rockpaperscissors extends Game
                     return $this->returnStorageFailure();
                 }
             } else {
-                Debug::isEnabled() && Debug::print('Invalid move data: ' . $arg);
+                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Invalid move data: ' . $arg);
 
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
@@ -211,8 +172,8 @@ class Rockpaperscissors extends Game
 
                     $gameOutput = '<b>' . __("{PLAYER} won this round!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
                 } else {
-                    $data['host_wins'] += 1;
-                    $data['guest_wins'] += 1;
+                    //$data['host_wins'] += 1;
+                    //$data['guest_wins'] += 1;
 
                     $gameOutput = '<b>' . __("This round ended with a draw!") . '</b>' . PHP_EOL;
                 }
@@ -222,11 +183,11 @@ class Rockpaperscissors extends Game
             $guestPick = ' (' . $this->symbols[$data['guest_pick'] . '_short'] . ')';
         }
 
-        if ($data['host_wins'] >= $data['guest_wins'] + 3 || ($data['round'] > 5 && $data['host_wins'] > $data['guest_wins'])) {
+        if ($data['host_wins'] >= 5 || $data['host_wins'] >= $data['guest_wins'] + 3 || ($data['round'] >= 5 && $data['host_wins'] > $data['guest_wins'])) {
             $gameOutput = '<b>' . __("{PLAYER} won the game!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>';
 
             $data['current_turn'] = 'E';
-        } elseif ($data['guest_wins'] >= $data['host_wins'] + 3 || ($data['round'] > 5 && $data['guest_wins'] > $data['host_wins'])) {
+        } elseif ($data['guest_wins'] >= 5 || $data['guest_wins'] >= $data['host_wins'] + 3 || ($data['round'] >= 5 && $data['guest_wins'] > $data['host_wins'])) {
             $gameOutput = '<b>' . __("{PLAYER} won the game!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>';
 
             $data['current_turn'] = 'E';
@@ -247,8 +208,8 @@ class Rockpaperscissors extends Game
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(
-                $this->getUserMention('host') . $hostPick . ' (' . $data['host_wins'] . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . $guestPick . ' (' . $data['guest_wins'] . ')' . PHP_EOL . PHP_EOL . $gameOutput,
-                $this->gameKeyboard($isOver)
+                $this->getUserMention('host') . (($data['host_wins'] > 0 || $data['guest_wins'] > 0) ? ' (' . $data['host_wins'] . ')' : '') . $hostPick . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . (($data['guest_wins'] > 0 || $data['host_wins'] > 0) ? ' (' . $data['guest_wins'] . ')' : '') . $guestPick . PHP_EOL . PHP_EOL . $gameOutput,
+                $this->customGameKeyboard($isOver)
             );
         } else {
             return $this->returnStorageFailure();
@@ -258,31 +219,30 @@ class Rockpaperscissors extends Game
     /**
      * Keyboard for game in progress
      *
-     * @param bool   $isOver
-     * @param string $winner
+     * @param bool $isOver
      *
      * @return InlineKeyboard
      */
-    protected function gameKeyboard($isOver = false, $winner = '')
+    protected function customGameKeyboard(bool $isOver = false)
     {
         if (!$isOver) {
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
                         'text'          => $this->symbols['R'] . ' ' . $this->symbols['R_short'],
-                        'callback_data' => $this->manager->getGame()::getCode() . ';game;R',
+                        'callback_data' => self::getCode() . ';game;R',
                     ]
                 ),
                 new InlineKeyboardButton(
                     [
                         'text'          => $this->symbols['P'] . ' ' . $this->symbols['P_short'],
-                        'callback_data' => $this->manager->getGame()::getCode() . ';game;P',
+                        'callback_data' => self::getCode() . ';game;P',
                     ]
                 ),
                 new InlineKeyboardButton(
                     [
                         'text'          => $this->symbols['S'] . ' ' . $this->symbols['S_short'],
-                        'callback_data' => $this->manager->getGame()::getCode() . ';game;S',
+                        'callback_data' => self::getCode() . ';game;S',
                     ]
                 ),
             ];
@@ -291,7 +251,7 @@ class Rockpaperscissors extends Game
                 new InlineKeyboardButton(
                     [
                         'text'          => __('Play again!'),
-                        'callback_data' => $this->manager->getGame()::getCode() . ';start',
+                        'callback_data' => self::getCode() . ';start',
                     ]
                 ),
             ];
@@ -302,7 +262,7 @@ class Rockpaperscissors extends Game
                 new InlineKeyboardButton(
                     [
                         'text'          => 'DEBUG: ' . 'Restart',
-                        'callback_data' => $this->manager->getGame()::getCode() . ';start',
+                        'callback_data' => self::getCode() . ';start',
                     ]
                 ),
             ];
@@ -312,13 +272,13 @@ class Rockpaperscissors extends Game
             new InlineKeyboardButton(
                 [
                     'text'          => __('Quit'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ';quit',
+                    'callback_data' => self::getCode() . ';quit',
                 ]
             ),
             new InlineKeyboardButton(
                 [
                     'text'          => __('Kick'),
-                    'callback_data' => $this->manager->getGame()::getCode() . ';kick',
+                    'callback_data' => self::getCode() . ';kick',
                 ]
             ),
         ];
@@ -331,12 +291,12 @@ class Rockpaperscissors extends Game
     /**
      * Check whenever game is over
      *
-     * @param $x
-     * @param $y
+     * @param string $x
+     * @param string $y
      *
      * @return string
      */
-    private function isGameOver($x, $y)
+    private function isGameOver(string $x, string $y)
     {
         if ($x == 'P' && $y == 'R') {
             return 'X';

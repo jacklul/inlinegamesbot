@@ -41,7 +41,7 @@ class Language
      *
      * @param string $language
      */
-    public static function set($language = ''): void
+    public static function set(string $language = ''): void
     {
         $t = new Translator();
 
@@ -87,7 +87,7 @@ class Language
     /**
      * Compile .po file into .php array file
      *
-     * @param $language
+     * @param string $language
      */
     private static function compileToArray(string $language): void
     {

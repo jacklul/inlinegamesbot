@@ -36,7 +36,7 @@ class InlinequeryCommand extends SystemCommand
         $articles = [];
 
         foreach ($this->getGamesList() as $game) {
-            /** @var \Bot\Entity\Game\Tictactoe $game_class */
+            /** @var \Bot\Entity\Game $game_class */
             if (class_exists($game_class = $game['class'])) {
                 $articles[] = [
                     'id'                    => $game_class::getCode(),
@@ -83,8 +83,8 @@ class InlinequeryCommand extends SystemCommand
         $games = [];
         if (is_dir(SRC_PATH . '/Entity/Game')) {
             foreach (new \DirectoryIterator(SRC_PATH . '/Entity/Game') as $file) {
-                if (!$file->isDir() && !$file->isDot()) {
-                    /** @var \Bot\Entity\Game\Tictactoe $game_class */
+                if (!$file->isDir() && !$file->isDot() && $file->getExtension() === 'php') {
+                    /** @var \Bot\Entity\Game $game_class */
                     $game_class = '\Bot\Entity\Game\\' . basename($file->getFilename(), '.php');
 
                     $games[] = [
@@ -108,11 +108,11 @@ class InlinequeryCommand extends SystemCommand
     /**
      * Create inline keyboard with button that creates the game session
      *
-     * @param $game_code
+     * @param string $game_code
      *
      * @return InlineKeyboard
      */
-    private function createInlineKeyboard($game_code)
+    private function createInlineKeyboard(string $game_code)
     {
         $inline_keyboard = [
             [

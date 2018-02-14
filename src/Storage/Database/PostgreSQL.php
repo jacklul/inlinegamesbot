@@ -115,12 +115,12 @@ class PostgreSQL
     /**
      * Select data from database
      *
-     * @param $id
+     * @param string $id
      *
      * @return array|bool
      * @throws StorageException
      */
-    public static function selectFromGame($id)
+    public static function selectFromGame(string $id)
     {
         if (!self::isDbConnected()) {
             return false;
@@ -155,13 +155,13 @@ class PostgreSQL
     /**
      * Insert data to database
      *
-     * @param $id
-     * @param $data
+     * @param string $id
+     * @param array $data
      *
      * @return bool
      * @throws StorageException
      */
-    public static function insertToGame($id, $data): bool
+    public static function insertToGame(string $id, array $data): bool
     {
         if (!self::isDbConnected()) {
             return false;
@@ -204,12 +204,12 @@ class PostgreSQL
     /**
      * Delete data from storage
      *
-     * @param $id
+     * @param string $id
      *
      * @return array|bool|mixed
      * @throws StorageException
      */
-    public static function deleteFromGame($id): bool
+    public static function deleteFromGame(string $id): bool
     {
         if (!self::isDbConnected()) {
             return false;
@@ -238,14 +238,14 @@ class PostgreSQL
     /**
      * Basic file-power lock to prevent other process accessing same game
      *
-     * @param $id
+     * @param string $id
      *
      * @return bool
      *
      * @throws StorageException
      * @throws \Bot\Exception\BotException
      */
-    public static function lockGame($id): bool
+    public static function lockGame(string $id): bool
     {
         if (!self::isDbConnected()) {
             return false;
@@ -269,13 +269,13 @@ class PostgreSQL
     /**
      * Unlock the game to allow access from other processes
      *
-     * @param $id
+     * @param string $id
      *
      * @return bool
      *
      * @throws StorageException
      */
-    public static function unlockGame($id): bool
+    public static function unlockGame(string $id): bool
     {
         if (!self::isDbConnected()) {
             return false;
@@ -302,7 +302,7 @@ class PostgreSQL
      * @return array|bool
      * @throws StorageException
      */
-    public static function listFromGame($time = 0)
+    public static function listFromGame(int $time = 0)
     {
         if (!self::isDbConnected()) {
             return false;

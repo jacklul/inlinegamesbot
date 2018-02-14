@@ -11,7 +11,7 @@
 namespace Bot\Monolog;
 
 use Bot\Entity\TempFile;
-use Bot\Helper\Debug;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
@@ -66,12 +66,12 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
      * TelegramBotAdminHandler constructor
      *
      * @param Telegram $telegram
-     * @param bool|int $level
-     * @param bool     $bubble
+     * @param int $level
+     * @param bool $bubble
      *
      * @throws \Bot\Exception\BotException
      */
-    public function __construct(Telegram $telegram, $level = Logger::ERROR, $bubble = true)
+    public function __construct(Telegram $telegram, int $level = Logger::ERROR, bool $bubble = true)
     {
         $this->telegram = $telegram;
         $this->bot_id = $telegram->getBotId();
@@ -109,7 +109,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
         }
 
         if ($message === $this->last_message) {
-            Debug::isEnabled() && Debug::print('Log report prevented - message is a duplicate (session)');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Log report prevented - message is a duplicate (session)');
 
             return false;
         }
@@ -118,14 +118,14 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
         if (isset($reports) && is_array($reports) && count($reports) > 0) {
             foreach ($reports as $report) {
                 if ($report['message'] === $message && $report['time'] + 86400 > $record['datetime']->format('U')) {
-                    Debug::isEnabled() && Debug::print('Log report prevented - message is a duplicate (last 24 hours)');
+                    Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Log report prevented - message is a duplicate (last 24 hours)');
 
                     return false;
                 }
             }
         }
 
-        Debug::isEnabled() && Debug::print('Sending report: ' . $message);
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Sending report: ' . $message);
 
         $success = false;
         foreach ($this->telegram->getAdminList() as $admin) {
@@ -185,7 +185,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
      *
      * @return bool
      */
-    private function addReport($report = []): bool
+    private function addReport(array $report = []): bool
     {
         if (empty($report['message']) || empty($report['time']) || is_null($this->reports_file)) {
             return false;

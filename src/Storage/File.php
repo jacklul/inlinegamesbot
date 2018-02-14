@@ -50,12 +50,12 @@ class File
     /**
      * Read data from the file
      *
-     * @param $id
+     * @param string $id
      *
      * @return array|bool
      * @throws StorageException
      */
-    public static function selectFromGame($id)
+    public static function selectFromGame(string $id)
     {
         if (empty($id)) {
             throw new StorageException('Id is empty!');
@@ -71,13 +71,13 @@ class File
     /**
      * Place data to the file
      *
-     * @param $id
-     * @param $data
+     * @param string $id
+     * @param array $data
      *
      * @return bool
      * @throws StorageException
      */
-    public static function insertToGame($id, $data): bool
+    public static function insertToGame(string $id, array $data): bool
     {
         if (empty($id)) {
             throw new StorageException('Id is empty!');
@@ -99,12 +99,12 @@ class File
     /**
      * Remove data file
      *
-     * @param $id
+     * @param string $id
      *
      * @return bool
      * @throws StorageException
      */
-    public static function deleteFromGame($id): bool
+    public static function deleteFromGame(string $id): bool
     {
         if (empty($id)) {
             throw new StorageException('Id is empty!');
@@ -120,12 +120,12 @@ class File
     /**
      * Lock the file to prevent another process modifying it
      *
-     * @param $id
+     * @param string $id
      *
      * @return bool
      * @throws StorageException
      */
-    public static function lockGame($id): bool
+    public static function lockGame(string $id): bool
     {
         if (empty($id)) {
             throw new StorageException('Id is empty!');
@@ -146,12 +146,12 @@ class File
     /**
      * Unlock the file after
      *
-     * @param $id
+     * @param string $id
      *
      * @return bool
      * @throws StorageException
      */
-    public static function unlockGame($id): bool
+    public static function unlockGame(string $id): bool
     {
         if (empty($id)) {
             throw new StorageException('Id is empty!');
@@ -172,7 +172,7 @@ class File
      * @return array
      * @throws StorageException
      */
-    public static function listFromGame($time = 0): array
+    public static function listFromGame(int $time = 0): array
     {
         if (!is_numeric($time)) {
             throw new StorageException('Time must be a number!');

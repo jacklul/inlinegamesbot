@@ -13,7 +13,7 @@ namespace Bot\Exception;
 use Exception;
 
 /**
- * Exception class used for bot related exception handling
+ * Exception class used for bot logic related exception handling
  */
 class BotException extends Exception
 {

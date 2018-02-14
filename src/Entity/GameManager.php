@@ -10,13 +10,11 @@
 
 namespace Bot\Entity;
 
-use Bot\Entity\Game;
 use Bot\Exception\BotException;
 use Bot\Exception\StorageException;
 use Bot\Helper\Botan;
-use Bot\Helper\Debug;
 use Bot\Helper\Language;
-use Bot\Helper\Storage;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\Commands\Command;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Entities\Update;
@@ -32,14 +30,14 @@ use Longman\TelegramBot\Request;
 class GameManager
 {
     /**
-     * Game ID (inline_message_id)
+     * Game session ID (inline_message_id)
      *
      * @var string
      */
     private $id;
 
     /**
-     * Game object
+     * Current game object
      *
      * @var Game
      */
@@ -48,29 +46,29 @@ class GameManager
     /**
      * Currently used storage class name
      *
-     * @var string|\Bot\Storage\Database\MySQL
+     * @var string|\Bot\Storage\File
      */
     private $storage;
 
     /**
-     * Update object
+     * Telegram Update object
      *
      * @var Update
      */
     private $update;
 
     /**
-     * Game Manager constructor
+     * GameManager constructor
      *
-     * @param string  $id
-     * @param string  $game_code
+     * @param string $id
+     * @param string $game_code
      * @param Command $command
      *
      * @throws BotException
      * @throws StorageException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    public function __construct($id, $game_code, Command $command)
+    public function __construct(string $id, string $game_code, Command $command)
     {
         if (empty($id)) {
             throw new BotException('Id is empty!');
@@ -80,27 +78,27 @@ class GameManager
             throw new BotException('Game code is empty!');
         }
 
-        Debug::isEnabled() && Debug::print('ID: ' . $id);
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('ID: ' . $id);
 
         $this->id = $id;
         $this->update = $command->getUpdate();
 
         try {
-            $this->storage = Storage::getClass();
-            $this->storage::initializeStorage();
+            /** @var \Bot\Storage\File $storage_class */
+            $this->storage = $storage_class = Utilities::getStorageClass();
+            $storage_class::initializeStorage();
         } catch (StorageException $e) {
             $this->notifyAboutStorageFailure();
             throw $e;
         }
 
         if ($game = $this->findGame($game_code)) {
-            $this->game = $game;
+            /** @var \Bot\Entity\Game $game_class */
+            $this->game = $game_class = $game;
 
-            /** @var \Bot\Entity\Game\Tictactoe $class */
-            $class = get_class($this->game);
-            Debug::isEnabled() && Debug::print('Game: ' . $class::getTitle());
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game: ' . $game_class::getTitle());
         } else {
-            Debug::isEnabled() && Debug::print('Game not found');
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game not found');
         }
 
         return $this;
@@ -109,18 +107,18 @@ class GameManager
     /**
      * Find game class based on game code
      *
-     * @param $game_code
+     * @param string $game_code
      *
      * @return Game|bool
      */
-    private function findGame($game_code)
+    private function findGame(string $game_code)
     {
         if (is_dir(SRC_PATH . '/Entity/Game')) {
             foreach (new \DirectoryIterator(SRC_PATH . '/Entity/Game') as $file) {
-                if (!$file->isDir() && !$file->isDot()) {
+                if (!$file->isDir() && !$file->isDot() && $file->getExtension() === 'php') {
                     $game_class = '\Bot\Entity\Game\\' . basename($file->getFilename(), '.php');
 
-                    /** @var \Bot\Entity\Game\Tictactoe $game_class */
+                    /** @var \Bot\Entity\Game $game_class */
                     if ($game_class::getCode() == $game_code) {
                         return new $game_class($this);
                     }
@@ -159,29 +157,29 @@ class GameManager
         $callback_query = $this->getUpdate()->getCallbackQuery();
         $chosen_inline_result = $this->getUpdate()->getChosenInlineResult();
 
-        if (!$this->storage) {
+        if (!$storage_class = $this->storage) {
             return $this->notifyAboutStorageFailure();
         }
 
-        if (!$this->storage::lockGame($this->id)) {
+        if (!$storage_class::lockGame($this->id)) {
             return $this->notifyAboutStorageLock();
         }
 
-        Debug::isEnabled() && Debug::print('BEGIN HANDLING THE GAME');
+        $game_class = $this->game;
+
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('BEGIN HANDLING THE GAME');
 
         try {
             if ($callback_query) {
                 $result = $this->game->handleAction(explode(';', $callback_query->getData())[1]);
+                $storage_class::unlockGame($this->id);
 
-                $this->storage::unlockGame($this->id);
-
-                Botan::track($this->getUpdate(), $this->getGame()::getTitle());  // track game traffic
+                Botan::track($this->getUpdate(), $game_class::getTitle());  // track game traffic
             } elseif ($chosen_inline_result) {
                 $result = $this->game->handleAction('new');
+                $storage_class::unlockGame($this->id);
 
-                $this->storage::unlockGame($this->id);
-
-                Botan::track($this->getUpdate(), $this->getGame()::getTitle() . ' (new session)');  // track new game initialized event
+                Botan::track($this->getUpdate(), $game_class::getTitle() . ' (new session)');  // track new game initialized event
             } else {
                 throw new BotException('Unknown update received!');
             }
@@ -193,7 +191,7 @@ class GameManager
             throw $e;
         }
 
-        Debug::isEnabled() && Debug::print('GAME HANDLED');
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('GAME HANDLED');
 
         Language::set(Language::getDefaultLanguage());      // reset language in case running in getUpdates loop
 
@@ -210,7 +208,7 @@ class GameManager
      */
     private function notifyAboutStorageFailure()
     {
-        Debug::isEnabled() && Debug::print('Storage failure');
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Storage failure');
 
         if ($callback_query = $this->update->getCallbackQuery()) {
             return Request::answerCallbackQuery(
@@ -235,7 +233,7 @@ class GameManager
      */
     protected function notifyAboutStorageLock()
     {
-        Debug::isEnabled() && Debug::print('Storage for this game is locked');
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Storage is locked');
 
         if ($callback_query = $this->update->getCallbackQuery()) {
             return Request::answerCallbackQuery(
@@ -260,7 +258,7 @@ class GameManager
      */
     protected function notifyAboutBotFailure()
     {
-        Debug::isEnabled() && Debug::print('Bot failure');
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Bot failure');
 
         if ($callback_query = $this->update->getCallbackQuery()) {
             return Request::answerCallbackQuery(
