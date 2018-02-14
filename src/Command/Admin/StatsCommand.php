@@ -48,6 +48,9 @@ class StatsCommand extends AdminCommand
             $message = $edited_message;
         }
 
+        $chat_id = null;
+        $data_query = null;
+
         if ($message) {
             $chat_id = $message->getChat()->getId();
         } elseif ($callback_query) {

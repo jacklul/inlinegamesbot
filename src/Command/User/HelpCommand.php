@@ -40,6 +40,9 @@ class HelpCommand extends UserCommand
             $message = $edited_message;
         }
 
+        $chat_id = null;
+        $data_query = null;
+
         if ($message) {
             if (!$message->getChat()->isPrivateChat()) {
                 return Request::emptyResponse();

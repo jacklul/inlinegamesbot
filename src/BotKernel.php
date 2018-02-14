@@ -13,7 +13,6 @@ namespace Bot;
 use Bot\Entity\TempFile;
 use Bot\Exception\BotException;
 use Bot\Exception\StorageException;
-use Bot\Helper\Storage;
 use Bot\Helper\Utilities;
 use Bot\Monolog\TelegramBotAdminHandler;
 use Dotenv\Dotenv;
