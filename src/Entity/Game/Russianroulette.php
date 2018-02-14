@@ -59,13 +59,6 @@ class Russianroulette extends Game
     protected static $order = 4;
 
     /**
-     * Game related variables
-     */
-    protected $max_x;
-    protected $max_y;
-    protected $symbols = [];
-
-    /**
      * Define game symbols (emojis)
      */
     private function defineSymbols()

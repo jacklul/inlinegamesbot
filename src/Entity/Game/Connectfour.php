@@ -57,13 +57,6 @@ class Connectfour extends Game
     protected static $order = 2;
 
     /**
-     * Game related variables
-     */
-    protected $max_x;
-    protected $max_y;
-    protected $symbols = [];
-
-    /**
      * Define game symbols
      */
     private function defineSymbols()

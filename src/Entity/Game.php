@@ -93,6 +93,13 @@ class Game
     protected $query_answered = false;
 
     /**
+     * Game related variables
+     */
+    protected $max_x;
+    protected $max_y;
+    protected $symbols = [];
+
+    /**
      * @return string
      */
     public static function getCode(): string

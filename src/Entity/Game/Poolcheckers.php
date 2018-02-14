@@ -68,9 +68,6 @@ class Poolcheckers extends Game
     /**
      * Game related variables
      */
-    protected $max_x;
-    protected $max_y;
-    protected $symbols = [];
     protected $selection;
 
     /**

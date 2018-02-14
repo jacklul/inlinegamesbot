@@ -57,13 +57,6 @@ class Tictactoe extends Game
     protected static $order = 1;
 
     /**
-     * Game related variables
-     */
-    protected $max_x;
-    protected $max_y;
-    protected $symbols = [];
-
-    /**
      * Define game symbols (emojis)
      */
     private function defineSymbols()

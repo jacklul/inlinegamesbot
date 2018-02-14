@@ -59,11 +59,6 @@ class Rockpaperscissors extends Game
     protected static $order = 3;
 
     /**
-     * Game related variables
-     */
-    protected $symbols = [];
-
-    /**
      * Define game symbols (emojis)
      */
     private function defineSymbols()
