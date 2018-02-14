@@ -904,28 +904,30 @@ class Poolcheckers extends Game
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
         }
 
-        if (isset($this->data['current_turn']) && $this->data['current_turn'] == 'E') {
+        $data = &$this->data['game_data'];
+
+        if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
             return $this->answerCallbackQuery(__("This game has ended!", true));
         }
 
         $this->defineSymbols();
 
-        $this->max_y = count($this->data['board']);
-        $this->max_x = count($this->data['board'][0]);
+        $this->max_y = count($data['board']);
+        $this->max_x = count($data['board'][0]);
 
         if ($this->getUser('host') && $this->getCurrentUserId() === $this->getUserId('host')) {
-            if ($this->data['vote']['host']['surrender']) {
+            if ($data['vote']['host']['surrender']) {
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' surrendered');
 
                 $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
                 $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
 
-                $this->data['current_turn'] = 'E';
+                $data['current_turn'] = 'E';
 
                 if ($this->saveData($this->data)) {
                     return $this->editMessage(
-                        $this->getUserMention('host') . ' (' . (($this->data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($this->data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
-                        $this->gameKeyboard($this->data['board'], 'surrender')
+                        $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
+                        $this->gameKeyboard($data['board'], 'surrender')
                     );
                 } else {
                     return $this->returnStorageFailure();
@@ -933,7 +935,7 @@ class Poolcheckers extends Game
             }
 
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to surrender');
-            $this->data['vote']['host']['surrender'] = true;
+            $data['vote']['host']['surrender'] = true;
 
             if ($this->saveData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
@@ -941,18 +943,18 @@ class Poolcheckers extends Game
                 return $this->returnStorageFailure();
             }
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
-            if ($this->data['vote']['guest']['surrender']) {
+            if ($data['vote']['guest']['surrender']) {
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' surrendered');
 
                 $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
                 $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
 
-                $this->data['current_turn'] = 'E';
+                $data['current_turn'] = 'E';
 
                 if ($this->saveData($this->data)) {
                     return $this->editMessage(
-                        $this->getUserMention('host') . ' (' . (($this->data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($this->data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
-                        $this->gameKeyboard($this->data['board'], 'surrender')
+                        $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
+                        $this->gameKeyboard($data['board'], 'surrender')
                     );
                 } else {
                     return $this->returnStorageFailure();
@@ -960,7 +962,7 @@ class Poolcheckers extends Game
             }
 
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to surrender');
-            $this->data['vote']['guest']['surrender'] = true;
+            $data['vote']['guest']['surrender'] = true;
 
             if ($this->saveData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
@@ -989,17 +991,19 @@ class Poolcheckers extends Game
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
         }
 
-        if (isset($this->data['current_turn']) && $this->data['current_turn'] == 'E') {
+        $data = &$this->data['game_data'];
+
+        if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
             return $this->answerCallbackQuery(__("This game has ended!", true));
         }
 
         $this->defineSymbols();
 
-        $this->max_y = count($this->data['board']);
-        $this->max_x = count($this->data['board'][0]);
+        $this->max_y = count($data['board']);
+        $this->max_x = count($data['board'][0]);
 
-        if ($this->getUser('host') && $this->getCurrentUserId() === $this->getUserId('host') && !$this->data['vote']['host']['draw']) {
-            $this->data['vote']['host']['draw'] = true;
+        if ($this->getUser('host') && $this->getCurrentUserId() === $this->getUserId('host') && !$data['vote']['host']['draw']) {
+            $data['vote']['host']['draw'] = true;
 
             if ($this->saveData($this->data)) {
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to draw');
@@ -1008,8 +1012,8 @@ class Poolcheckers extends Game
             } else {
                 return $this->returnStorageFailure();
             }
-        } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest') && !$this->data['vote']['guest']['draw']) {
-            $this->data['vote']['guest']['draw'] = true;
+        } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest') && !$data['vote']['guest']['draw']) {
+            $data['vote']['guest']['draw'] = true;
 
             if ($this->saveData($this->data)) {
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to draw');
