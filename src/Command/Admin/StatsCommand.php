@@ -11,7 +11,7 @@
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
 use Bot\Entity\GameManager;
-use Bot\Helper\Storage;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
@@ -72,7 +72,7 @@ class StatsCommand extends AdminCommand
         foreach ($games as $game) {
             $data = json_decode($game['data'], true);
             $game_obj = new GameManager($game['id'], $data['game_code'], $this);
-            $game_class = $game->getGame();
+            $game_class = $game_obj->getGame();
             $game_title = $game_class::getTitle();
 
             if (isset($stats['games'][$game_title])) {

@@ -11,7 +11,6 @@
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
 use Bot\Entity\GameManager;
-use Bot\Helper\Storage;
 use Bot\Helper\Utilities;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
@@ -80,14 +79,14 @@ class CleansessionsCommand extends AdminCommand
             if (is_array($inactive) && count($inactive) > 0) {
                 $chat_action_start = 0;
                 $last_request_time = 0;
-                $timelimit = ini_get('max_execution_time') > 0 ?: 59;
+                $timelimit = ini_get('max_execution_time') > 0 ? ini_get('max_execution_time') : 59;
                 $start_time = time();
 
                 $hours = floor($cleanInterval / 3600);
                 $minutes = floor(($cleanInterval / 60) % 60);
                 $seconds = $cleanInterval % 60;
 
-                $data['text'] = 'Cleaning games older than ' . $hours . 'h ' . $minutes . 'm ' . $seconds . 's ' . '... (time limit: ' . $timelimit . ' seconds)';
+                $data['text'] = 'Cleaning games older than ' . $hours . 'h ' . $minutes . 'm ' . $seconds . 's' . '... (time limit: ' . $timelimit . ' seconds)';
 
                 if ($chat_id != $bot_id) {
                     Request::sendMessage($data);
