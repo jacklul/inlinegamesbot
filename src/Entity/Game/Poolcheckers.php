@@ -472,7 +472,7 @@ class Poolcheckers extends Game
      * @return array|bool
      */
 
-    private function possibleMoves(array $board, string $selection, bool $onlykill = false, string $char = '', string $backmultijumpblock = null)
+    private function possibleMoves(array $board, string $selection, bool $onlykill = false, string $char = null, string $backmultijumpblock = null)
     {
         $valid_moves = [];
         $kill = [];

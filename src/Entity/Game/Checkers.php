@@ -469,7 +469,7 @@ class Checkers extends Game
      *
      * @return array|bool
      */
-    private function possibleMoves(array $board, string $selection, bool $onlykill = false, string $char = '')
+    private function possibleMoves(array $board, string $selection, bool $onlykill = false, string $char = null)
     {
         $valid_moves = [];
         $kill = [];

@@ -349,8 +349,12 @@ class Game
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function getUser(string $user, bool $as_json = false)
+    protected function getUser(string $user = null, bool $as_json = false)
     {
+        if ($user === null) {
+            return false;
+        }
+
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint($user . ' (as_json: ' . ($as_json ? 'true' : 'false') . ')');
 
         if ($as_json) {
@@ -414,7 +418,7 @@ class Game
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function getUserId(string $user)
+    protected function getUserId(string $user = null)
     {
         return $this->getUser($user) ? $this->getUser($user)->getId() : false;
     }
@@ -441,7 +445,7 @@ class Game
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function getUserMention(string $user)
+    protected function getUserMention(string $user = null)
     {
         return $this->getUser($user) ? '<a href="tg://user?id=' . $this->getUser($user)->getId() . '">' . filter_var($this->getUser($user)->getFirstName(), FILTER_SANITIZE_SPECIAL_CHARS) . '</a>' : false;
     }
@@ -469,7 +473,7 @@ class Game
      */
     protected function newAction()
     {
-        if ($this->getUser('host') && $this->getCurrentUserId() != $this->getCurrentUserId()) {
+        if ($this->getUser('host')) {
             return $this->answerCallbackQuery(__('This game is already created!'), true);
         }
 

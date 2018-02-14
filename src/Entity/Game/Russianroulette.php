@@ -214,7 +214,7 @@ class Russianroulette extends Game
      *
      * @return InlineKeyboard
      */
-    protected function customGameKeyboard(string $hit = '')
+    protected function customGameKeyboard(string $hit = null)
     {
         $inline_keyboard[] = [
             new InlineKeyboardButton(
