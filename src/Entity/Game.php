@@ -264,8 +264,12 @@ class Game
      * @throws BotException
      * @throws \Bot\Exception\StorageException
      */
-    protected function saveData(array $data): bool
+    protected function saveData(array $data = null): bool
     {
+        if ($data == null) {
+            $data = [];
+        }
+
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Saving game data to database');
 
         /** @var \Bot\Storage\File $storage_class */
@@ -273,6 +277,9 @@ class Game
 
         // Make sure we have the game code in the data array for /cleansessions command!
         $data['game_code'] = static::getCode();
+
+        // Sort it
+        ksort($data);
 
         return $storage_class::insertToGame($this->manager->getId(), $data);
     }
@@ -309,6 +316,7 @@ class Game
      *
      * @param string $text
      * @param InlineKeyboard $reply_markup
+     * @param bool $ignore_error
      *
      * @return ServerResponse|mixed
      *
@@ -316,7 +324,7 @@ class Game
      * @throws \Bot\Exception\StorageException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function editMessage(string $text, InlineKeyboard $reply_markup)
+    protected function editMessage(string $text, InlineKeyboard $reply_markup, bool $ignore_error = false)
     {
         $result = Request::editMessageText(
             [
@@ -328,7 +336,7 @@ class Game
             ]
         );
 
-        if (strpos($result->getDescription(), 'ENTITY_MENTION_USER_INVALID') !== false) {
+        if (strpos($result->getDescription(), 'ENTITY_MENTION_USER_INVALID') !== false && $ignore_error === false) {
             $this->data['settings']['use_old_mentions'] = true;
 
             if ($this->saveData($this->data)) {
@@ -341,7 +349,7 @@ class Game
                         }
                     }
 
-                    return $this->editMessage($text, $reply_markup);
+                    return $this->editMessage($text, $reply_markup, true);
                 }
             }
         }
@@ -514,7 +522,12 @@ class Game
 
         $this->data['players']['host'] = $this->getCurrentUser(true);
         $this->data['players']['guest'] = null;
-        $this->data['data'] = null;
+
+        if (isset($this->data['settings']['use_old_mentions']) && $this->data['settings']['use_old_mentions'] === true) {
+            $this->data['settings']['use_old_mentions'] = false;
+        }
+
+        $this->data['game_data'] = null;
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
@@ -594,7 +607,6 @@ class Game
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Quit (host): ' . $this->getCurrentUserMention());
 
                 $this->data['players']['host'] = null;
-                $this->data['settings']['use_old_mentions'] = false;
 
                 if ($this->saveData($this->data)) {
                     return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
@@ -663,6 +675,7 @@ class Game
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \Bot\Exception\StorageException
      */
     protected function startAction()
     {
@@ -690,7 +703,7 @@ class Game
             return $this->answerCallbackQuery();
         }
 
-        $this->data['data'] = [];
+        $this->data['game_data'] = [];
 
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention());
 
