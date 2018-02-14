@@ -88,7 +88,7 @@ class Tictactoe extends Game
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
         }
 
-        $data = &$this->data['data'];
+        $data = &$this->data;
 
         $this->defineSymbols();
 
