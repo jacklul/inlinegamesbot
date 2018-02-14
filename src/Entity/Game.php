@@ -1034,5 +1034,4 @@ class Game
 
         return $this->answerCallbackQuery();
     }
-
 }

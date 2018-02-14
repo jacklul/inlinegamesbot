@@ -138,10 +138,6 @@ class Rockpaperscissors extends Game
 
                 if ($this->saveData($this->data)) {
                     Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' picked ' . $arg);
-
-                    /*if ($data['host_pick'] == '' || $data['guest_pick'] == '') {
-                        return $this->answerCallbackQuery();
-                    }*/
                 } else {
                     return $this->returnStorageFailure();
                 }

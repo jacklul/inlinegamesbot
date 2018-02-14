@@ -216,5 +216,4 @@ class Utilities
 
         return round($bytes, $precision) . ' ' . $units[$pow];
     }
-
 }
