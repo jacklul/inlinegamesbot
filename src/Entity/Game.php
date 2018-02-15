@@ -72,6 +72,13 @@ class Game
     protected $data;
 
     /**
+     * Old game data
+     *
+     * @var mixed
+     */
+    protected $data_old;
+
+    /**
      * Game Manager object
      *
      * @var GameManager
@@ -174,7 +181,7 @@ class Game
             return $this->returnStorageFailure();
         }
 
-        $data_before = $this->data;
+        $this->data_old = $this->data;
         $action = strtolower(preg_replace("/[^a-zA-Z]+/", "", $action));
         $action = $action . 'Action';
 
@@ -233,24 +240,18 @@ class Game
             Utilities::debugDump(
                 'CRASH' . ($this->manager->getId() ? ' (Session ID: ' . $this->manager->getId() . ')' : ''),
                 [
-                    'Game'               => static::getTitle(),
-                    'Game data (before)' => json_encode($data_before),
-                    'Game data (after)'  => json_encode($this->data),
-                    'Callback data'      => $this->manager->getUpdate()->getCallbackQuery() ? $this->manager->getUpdate()->getCallbackQuery()->getData() : '<not a callback query>',
-                    'Update object'      => json_encode(Utilities::updateToArray($this->manager->getUpdate())),
-                    'Result'             => $result,
+                    'Game'            => static::getTitle(),
+                    'Game data (old)' => json_encode($this->data_old),
+                    'Game data (new)' => json_encode($this->data),
+                    'Callback data'   => $this->manager->getUpdate()->getCallbackQuery() ? $this->manager->getUpdate()->getCallbackQuery()->getData() : '<not a callback query>',
+                    'Update object'   => json_encode(Utilities::updateToArray($this->manager->getUpdate())),
+                    'Result'          => $result,
                 ]
             )
         );
 
-        if ($this->saveData([])) {
-            $result = $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
-
-            if (!$result->isOk()) {
-                return $result;
-            }
-        }
-
+        $this->saveData([]);
+        $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
         return $this->answerCallbackQuery(__('Critical error!', true));
     }
 
@@ -353,6 +354,15 @@ class Game
                     return $this->editMessage($text, $reply_markup, true);
                 }
             }
+        }
+
+        // If editing fails then revert data to avoid desync
+        if (!$result->isOk()) {
+            if (isset($this->data['settings']['use_old_mentions']) && $this->data['settings']['use_old_mentions'] === true) {
+                $this->data_old['settings']['use_old_mentions'] = true;
+            }
+
+            $this->saveData($this->data_old);
         }
 
         return $result;
