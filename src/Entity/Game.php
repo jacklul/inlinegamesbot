@@ -691,13 +691,7 @@ class Game
     protected function startAction()
     {
         if (!$this->getUser('host')) {
-            $result = $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
-
-            if (!$result->isOk()) {
-                return $result;
-            }
-
-            return $this->answerCallbackQuery();
+            return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
         }
 
         if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
@@ -758,9 +752,6 @@ class Game
         }
 
         $current_languge = Language::getCurrentLanguage();
-
-        $this->languages;
-
         $selected_language = $this->languages[0];
 
         $picknext = false;
@@ -782,17 +773,11 @@ class Game
             Language::set($selected_language);
         }
 
-        if ($this->getUser('host') && !$this->getUser('guest')) {
-            $result = $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
-        } elseif ($this->getUser('host') && $this->getUser('guest')) {
-            $result = $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
+        if ($this->getUser('host') && $this->getUser('guest')) {
+            return $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
+        } else {
+            return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
         }
-
-        if (isset($result) && !$result->isOk()) {
-            return $result;
-        }
-
-        return $this->answerCallbackQuery();
     }
 
     /**
