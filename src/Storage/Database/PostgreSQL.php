@@ -256,14 +256,7 @@ class PostgreSQL
         }
 
         self::$lock = new TempFile($id);
-
-        $file = self::$lock->getFile();
-
-        if (!$file) {
-            throw new StorageException('Cannot access lock file!');
-        }
-
-        return flock(fopen($file, "a+"), LOCK_EX);
+        return flock(fopen(self::$lock->getFile(), "a+"), LOCK_EX);
     }
 
     /**
@@ -285,13 +278,11 @@ class PostgreSQL
             throw new StorageException('Id is empty!');
         }
 
-        $file = self::$lock->getFile();
-
-        if (!$file) {
-            throw new StorageException('Cannot access lock file!');
+        if (self::$lock === null) {
+            throw new StorageException('No lock file object!');
         }
 
-        return flock(fopen($file, "a+"), LOCK_UN);
+        return flock(fopen(self::$lock->getFile(), "a+"), LOCK_UN);
     }
 
     /**
