@@ -10,6 +10,7 @@
 
 namespace Bot\Entity;
 
+use Bot\Exception\BotException;
 use Bot\Helper\Utilities;
 
 /**
@@ -53,7 +54,7 @@ class TempFile
         }
 
         if (!is_writable(dirname($this->file))) {
-            $this->file = null;
+            throw new BotException('Couldn\'t create file: ' . $this->file);
         }
 
         touch($this->file);
