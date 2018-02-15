@@ -203,7 +203,7 @@ class Game
                 'message is not modified',          // Editing a message with exactly same content
                 'QUERY_ID_INVALID',                 // Callback query after it expired, or trying to reply to a callback that was already answered
                 'MESSAGE_ID_INVALID',               // Callback query from deleted message, or chooses inline result on message that is no yet delivered to Telegram servers
-                //'ENTITY_MENTION_USER_INVALID',      // User mention ended up somehow invalid
+                'ENTITY_MENTION_USER_INVALID',      // User mention ended up somehow invalid
             ];
 
             if ($result->isOk() || Utilities::strposa($result->getDescription(), $allowedAPIErrors) !== false) {
@@ -316,7 +316,7 @@ class Game
      *
      * @param string $text
      * @param InlineKeyboard $reply_markup
-     * @param bool $ignore_error
+     * @param bool $ignore_mention_error
      *
      * @return ServerResponse|mixed
      *
@@ -324,7 +324,7 @@ class Game
      * @throws \Bot\Exception\StorageException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function editMessage(string $text, InlineKeyboard $reply_markup, bool $ignore_error = false)
+    protected function editMessage(string $text, InlineKeyboard $reply_markup, bool $ignore_mention_error = false)
     {
         $result = Request::editMessageText(
             [
@@ -336,7 +336,8 @@ class Game
             ]
         );
 
-        if (strpos($result->getDescription(), 'ENTITY_MENTION_USER_INVALID') !== false && $ignore_error === false) {
+        // In case mentions in the message fails replace them with regular ones - tryMention()
+        if ($ignore_mention_error === false && strpos($result->getDescription(), 'ENTITY_MENTION_USER_INVALID') !== false) {
             $this->data['settings']['use_old_mentions'] = true;
 
             if ($this->saveData($this->data)) {
