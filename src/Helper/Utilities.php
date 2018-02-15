@@ -45,7 +45,7 @@ class Utilities
      */
     public static function getStorageClass(): string
     {
-        if (!empty($debug_storage = getenv('STORAGE'))) {
+        if (!empty($debug_storage = getenv('STORAGE_CLASS'))) {
             $storage = str_replace('"', '', $debug_storage);
             self::isDebugPrintEnabled() && self::debugPrint('Forcing storage: \'' . $storage . '\'');
         } elseif (getenv('DATABASE_URL')) {
