@@ -211,6 +211,7 @@ class Game
                 'QUERY_ID_INVALID',                 // Callback query after it expired, or trying to reply to a callback that was already answered
                 'MESSAGE_ID_INVALID',               // Callback query from deleted message, or chooses inline result on message that is no yet delivered to Telegram servers
                 'ENTITY_MENTION_USER_INVALID',      // User mention ended up somehow invalid
+                'Too Many Requests',                // Telegram API limit reached
             ];
 
             if ($result->isOk() || Utilities::strposa($result->getDescription(), $allowedAPIErrors) !== false) {
