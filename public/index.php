@@ -11,14 +11,11 @@
 use Bot\BotKernel;
 
 /**
- * Composer autoloader
- */
-require_once __DIR__ . ' /../vendor/autoload.php';
-
-/**
  * Handle webhook request only when it's a POST request
  */
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . ' /../vendor/autoload.php';
+
     try {
         $app = new BotKernel(true);
         $app->run();

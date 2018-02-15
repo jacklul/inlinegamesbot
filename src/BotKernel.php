@@ -25,8 +25,8 @@ use Longman\TelegramBot\TelegramLog;
 use Monolog\Logger;
 
 define("ROOT_PATH", realpath(dirname(__DIR__)));
-define("APP_PATH", ROOT_PATH . '/bot/');
-define("SRC_PATH", ROOT_PATH . '/src/');
+define("APP_PATH", ROOT_PATH . '/bot');
+define("SRC_PATH", ROOT_PATH . '/src');
 
 /**
  * Class BotKernel
@@ -172,7 +172,7 @@ class BotKernel
             'admins'           => [(int)getenv('BOT_ADMIN') ?: 0],
             'commands'         => [
                 'paths'   => [
-                    SRC_PATH . '/Command/',
+                    SRC_PATH . '/Command',
                 ],
                 'configs' => [
                     'cleansessions' => [
@@ -484,6 +484,10 @@ class BotKernel
      */
     private function handleLongPolling(): void
     {
+        if (!defined('STDIN')) {
+            print 'Cannot run this from the webspace!' . PHP_EOL;
+        }
+
         print '[' . date('Y-m-d H:i:s', time()) . '] Running with getUpdates method...' . PHP_EOL;
 
         while (true) {
@@ -518,6 +522,10 @@ class BotKernel
      */
     private function handleWorker(): void
     {
+        if (!defined('STDIN')) {
+            print 'Cannot run this from the webspace!' . PHP_EOL;
+        }
+
         print '[' . date('Y-m-d H:i:s', time()) . '] Initializing worker...' . PHP_EOL;
 
         $interval = 60;
