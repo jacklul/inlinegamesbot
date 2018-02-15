@@ -175,7 +175,7 @@ class BotKernel
                 ],
                 'configs' => [
                     'cleansessions' => [
-                        'clean_interval' => 21600,
+                        'clean_interval' => 86400,
                     ],
                 ],
             ],
@@ -202,7 +202,7 @@ class BotKernel
             'botan'            => [
                 'token'   => getenv('BOTAN_TOKEN'),
                 'options' => [
-                    'timeout' => 5,
+                    'timeout' => 3,
                 ],
             ],
             'cron'             => [
