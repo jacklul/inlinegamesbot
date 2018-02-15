@@ -22,14 +22,14 @@ use Spatie\Emoji\Emoji;
 class Tictactoe extends Game
 {
     /**
-     * Game unique id (for callback queries)
+     * Game unique ID
      *
      * @var string
      */
     protected static $code = 'xo';
 
     /**
-     * Game name
+     * Game name / title
      *
      * @var string
      */
@@ -43,14 +43,14 @@ class Tictactoe extends Game
     protected static $description = 'Tic-tac-toe is a game for two players, X and O, who take turns marking the spaces in a 3×3 grid.';
 
     /**
-     * Game image (for inline query result)
+     * Game thumbnail image
      *
      * @var string
      */
     protected static $image = 'http://i.imgur.com/yU2uexr.png';
 
     /**
-     * Order on the game list (inline query result)
+     * Order on the games list
      *
      * @var int
      */

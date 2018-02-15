@@ -24,14 +24,14 @@ use Spatie\Emoji\Emoji;
 class Rockpaperscissors extends Game
 {
     /**
-     * Game unique id (for callback queries)
+     * Game unique ID
      *
      * @var string
      */
     protected static $code = 'rps';
 
     /**
-     * Game name
+     * Game name / title
      *
      * @var string
      */
@@ -45,14 +45,14 @@ class Rockpaperscissors extends Game
     protected static $description = 'Rock-paper-scissors is game in which each player simultaneously forms one of three shapes with an outstretched hand.';
 
     /**
-     * Game image (for inline query result)
+     * Game thumbnail image
      *
      * @var string
      */
     protected static $image = 'https://i.imgur.com/1H8HI7n.png';
 
     /**
-     * Order on the game list (inline query result)
+     * Order on the games list
      *
      * @var int
      */
@@ -163,9 +163,6 @@ class Rockpaperscissors extends Game
 
                     $gameOutput = '<b>' . __("{PLAYER} won this round!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
                 } else {
-                    //$data['host_wins'] += 1;
-                    //$data['guest_wins'] += 1;
-
                     $gameOutput = '<b>' . __("This round ended with a draw!") . '</b>' . PHP_EOL;
                 }
             }

@@ -24,14 +24,14 @@ use Spatie\Emoji\Emoji;
 class Poolcheckers extends Game
 {
     /**
-     * Game unique id (for callback queries)
+     * Game unique ID
      *
      * @var string
      */
     protected static $code = 'pck';
 
     /**
-     * Game name
+     * Game name / title
      *
      * @var string
      */
@@ -52,14 +52,14 @@ class Poolcheckers extends Game
     protected static $description = 'Checkers is game in which the goal is to capture the other player\'s checkers or make them impossible to move.';
 
     /**
-     * Game image (for inline query result)
+     * Game thumbnail image
      *
      * @var string
      */
     protected static $image = 'https://i.imgur.com/mYuCwKA.jpg';
 
     /**
-     * Order on the game list (inline query result)
+     * Order on the games list
      *
      * @var int
      */

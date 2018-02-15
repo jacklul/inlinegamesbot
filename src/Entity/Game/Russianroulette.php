@@ -24,14 +24,14 @@ use Spatie\Emoji\Emoji;
 class Russianroulette extends Game
 {
     /**
-     * Game unique id (for callback queries)
+     * Game unique ID
      *
      * @var string
      */
     protected static $code = 'rr';
 
     /**
-     * Game name
+     * Game name / title
      *
      * @var string
      */
@@ -45,14 +45,14 @@ class Russianroulette extends Game
     protected static $description = 'Russian roulette is a game of chance in which a player places a single round in a revolver, spins the cylinder, places the muzzle against their head, and pulls the trigger.';
 
     /**
-     * Game image (for inline query result)
+     * Game thumbnail image
      *
      * @var string
      */
     protected static $image = 'https://i.imgur.com/LffxQLK.jpg';
 
     /**
-     * Order on the game list (inline query result)
+     * Order on the games list
      *
      * @var int
      */

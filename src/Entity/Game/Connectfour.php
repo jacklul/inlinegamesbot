@@ -22,14 +22,14 @@ use Spatie\Emoji\Emoji;
 class Connectfour extends Game
 {
     /**
-     * Game unique id (for callback queries)
+     * Game unique ID
      *
      * @var string
      */
     protected static $code = 'c4';
 
     /**
-     * Game name
+     * Game name / title
      *
      * @var string
      */
@@ -43,14 +43,14 @@ class Connectfour extends Game
     protected static $description = 'Connect Four is a connection game in which the players take turns dropping colored discs from the top into a seven-column, six-row vertically suspended grid.';
 
     /**
-     * Game image (for inline query result)
+     * Game thumbnail image
      *
      * @var string
      */
     protected static $image = 'http://i.imgur.com/KgH8blx.jpg';
 
     /**
-     * Order on the game list (inline query result)
+     * Order on the games list
      *
      * @var int
      */

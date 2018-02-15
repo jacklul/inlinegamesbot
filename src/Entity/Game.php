@@ -67,14 +67,14 @@ class Game
     /**
      * Current game data
      *
-     * @var mixed
+     * @var array|null|mixed
      */
     protected $data;
 
     /**
      * Old game data
      *
-     * @var mixed
+     * @var array|null|mixed
      */
     protected $data_old;
 
@@ -291,7 +291,7 @@ class Game
      * @param string $text
      * @param bool $alert
      *
-     * @return ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
@@ -319,7 +319,7 @@ class Game
      * @param InlineKeyboard $reply_markup
      * @param bool $ignore_mention_error
      *
-     * @return ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws BotException
      * @throws \Bot\Exception\StorageException
@@ -342,7 +342,7 @@ class Game
             $this->data['settings']['use_old_mentions'] = true;
 
             if ($this->saveData($this->data)) {
-                if (preg_match_all("/\<a\shref\=\"tg\:\/\/user\?id\=(.*)\"\>.*\<\/a\>/Us", $text, $matches)) {
+                if (preg_match_all("/<a\shref=\"tg:\/\/user\?id=(.*)\">.*<\/a>/Us", $text, $matches)) {
                     for ($i = 0; $i < count($matches[1]); $i++) {
                         if ($matches[1][$i] == $this->getUserId('host')) {
                             $text = str_replace($matches[0][$i], $this->getUser('host')->tryMention(), $text);
@@ -387,7 +387,7 @@ class Game
      * @param string $user
      * @param bool $as_json
      *
-     * @return bool|User
+     * @return User|bool
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -420,7 +420,7 @@ class Game
      *
      * @param bool $as_json
      *
-     * @return User|mixed
+     * @return User|string|null
      *
      * @throws BotException
      */
@@ -456,7 +456,7 @@ class Game
      *
      * @param string $user
      *
-     * @return bool|int
+     * @return int|bool
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -469,7 +469,7 @@ class Game
     /**
      * Get current user id safely (prevent getId() on null)
      *
-     * @return bool|int
+     * @return int|bool
      *
      * @throws BotException
      */
@@ -483,7 +483,7 @@ class Game
      *
      * @param string $user
      *
-     * @return bool|int
+     * @return string|bool
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -500,7 +500,7 @@ class Game
     /**
      * Get current user mention
      *
-     * @return bool|int
+     * @return string|bool
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -519,7 +519,7 @@ class Game
     /**
      * Handle 'new' game action
      *
-     * @return ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -550,7 +550,7 @@ class Game
     /**
      * Handle 'join' game action
      *
-     * @return ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -590,7 +590,7 @@ class Game
     /**
      * Handle 'quit' game action
      *
-     * @return ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -645,7 +645,7 @@ class Game
     /**
      * Handle 'kick' game action
      *
-     * @return ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -682,7 +682,7 @@ class Game
     /**
      * Handle 'start' game action
      *
-     * @return ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -722,7 +722,7 @@ class Game
      *
      * This is just a dummy function.
      *
-     * @return ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -739,7 +739,7 @@ class Game
     /**
      * Change language
      *
-     * @return ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -783,7 +783,7 @@ class Game
     /**
      * This will force a crash (for testing purposes)
      *
-     * @return ServerResponse|mixed
+     * @return ServerResponse|string
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
@@ -949,7 +949,7 @@ class Game
      * @param array $board
      * @param string $winner
      *
-     * @return bool|InlineKeyboard
+     * @return InlineKeyboard|bool
      *
      * @throws BotException
      */
@@ -1067,10 +1067,11 @@ class Game
     /**
      * Handle a case when game data is empty but received a game action request
      *
-     * @return ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \Bot\Exception\StorageException
      */
     protected function handleEmptyData()
     {
