@@ -8,6 +8,7 @@ vendor/
 bot/config.php
 .env*
 !.env.example
+bot/language/*.mo
 
 # Bot data directory
 data/
