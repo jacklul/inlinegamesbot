@@ -17,6 +17,7 @@ use Bot\Helper\Utilities;
 use Bot\Monolog\TelegramBotAdminHandler;
 use Dotenv\Dotenv;
 use Gettext\Translator;
+use GuzzleHttp\Client;
 use Longman\IPTools\Ip;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
@@ -278,6 +279,10 @@ class BotKernel
             $monolog->pushHandler(new TelegramBotAdminHandler($this->telegram, Logger::ERROR));
 
             TelegramLog::initialize($monolog);
+        }
+
+        if (isset($this->config['custom_http_client'])) {
+            Request::setClient(new Client($this->config['custom_http_client']));
         }
 
         if (isset($this->config['commands']['paths'])) {
