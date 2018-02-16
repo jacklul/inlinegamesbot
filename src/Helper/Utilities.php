@@ -130,7 +130,11 @@ class Utilities
      */
     public static function isDebugPrintEnabled(): bool
     {
-        return self::$debug_print_enabled;
+        if (defined("STDIN")) {
+            return self::$debug_print_enabled;
+        }
+
+        return false;
     }
 
     /**

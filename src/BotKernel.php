@@ -118,7 +118,7 @@ class BotKernel
         }
 
         // Load environment variables from file if it exists
-        if (file_exists(ROOT_PATH . '/.env')) {
+        if (class_exists('Dotenv\Dotenv') && file_exists(ROOT_PATH . '/.env')) {
             $env = new Dotenv(ROOT_PATH, file_exists(ROOT_PATH . '/.env_dev') ? '.env_dev' : '.env');
             $env->load();
         }
@@ -486,6 +486,7 @@ class BotKernel
     {
         if (!defined('STDIN')) {
             print 'Cannot run this from the webspace!' . PHP_EOL;
+            return;
         }
 
         print '[' . date('Y-m-d H:i:s', time()) . '] Running with getUpdates method...' . PHP_EOL;
@@ -524,6 +525,7 @@ class BotKernel
     {
         if (!defined('STDIN')) {
             print 'Cannot run this from the webspace!' . PHP_EOL;
+            return;
         }
 
         print '[' . date('Y-m-d H:i:s', time()) . '] Initializing worker...' . PHP_EOL;

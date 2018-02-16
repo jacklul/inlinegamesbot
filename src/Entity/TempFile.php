@@ -67,7 +67,7 @@ class TempFile
      */
     public function __destruct()
     {
-        if ($this->delete && !is_null($this->file)) {
+        if ($this->delete && !is_null($this->file) && file_exists($this->file)) {
             @unlink($this->file);
         }
     }

@@ -599,6 +599,14 @@ class Game
      */
     protected function quitAction()
     {
+        if (!$this->getUser('host') && !$this->getUser('guest')) {
+            if ($this->saveData($this->data)) {
+                return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
+            } else {
+                return $this->returnStorageFailure();
+            }
+        }
+
         if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
         }
