@@ -130,7 +130,7 @@ class Utilities
      */
     public static function isDebugPrintEnabled(): bool
     {
-        if (defined("STDIN")) {
+        if ('cli' === PHP_SAPI) {
             return self::$debug_print_enabled;
         }
 

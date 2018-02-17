@@ -372,13 +372,16 @@ class BotKernel
      */
     private function validateRequest(): bool
     {
-        if (!defined('STDIN')) {
-            if (!empty($this->config['secret']) && isset($_GET['s']) && $_GET['s'] !== $this->config['secret']) {
+        if ('cli' !== PHP_SAPI) {
+            $secret = getenv('BOT_SECRET');
+            $secret_get = isset($_GET['s']) ? $_GET['s'] : '';
+
+            if (!isset($secret, $secret_get) || $secret !== $secret_get) {
                 return false;
             }
 
             if (!empty($this->config['valid_ip'] && is_array($this->config['valid_ip']))) {
-                if ($this->config['validate_request'] && !defined('STDIN')) {
+                if ($this->config['validate_request'] && 'cli' !== PHP_SAPI) {
                     $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
                     foreach (['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR'] as $key) {
                         if (filter_var(isset($_SERVER[$key]) ? $_SERVER[$key] : null, FILTER_VALIDATE_IP)) {
@@ -484,7 +487,7 @@ class BotKernel
      */
     private function handleLongPolling(): void
     {
-        if (!defined('STDIN')) {
+        if ('cli' !== PHP_SAPI) {
             print 'Cannot run this from the webspace!' . PHP_EOL;
             return;
         }
@@ -523,7 +526,7 @@ class BotKernel
      */
     private function handleWorker(): void
     {
-        if (!defined('STDIN')) {
+        if ('cli' !== PHP_SAPI) {
             print 'Cannot run this from the webspace!' . PHP_EOL;
             return;
         }
@@ -589,7 +592,7 @@ class BotKernel
 
         $fh = fopen($file, 'w');
         if (!$fh || !flock($fh, LOCK_EX | LOCK_NB)) {
-            if (defined('STDIN')) {
+            if ('cli' === PHP_SAPI) {
                 echo "There is already another cron task running in the background!" . PHP_EOL;
             }
 
