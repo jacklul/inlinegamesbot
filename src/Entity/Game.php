@@ -504,17 +504,14 @@ class Game
      * @return string|bool
      *
      * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function getCurrentUserMention()
     {
-        if ($this->getCurrentUserId() === $this->getUserId('host')) {
-            return $this->getUserMention('host');
-        } elseif ($this->getCurrentUserId() === $this->getUserId('guest')) {
-            return $this->getUserMention('guest');
+        if (isset($this->data['settings']['use_old_mentions']) && $this->data['settings']['use_old_mentions'] === true) {
+            return $this->getCurrentUser() ? filter_var($this->getCurrentUser()->tryMention(), FILTER_SANITIZE_SPECIAL_CHARS) : false;
         }
 
-        return false;
+        return $this->getCurrentUser() ? '<a href="tg://user?id=' . $this->getCurrentUser()->getId() . '">' . filter_var($this->getCurrentUser()->getFirstName(), FILTER_SANITIZE_SPECIAL_CHARS) . '</a>' : false;
     }
 
     /**
@@ -599,14 +596,6 @@ class Game
      */
     protected function quitAction()
     {
-        if (!$this->getUser('host') && !$this->getUser('guest')) {
-            if ($this->saveData($this->data)) {
-                return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
-            } else {
-                return $this->returnStorageFailure();
-            }
-        }
-
         if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
         }
@@ -615,11 +604,13 @@ class Game
             if ($this->getUser('guest')) {
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Quit, host migration: ' . $this->getCurrentUserMention() . ' => ' . $this->getUserMention('guest'));
 
+                $currentUserMention = $this->getCurrentUserMention();
+
                 $this->data['players']['host'] = $this->data['players']['guest'];
                 $this->data['players']['guest'] = null;
 
                 if ($this->saveData($this->data)) {
-                    return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $this->getCurrentUserMention()]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+                    return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $currentUserMention]) . PHP_EOL . __("{PLAYER_HOST} is is now host.", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
                 } else {
                     return $this->returnStorageFailure();
                 }
@@ -637,10 +628,12 @@ class Game
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Quit (guest): ' . $this->getCurrentUserMention());
 
+            $currentUserMention = $this->getCurrentUserMention();
+
             $this->data['players']['guest'] = null;
 
             if ($this->saveData($this->data)) {
-                return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
+                return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $currentUserMention]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
             } else {
                 return $this->returnStorageFailure();
             }
@@ -716,8 +709,6 @@ class Game
 
             return $this->answerCallbackQuery();
         }
-
-        $this->data['game_data'] = [];
 
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention());
 

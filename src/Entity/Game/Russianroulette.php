@@ -124,7 +124,7 @@ class Russianroulette extends Game
             return $this->answerCallbackQuery(__("This game has ended!"), true);
         }
 
-        if ($this->getCurrentUserId() !== $this->getUserId($data['settings'][$data['current_turn']])) {
+        if ($this->getCurrentUserId() !== $this->getUserId($data['settings'][$data['current_turn']]) && $command !== 'start') {
             return $this->answerCallbackQuery(__("It's not your turn!"), true);
         }
 

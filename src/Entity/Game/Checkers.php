@@ -245,9 +245,7 @@ class Checkers extends Game
                         } else {
                             if ($data['current_selection_lock'] == true) {
                                 return $this->answerCallbackQuery(__("You must make a jump when possible!"), true);
-                            } elseif ($this->getCurrentUserId() === $this->getUserId('host') && $data['current_turn'] == 'X' && strpos($data['board'][$args[0]][$args[1]], 'X') !== false) {
-                                $data['current_selection'] = $args[0] . $args[1];
-                            } elseif ($this->getCurrentUserId() === $this->getUserId('guest') && $data['current_turn'] == 'O' && strpos($data['board'][$args[0]][$args[1]], 'O') !== false) {
+                            } elseif ($this->getCurrentUserId() === $this->getUserId($data['settings'][$data['current_turn']]) && strpos($data['board'][$args[0]][$args[1]], $data['current_turn']) !== false) {
                                 $data['current_selection'] = $args[0] . $args[1];
                             } else {
                                 return $this->answerCallbackQuery(__("Invalid move!"), true);
@@ -255,9 +253,7 @@ class Checkers extends Game
                         }
                     }
                 } elseif ($args[0] !== '' && $args[1] !== '') {
-                    if ($this->getCurrentUserId() === $this->getUserId('host') && $data['current_turn'] == 'X' && strpos($data['board'][$args[0]][$args[1]], 'X') !== false) {
-                        $data['current_selection'] = $args[0] . $args[1];
-                    } elseif ($this->getCurrentUserId() === $this->getUserId('guest') && $data['current_turn'] == 'O' && strpos($data['board'][$args[0]][$args[1]], 'O') !== false) {
+                    if ($this->getCurrentUserId() === $this->getUserId($data['settings'][$data['current_turn']]) && strpos($data['board'][$args[0]][$args[1]], $data['current_turn']) !== false) {
                         $data['current_selection'] = $args[0] . $args[1];
                     } elseif ($command === 'game') {
                         return $this->answerCallbackQuery(__("Invalid selection!"), true);
