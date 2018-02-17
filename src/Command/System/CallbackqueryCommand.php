@@ -10,8 +10,8 @@
 
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
-use Bot\Entity\GameManager;
-use Bot\Helper\Utilities;
+use jacklul\inlinegamesbot\Entity\GameManager;
+use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Request;
 
@@ -36,8 +36,8 @@ class CallbackqueryCommand extends SystemCommand
     /**
      * @return bool|\Longman\TelegramBot\Entities\ServerResponse|mixed
      *
-     * @throws \Bot\Exception\BotException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function execute()

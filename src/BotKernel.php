@@ -8,13 +8,13 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot;
+namespace jacklul\inlinegamesbot;
 
-use Bot\Entity\TempFile;
-use Bot\Exception\BotException;
-use Bot\Exception\StorageException;
-use Bot\Helper\Utilities;
-use Bot\Monolog\TelegramBotAdminHandler;
+use jacklul\inlinegamesbot\Entity\TempFile;
+use jacklul\inlinegamesbot\Exception\BotException;
+use jacklul\inlinegamesbot\Exception\StorageException;
+use jacklul\inlinegamesbot\Helper\Utilities;
+use jacklul\inlinegamesbot\Monolog\TelegramBotAdminHandler;
 use Dotenv\Dotenv;
 use Gettext\Translator;
 use GuzzleHttp\Client;
@@ -624,7 +624,7 @@ class BotKernel
      */
     private function installDb()
     {
-        /** @var \Bot\Storage\File $storage_class */
+        /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
         $storage_class = Utilities::getStorageClass();
 
         print 'Installing storage structure (' . end(explode('\\', $storage_class)) . ')...' . PHP_EOL;

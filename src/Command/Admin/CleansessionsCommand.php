@@ -10,8 +10,8 @@
 
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
-use Bot\Entity\GameManager;
-use Bot\Helper\Utilities;
+use jacklul\inlinegamesbot\Entity\GameManager;
+use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
@@ -34,8 +34,8 @@ class CleansessionsCommand extends AdminCommand
     /**
      * @return \Longman\TelegramBot\Entities\ServerResponse
      *
-     * @throws \Bot\Exception\BotException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     public function execute()
@@ -69,7 +69,7 @@ class CleansessionsCommand extends AdminCommand
             set_time_limit(10);
         }
 
-        /** @var \Bot\Storage\File $storage_class */
+        /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
         $storage_class = Utilities::getStorageClass();
 
         if (class_exists($storage_class)) {

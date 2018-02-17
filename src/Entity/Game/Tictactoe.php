@@ -8,16 +8,16 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Entity\Game;
+namespace jacklul\inlinegamesbot\Entity\Game;
 
-use Bot\Entity\Game;
-use Bot\Helper\Utilities;
+use jacklul\inlinegamesbot\Entity\Game;
+use jacklul\inlinegamesbot\Helper\Utilities;
 use Spatie\Emoji\Emoji;
 
 /**
  * Class Tictactoe
  *
- * @package Bot\Entity\Game
+ * @package jacklul\inlinegamesbot\Entity\Game
  */
 class Tictactoe extends Game
 {
@@ -78,9 +78,9 @@ class Tictactoe extends Game
      *
      * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
      *
-     * @throws \Bot\Exception\BotException
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     protected function gameAction()
     {

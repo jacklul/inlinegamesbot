@@ -8,9 +8,9 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Helper;
+namespace jacklul\inlinegamesbot\Helper;
 
-use Bot\Exception\BotException;
+use jacklul\inlinegamesbot\Exception\BotException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Longman\TelegramBot\Entities\Update;
@@ -20,7 +20,7 @@ use Longman\TelegramBot\Entities\Update;
  *
  * Custom class for pushing stats to botan.io
  *
- * @package Bot\Helper
+ * @package jacklul\inlinegamesbot\Helper
  */
 class Botan
 {

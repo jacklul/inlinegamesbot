@@ -8,7 +8,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-use Bot\BotKernel;
+use jacklul\inlinegamesbot\BotKernel;
 
 /**
  * Handle webhook request only when it's a POST request

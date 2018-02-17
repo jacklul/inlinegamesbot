@@ -8,18 +8,18 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Storage\Database;
+namespace jacklul\inlinegamesbot\Storage\Database;
 
 use AD7six\Dsn\Dsn;
-use Bot\Entity\TempFile;
-use Bot\Exception\StorageException;
+use jacklul\inlinegamesbot\Entity\TempFile;
+use jacklul\inlinegamesbot\Exception\StorageException;
 use PDO;
 use PDOException;
 
 /**
  * Class PostgreSQL
  *
- * @package Bot\Storage\Driver
+ * @package jacklul\inlinegamesbot\Storage\Driver
  */
 class PostgreSQL
 {
@@ -243,7 +243,7 @@ class PostgreSQL
      * @return bool
      *
      * @throws StorageException
-     * @throws \Bot\Exception\BotException
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
      */
     public static function lockGame(string $id): bool
     {

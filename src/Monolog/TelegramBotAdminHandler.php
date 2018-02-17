@@ -8,10 +8,10 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Monolog;
+namespace jacklul\inlinegamesbot\Monolog;
 
-use Bot\Entity\TempFile;
-use Bot\Helper\Utilities;
+use jacklul\inlinegamesbot\Entity\TempFile;
+use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
@@ -23,7 +23,7 @@ use Monolog\Logger;
  *
  * Custom handler sending reports directly to bot admins
  *
- * @package Bot\Monolog\Handler
+ * @package jacklul\inlinegamesbot\Monolog\Handler
  */
 class TelegramBotAdminHandler extends AbstractProcessingHandler
 {
@@ -69,7 +69,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
      * @param int $level
      * @param bool $bubble
      *
-     * @throws \Bot\Exception\BotException
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
      */
     public function __construct(Telegram $telegram, int $level = Logger::ERROR, bool $bubble = true)
     {
@@ -93,7 +93,7 @@ class TelegramBotAdminHandler extends AbstractProcessingHandler
      *
      * @return bool
      *
-     * @throws \Bot\Exception\BotException
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
      */
     protected function write(array $record): bool
     {

@@ -8,16 +8,16 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Storage;
+namespace jacklul\inlinegamesbot\Storage;
 
-use Bot\Exception\StorageException;
+use jacklul\inlinegamesbot\Exception\StorageException;
 
 /**
  * Class File
  *
  * Stores data in json formatted text files
  *
- * @package Bot\Storage\Driver
+ * @package jacklul\inlinegamesbot\Storage\Driver
  */
 class File
 {

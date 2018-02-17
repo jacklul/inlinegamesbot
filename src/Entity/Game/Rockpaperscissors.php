@@ -8,10 +8,10 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Entity\Game;
+namespace jacklul\inlinegamesbot\Entity\Game;
 
-use Bot\Entity\Game;
-use Bot\Helper\Utilities;
+use jacklul\inlinegamesbot\Entity\Game;
+use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Spatie\Emoji\Emoji;
@@ -19,7 +19,7 @@ use Spatie\Emoji\Emoji;
 /**
  * Class Rockpaperscissors
  *
- * @package Bot\Entity\Game
+ * @package jacklul\inlinegamesbot\Entity\Game
  */
 class Rockpaperscissors extends Game
 {
@@ -76,9 +76,9 @@ class Rockpaperscissors extends Game
      *
      * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
      *
-     * @throws \Bot\Exception\BotException
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     protected function gameAction()
     {

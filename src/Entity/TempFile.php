@@ -8,17 +8,17 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Entity;
+namespace jacklul\inlinegamesbot\Entity;
 
-use Bot\Exception\BotException;
-use Bot\Helper\Utilities;
+use jacklul\inlinegamesbot\Exception\BotException;
+use jacklul\inlinegamesbot\Helper\Utilities;
 
 /**
  * Class TempFile
  *
  * A temporary file handler, with removal after it's not used
  *
- * @package Bot\Entity
+ * @package jacklul\inlinegamesbot\Entity
  */
 class TempFile
 {
@@ -42,7 +42,7 @@ class TempFile
      * @param string $name
      * @param bool $delete
      *
-     * @throws \Bot\Exception\BotException
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
      */
     public function __construct($name, $delete = true)
     {

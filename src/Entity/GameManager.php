@@ -8,13 +8,13 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Entity;
+namespace jacklul\inlinegamesbot\Entity;
 
-use Bot\Exception\BotException;
-use Bot\Exception\StorageException;
-use Bot\Helper\Botan;
-use Bot\Helper\Language;
-use Bot\Helper\Utilities;
+use jacklul\inlinegamesbot\Exception\BotException;
+use jacklul\inlinegamesbot\Exception\StorageException;
+use jacklul\inlinegamesbot\Helper\Botan;
+use jacklul\inlinegamesbot\Helper\Language;
+use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Commands\Command;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Entities\Update;
@@ -25,7 +25,7 @@ use Longman\TelegramBot\Request;
  *
  * This the 'manager', it does everything what's required before running a game
  *
- * @package Bot\Manager
+ * @package jacklul\inlinegamesbot\Manager
  */
 class GameManager
 {
@@ -46,7 +46,7 @@ class GameManager
     /**
      * Currently used storage class name
      *
-     * @var string|\Bot\Storage\File
+     * @var string|\jacklul\inlinegamesbot\Storage\File
      */
     private $storage;
 
@@ -84,7 +84,7 @@ class GameManager
         $this->update = $command->getUpdate();
 
         try {
-            /** @var \Bot\Storage\File $storage_class */
+            /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
             $this->storage = $storage_class = Utilities::getStorageClass();
             $storage_class::initializeStorage();
         } catch (StorageException $e) {
@@ -93,7 +93,7 @@ class GameManager
         }
 
         if ($game = $this->findGame($game_code)) {
-            /** @var \Bot\Entity\Game $game_class */
+            /** @var \jacklul\inlinegamesbot\Entity\Game $game_class */
             $this->game = $game_class = $game;
 
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game: ' . $game_class::getTitle());
@@ -116,9 +116,9 @@ class GameManager
         if (is_dir(SRC_PATH . '/Entity/Game')) {
             foreach (new \DirectoryIterator(SRC_PATH . '/Entity/Game') as $file) {
                 if (!$file->isDir() && !$file->isDot() && $file->getExtension() === 'php') {
-                    $game_class = '\Bot\Entity\Game\\' . basename($file->getFilename(), '.php');
+                    $game_class = '\jacklul\inlinegamesbot\Entity\Game\\' . basename($file->getFilename(), '.php');
 
-                    /** @var \Bot\Entity\Game $game_class */
+                    /** @var \jacklul\inlinegamesbot\Entity\Game $game_class */
                     if ($game_class::getCode() == $game_code) {
                         return new $game_class($this);
                     }
@@ -151,6 +151,7 @@ class GameManager
      * @throws BotException
      * @throws StorageException
      * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \Throwable
      */
     public function run()
     {
@@ -188,6 +189,9 @@ class GameManager
             throw $e;
         } catch (StorageException $e) {
             $this->notifyAboutStorageFailure();
+            throw $e;
+        } catch (\Throwable $e) {
+            $this->notifyAboutBotFailure();
             throw $e;
         }
 

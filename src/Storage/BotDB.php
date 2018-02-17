@@ -8,17 +8,17 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Storage;
+namespace jacklul\inlinegamesbot\Storage;
 
-use Bot\Storage\Database\MySQL;
+use jacklul\inlinegamesbot\Storage\Database\MySQL;
 use Longman\TelegramBot\DB;
 
 /**
  * Class BotDB
  *
- * Pulls PDO connection from \Longman\TelegramBot\DB and redirects all calls to \Bot\Storage\MySQL
+ * Pulls PDO connection from \Longman\TelegramBot\DB and redirects all calls to \jacklul\inlinegamesbot\Storage\MySQL
  *
- * @package Bot\Storage\Driver
+ * @package jacklul\inlinegamesbot\Storage\Driver
  */
 class BotDB extends DB
 {
@@ -27,7 +27,7 @@ class BotDB extends DB
      *
      * @return bool
      *
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     public static function initializeStorage(): bool
     {
@@ -39,7 +39,7 @@ class BotDB extends DB
      *
      * @return bool
      *
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     public static function createStructure(): bool
     {
@@ -55,7 +55,7 @@ class BotDB extends DB
      *
      * @return array|bool
      *
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     public static function selectFromGame(string $id)
     {
@@ -70,7 +70,7 @@ class BotDB extends DB
      *
      * @return bool
      *
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     public static function insertToGame(string $id, array $data): bool
     {
@@ -84,7 +84,7 @@ class BotDB extends DB
      *
      * @return bool
      *
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     public static function deleteFromGame(string $id): bool
     {
@@ -98,8 +98,8 @@ class BotDB extends DB
      *
      * @return bool
      *
-     * @throws \Bot\Exception\BotException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     public static function lockGame(string $id): bool
     {
@@ -113,7 +113,7 @@ class BotDB extends DB
      *
      * @return bool
      *
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     public static function unlockGame(string $id): bool
     {
@@ -127,7 +127,7 @@ class BotDB extends DB
      *
      * @return array|bool
      *
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     public static function listFromGame(int $time = 0)
     {

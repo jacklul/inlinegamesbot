@@ -8,7 +8,7 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Helper;
+namespace jacklul\inlinegamesbot\Helper;
 
 use Gettext\Translations;
 use Gettext\Translator;
@@ -18,7 +18,7 @@ use Gettext\Translator;
  *
  * Simple localization class
  *
- * @package Bot\Helper
+ * @package jacklul\inlinegamesbot\Helper
  */
 class Language
 {

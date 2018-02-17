@@ -8,11 +8,11 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Helper;
+namespace jacklul\inlinegamesbot\Helper;
 
 use AD7six\Dsn\Dsn;
-use Bot\Exception\BotException;
-use Bot\Exception\StorageException;
+use jacklul\inlinegamesbot\Exception\BotException;
+use jacklul\inlinegamesbot\Exception\StorageException;
 use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\TelegramLog;
@@ -22,7 +22,7 @@ use Longman\TelegramBot\TelegramLog;
  *
  * Extra functions
  *
- * @package Bot\Helper
+ * @package jacklul\inlinegamesbot\Helper
  */
 class Utilities
 {
@@ -41,7 +41,7 @@ class Utilities
      * @return string
      *
      * @throws StorageException
-     * @throws \Bot\Exception\BotException
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
      */
     public static function getStorageClass(): string
     {
@@ -60,11 +60,11 @@ class Utilities
                 throw new StorageException('Unsupported database type!');
             }
 
-            $storage = 'Bot\Storage\Database\\' . self::$storage_drivers[$dsn['engine']] ?: '';
+            $storage = 'jacklul\inlinegamesbot\Storage\Database\\' . self::$storage_drivers[$dsn['engine']] ?: '';
         } elseif (DB::isDbConnected()) {
-            $storage = 'Bot\Storage\BotDB';
+            $storage = 'jacklul\inlinegamesbot\Storage\BotDB';
         } else {
-            $storage = 'Bot\Storage\File';
+            $storage = 'jacklul\inlinegamesbot\Storage\File';
         }
 
         if (!class_exists($storage)) {

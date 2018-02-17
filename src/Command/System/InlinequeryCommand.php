@@ -36,7 +36,7 @@ class InlinequeryCommand extends SystemCommand
         $articles = [];
 
         foreach ($this->getGamesList() as $game) {
-            /** @var \Bot\Entity\Game $game_class */
+            /** @var \jacklul\inlinegamesbot\Entity\Game $game_class */
             if (class_exists($game_class = $game['class'])) {
                 $articles[] = [
                     'id'                    => $game_class::getCode(),
@@ -84,8 +84,8 @@ class InlinequeryCommand extends SystemCommand
         if (is_dir(SRC_PATH . '/Entity/Game')) {
             foreach (new \DirectoryIterator(SRC_PATH . '/Entity/Game') as $file) {
                 if (!$file->isDir() && !$file->isDot() && $file->getExtension() === 'php') {
-                    /** @var \Bot\Entity\Game $game_class */
-                    $game_class = '\Bot\Entity\Game\\' . basename($file->getFilename(), '.php');
+                    /** @var \jacklul\inlinegamesbot\Entity\Game $game_class */
+                    $game_class = '\jacklul\inlinegamesbot\Entity\Game\\' . basename($file->getFilename(), '.php');
 
                     $games[] = [
                         'class' => $game_class,

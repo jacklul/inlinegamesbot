@@ -8,11 +8,11 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace Bot\Entity;
+namespace jacklul\inlinegamesbot\Entity;
 
-use Bot\Exception\BotException;
-use Bot\Helper\Language;
-use Bot\Helper\Utilities;
+use jacklul\inlinegamesbot\Exception\BotException;
+use jacklul\inlinegamesbot\Helper\Language;
+use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;
@@ -25,7 +25,7 @@ use Longman\TelegramBot\TelegramLog;
  *
  * The "master" class for all games, contains shared methods
  *
- * @package Bot\Entity
+ * @package jacklul\inlinegamesbot\Entity
  */
 class Game
 {
@@ -166,14 +166,14 @@ class Game
      * @throws BotException
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     public function handleAction(string $action)
     {
         if (class_exists($storage_class = $this->manager->getStorage()) && $this->data === null) {
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Reading game data from the database');
 
-            /** @var \Bot\Storage\File $storage_class */
+            /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
             $this->data = $storage_class::selectFromGame($this->manager->getId());
         }
 
@@ -264,7 +264,7 @@ class Game
      * @return bool
      *
      * @throws BotException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     protected function saveData(array $data = null): bool
     {
@@ -274,7 +274,7 @@ class Game
 
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Saving game data to database');
 
-        /** @var \Bot\Storage\File $storage_class */
+        /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
         $storage_class = $this->manager->getStorage();
 
         // Make sure we have the game code in the data array for /cleansessions command!
@@ -323,7 +323,7 @@ class Game
      * @return ServerResponse
      *
      * @throws BotException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function editMessage(string $text, InlineKeyboard $reply_markup, bool $ignore_mention_error = false)
@@ -524,7 +524,7 @@ class Game
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     protected function newAction()
     {
@@ -555,7 +555,7 @@ class Game
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     protected function joinAction()
     {
@@ -595,7 +595,7 @@ class Game
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     protected function quitAction()
     {
@@ -658,7 +658,7 @@ class Game
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     protected function kickAction()
     {
@@ -695,7 +695,7 @@ class Game
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     protected function startAction()
     {
@@ -752,7 +752,7 @@ class Game
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     protected function languageAction()
     {
@@ -1080,7 +1080,7 @@ class Game
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \Bot\Exception\StorageException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     protected function handleEmptyData()
     {
