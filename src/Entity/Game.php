@@ -13,7 +13,7 @@ namespace jacklul\inlinegamesbot\Entity;
 use jacklul\inlinegamesbot\Exception\BotException;
 use jacklul\inlinegamesbot\Helper\Language;
 use jacklul\inlinegamesbot\Helper\Utilities;
-use jacklul\inlinegamesbot\Storage\Cache;
+use jacklul\inlinegamesbot\Helper\Cache;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;

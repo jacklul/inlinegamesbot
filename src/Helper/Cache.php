@@ -8,9 +8,8 @@
  * the LICENSE file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Storage;
+namespace jacklul\inlinegamesbot\Helper;
 
-use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\TelegramLog;
 use Memcache;
 use Memcached;
@@ -18,7 +17,7 @@ use Memcached;
 /**
  * Class Cache
  *
- * @package jacklul\inlinegamesbot\Storage
+ * @package jacklul\inlinegamesbot\Helper
  */
 class Cache
 {
