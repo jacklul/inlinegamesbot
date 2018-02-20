@@ -87,14 +87,12 @@ class Utilities
      * Show debug message and (if enabled) write to debug log
      *
      * @param string $text
-     *
-     * @throws BotException
      */
     public static function debugPrint(string $text): void
     {
         if (self::$debug_print_enabled) {
             if ($text === '') {
-                throw new BotException('Text cannot be empty!');
+                return;
             }
 
             if (TelegramLog::isDebugLogActive()) {
