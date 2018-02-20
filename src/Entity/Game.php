@@ -781,22 +781,6 @@ class Game
     }
 
     /**
-     * This will force a crash (for testing purposes)
-     *
-     * @return ServerResponse|string
-     *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     */
-    protected function crashAction()
-    {
-        if (!getenv('DEBUG')) {
-            return $this->answerCallbackQuery();
-        }
-
-        return '(forced crash)';
-    }
-
-    /**
      * Get specified reply markup
      *
      * @param string $inline_keyboard
@@ -822,18 +806,6 @@ class Game
         }
 
         $inline_keyboard = $this->$inline_keyboard();
-
-        if (getenv('DEBUG')) {
-            $inline_keyboard[] = [
-                new InlineKeyboardButton(
-                    [
-                        'text'          => 'DEBUG: ' . 'CRASH',
-                        'callback_data' => static::getCode() . ';crash',
-                    ]
-                ),
-            ];
-        }
-
         $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
 
         return $inline_keyboard_markup;
