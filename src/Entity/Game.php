@@ -13,6 +13,7 @@ namespace jacklul\inlinegamesbot\Entity;
 use jacklul\inlinegamesbot\Exception\BotException;
 use jacklul\inlinegamesbot\Helper\Language;
 use jacklul\inlinegamesbot\Helper\Utilities;
+use jacklul\inlinegamesbot\Storage\Cache;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;
@@ -170,11 +171,19 @@ class Game
      */
     public function handleAction(string $action)
     {
+        $game_id = $this->manager->getId();
         if (class_exists($storage_class = $this->manager->getStorage()) && $this->data === null) {
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Reading game data from the database');
 
-            /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
-            $this->data = $storage_class::selectFromGame($this->manager->getId());
+            $cached_data = Cache::get($game_id);
+            if ($cached_data !== null) {
+                $this->data = json_decode($cached_data, true);
+            }
+
+            if (empty($this->data)) {
+                /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
+                $this->data = $storage_class::selectFromGame($game_id);
+            }
         }
 
         if ($this->data === null || $this->data === false) {
@@ -283,6 +292,7 @@ class Game
         // Sort it
         ksort($data);
 
+        Cache::set($this->manager->getId(), json_encode($data));
         return $storage_class::insertToGame($this->manager->getId(), $data);
     }
 
