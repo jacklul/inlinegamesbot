@@ -42,7 +42,7 @@ class Cache
                     self::$cache->addServer($host, $port);
                 }
 
-                if (!@self::$cache->getStats()) {
+                if (method_exists(self::$cache, 'getStats') && !@self::$cache->getStats()) {
                     Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Initialization failed!');
                     self::$cache = null;
                 }
@@ -63,7 +63,7 @@ class Cache
                     self::$cache->addServer($host, $port);
                 }
 
-                if (!@self::$cache->getStats()) {
+                if (method_exists(self::$cache, 'getStats') && !@self::$cache->getStats()) {
                     Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Initialization failed!');
                     self::$cache = null;
                 }
