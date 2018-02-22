@@ -1,13 +1,15 @@
 {
   "name": "jacklul/inlinegamesbot",
+  "type": "project",
   "description": "A Telegram bot providing games that can be played in any chat.",
   "authors": [
     {
       "name": "Jack'lul",
-      "email": "jacklulcat@gmail.com"
+      "email": "jacklulcat@gmail.com",
+      "homepage": "https://jacklul.github.io",
+      "role": "Developer"
     }
   ],
-  "type": "project",
   "require": {
     "php": "^7.1.0",
     "ext-curl": "*",
