@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "fd2da5eb32c80920bb5bcf45117b18bc",
+    "content-hash": "42db64f24d3aa7f233e31e1ed96dbf42",
     "packages": [
         {
             "name": "ad7six/dsn",
@@ -351,6 +351,52 @@
                 "url"
             ],
             "time": "2017-03-20T17:10:46+00:00"
+        },
+        {
+            "name": "jacklul/monolog-telegram",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jacklul/monolog-telegram.git",
+                "reference": "44e5ca2bb81fa91c595e9708886cd38ade9a22e6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jacklul/monolog-telegram/zipball/44e5ca2bb81fa91c595e9708886cd38ade9a22e6",
+                "reference": "44e5ca2bb81fa91c595e9708886cd38ade9a22e6",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.3",
+                "monolog/monolog": "^1.23",
+                "php": "^5.5|^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "jacklul\\MonologTelegramHandler\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jack'lul",
+                    "email": "jacklulcat@gmail.com",
+                    "homepage": "https://jacklul.github.io",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Sends your logs through Telegram bot to any chat.",
+            "keywords": [
+                "log",
+                "logging",
+                "monolog",
+                "telegram"
+            ],
+            "time": "2018-02-22T18:31:45+00:00"
         },
         {
             "name": "longman/ip-tools",

@@ -19,10 +19,13 @@ use Dotenv\Dotenv;
 use Gettext\Translator;
 use GuzzleHttp\Client;
 use jacklul\inlinegamesbot\Helper\Cache;
+use jacklul\MonologTelegramHandler\TelegramHandler;
 use Longman\IPTools\Ip;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
+use Monolog\Handler\DeduplicationHandler;
+use Monolog\Handler\ErrorLogHandler;
 use Monolog\Logger;
 
 define("ROOT_PATH", realpath(dirname(__DIR__)));
@@ -277,7 +280,7 @@ class BotKernel
             $this->telegram->enableAdmins($this->config['admins']);
 
             $monolog = new Logger($this->config['bot_username']);
-            $monolog->pushHandler(new TelegramBotAdminHandler($this->telegram, Logger::ERROR));
+            $monolog->pushHandler(new DeduplicationHandler(new TelegramHandler($this->config['api_key'], $this->config['admins'][0], Logger::ERROR)));
 
             TelegramLog::initialize($monolog);
         }
