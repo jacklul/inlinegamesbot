@@ -25,7 +25,6 @@ use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
 use Monolog\Handler\DeduplicationHandler;
-use Monolog\Handler\ErrorLogHandler;
 use Monolog\Logger;
 
 define("ROOT_PATH", realpath(dirname(__DIR__)));
