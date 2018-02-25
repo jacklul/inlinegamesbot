@@ -71,6 +71,14 @@ class Poolcheckers extends Game
     protected $selection;
 
     /**
+     * @return string
+     */
+    public static function getTitleExtra(): string
+    {
+        return self::$title_extra;
+    }
+
+    /**
      * Define game symbols (emojis)
      */
     private function defineSymbols()
