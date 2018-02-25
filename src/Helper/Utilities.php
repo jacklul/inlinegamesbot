@@ -47,6 +47,8 @@ class Utilities
         if (!empty($debug_storage = getenv('STORAGE_CLASS'))) {
             $storage = str_replace('"', '', $debug_storage);
             self::isDebugPrintEnabled() && self::debugPrint('Forcing storage: \'' . $storage . '\'');
+        } elseif (DB::isDbConnected()) {
+            $storage = 'jacklul\inlinegamesbot\Storage\BotDB';
         } elseif (getenv('DATABASE_URL')) {
             try {
                 $dsn = Dsn::parse(getenv('DATABASE_URL'));
@@ -60,13 +62,11 @@ class Utilities
             }
 
             $storage = 'jacklul\inlinegamesbot\Storage\Database\\' . self::$storage_drivers[$dsn['engine']] ?: '';
-        } elseif (DB::isDbConnected()) {
-            $storage = 'jacklul\inlinegamesbot\Storage\BotDB';
-        } else {
+        } elseif (defined('DATA_PATH')) {
             $storage = 'jacklul\inlinegamesbot\Storage\File';
         }
 
-        if (!class_exists($storage)) {
+        if (empty($storage) || !class_exists($storage)) {
             throw new StorageException('Storage class doesn\'t exist: ' . $storage);
         }
 

@@ -14,7 +14,6 @@ use jacklul\inlinegamesbot\Entity\TempFile;
 use jacklul\inlinegamesbot\Exception\BotException;
 use jacklul\inlinegamesbot\Exception\StorageException;
 use jacklul\inlinegamesbot\Helper\Utilities;
-use jacklul\inlinegamesbot\Monolog\TelegramBotAdminHandler;
 use Dotenv\Dotenv;
 use Gettext\Translator;
 use GuzzleHttp\Client;
@@ -128,11 +127,9 @@ class BotKernel
             $env->load();
         }
 
-        // Set custom data path if variable exists, otherwise use 'data' directory
+        // Set custom data path if variable exists, otherwise do not use anything
         if (!empty($data_path = getenv('DATA_PATH'))) {
-            define("DATA_PATH", str_replace('"', '', $data_path));
-        } else {
-            define("DATA_PATH", ROOT_PATH . '/data/');
+            define('DATA_PATH', str_replace('"', '', str_replace('./', ROOT_PATH . '/', $data_path)));
         }
 
         if (getenv('DEBUG')) {
@@ -591,7 +588,7 @@ class BotKernel
         $commands = [];
 
         $cronlock = new TempFile('cron');
-        $file = $cronlock->getFile();
+        $file = $cronlock->getFile()->getPathname();
 
         if ($file === null) {
             exit("Couldn't obtain lockfile!" . PHP_EOL);
@@ -629,7 +626,6 @@ class BotKernel
     /**
      * Handle installing database structure
      *
-     * @throws BotException
      * @throws StorageException
      */
     private function installDb()

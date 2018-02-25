@@ -46,11 +46,16 @@ class Language
         $t = new Translator();
 
         if (file_exists(APP_PATH . '/language/messages.' . $language . '.po')) {
-            if (!file_exists(DATA_PATH . '/language/messages.' . $language . '.cache') || md5_file(APP_PATH . '/language/messages.' . $language . '.po') != file_get_contents(DATA_PATH . '/language/messages.' . $language . '.cache')) {
-                self::compileToArray($language);
-            }
+            if (defined('DATA_PATH') && is_writable(DATA_PATH . '/language/')) {
+                if (!file_exists(DATA_PATH . '/language/messages.' . $language . '.cache') || md5_file(APP_PATH . '/language/messages.' . $language . '.po') != file_get_contents(DATA_PATH . '/language/messages.' . $language . '.cache')) {
+                    self::compileToArray($language);
+                }
 
-            $t->loadTranslations(DATA_PATH . '/language/messages.' . $language . '.php');
+                $t->loadTranslations(DATA_PATH . '/language/messages.' . $language . '.php');
+            } else {
+                $translations = Translations::fromPoFile(APP_PATH . '/language/messages.' . $language . '.po');
+                $t->loadTranslations($translations);
+            }
 
             self::$current_language = $language;
         } else {
@@ -91,7 +96,7 @@ class Language
      */
     private static function compileToArray(string $language): void
     {
-        if (!file_exists(DATA_PATH . '/language/messages.' . $language . '/.php')) {
+        if (defined('DATA_PATH') && !file_exists(DATA_PATH . '/language/messages.' . $language . '/.php')) {
             $translation = Translations::fromPoFile(APP_PATH . '/language/messages.' . $language . '.po');
 
             if (!is_dir(DATA_PATH . '/language/')) {

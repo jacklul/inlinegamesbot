@@ -23,11 +23,16 @@ class File
 {
     /**
      * Initialize - define paths
+     * @throws StorageException
      */
     public static function initializeStorage(): bool
     {
         if (!defined('STORAGE_GAME_PATH')) {
-            define("STORAGE_GAME_PATH", DATA_PATH . '/game');
+            if (!defined('DATA_PATH')) {
+                throw new StorageException('Data path is not set!');
+            }
+
+            define('STORAGE_GAME_PATH', DATA_PATH . '/game');
 
             if (!is_dir(STORAGE_GAME_PATH)) {
                 mkdir(STORAGE_GAME_PATH, 0755, true);
