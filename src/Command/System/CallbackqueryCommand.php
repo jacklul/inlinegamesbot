@@ -39,6 +39,7 @@ class CallbackqueryCommand extends SystemCommand
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \Throwable
      */
     public function execute()
     {

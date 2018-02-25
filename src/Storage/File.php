@@ -183,6 +183,7 @@ class File
             throw new StorageException('Time must be a number!');
         }
 
+        // For performance reasons this storage handler won't be returning entry data here
         $ids = [];
         foreach (new \DirectoryIterator(STORAGE_GAME_PATH) as $file) {
             if (!$file->isDir() && !$file->isDot() && $file->getMTime() + $time < time()) {

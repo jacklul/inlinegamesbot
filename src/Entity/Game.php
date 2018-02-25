@@ -272,7 +272,6 @@ class Game
      *
      * @return bool
      *
-     * @throws BotException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     protected function saveData(array $data = null): bool
@@ -382,7 +381,6 @@ class Game
     /**
      * Returns notice about storage failure (error while saving mostly)
      *
-     * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function returnStorageFailure()
@@ -400,7 +398,6 @@ class Game
      *
      * @return User|bool
      *
-     * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function getUser(string $user = null, bool $as_json = false)
@@ -469,7 +466,6 @@ class Game
      *
      * @return int|bool
      *
-     * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function getUserId(string $user = null)
@@ -496,7 +492,6 @@ class Game
      *
      * @return string|bool
      *
-     * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function getUserMention(string $user = null)
@@ -796,8 +791,6 @@ class Game
      * @param string $inline_keyboard
      *
      * @return InlineKeyboard
-     *
-     * @throws BotException
      */
     protected function getReplyMarkup(string $inline_keyboard = null)
     {
@@ -932,8 +925,6 @@ class Game
      * @param string $winner
      *
      * @return InlineKeyboard|bool
-     *
-     * @throws BotException
      */
     protected function gameKeyboard(array $board, string $winner = null)
     {
@@ -1023,8 +1014,6 @@ class Game
      * Debug print of game board
      *
      * @param array $board
-     *
-     * @throws BotException
      */
     protected function boardPrint(array $board)
     {
