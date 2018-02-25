@@ -19,7 +19,7 @@ use PDOException;
 /**
  * Class PostgreSQL
  *
- * @package jacklul\inlinegamesbot\Storage\Driver
+ * @package jacklul\inlinegamesbot\Storage\Database
  */
 class PostgreSQL
 {

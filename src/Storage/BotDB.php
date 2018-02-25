@@ -18,7 +18,7 @@ use Longman\TelegramBot\DB;
  *
  * Pulls PDO connection from \Longman\TelegramBot\DB and redirects all calls to \jacklul\inlinegamesbot\Storage\MySQL
  *
- * @package jacklul\inlinegamesbot\Storage\Driver
+ * @package jacklul\inlinegamesbot\Storage
  */
 class BotDB extends DB
 {

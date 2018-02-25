@@ -41,7 +41,6 @@ class Utilities
      * @return string
      *
      * @throws StorageException
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
      */
     public static function getStorageClass(): string
     {

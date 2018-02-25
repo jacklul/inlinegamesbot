@@ -25,7 +25,7 @@ use Longman\TelegramBot\Request;
  *
  * This the 'manager', it does everything what's required before running a game
  *
- * @package jacklul\inlinegamesbot\Manager
+ * @package jacklul\inlinegamesbot\Entity
  */
 class GameManager
 {

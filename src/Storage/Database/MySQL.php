@@ -19,7 +19,7 @@ use PDOException;
 /**
  * Class MySQL
  *
- * @package jacklul\inlinegamesbot\Storage\Driver
+ * @package jacklul\inlinegamesbot\Storage\Database
  */
 class MySQL
 {

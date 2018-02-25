@@ -14,6 +14,8 @@ use Exception;
 
 /**
  * Exception class used for bot logic related exception handling
+ *
+ * @package jacklul\inlinegamesbot\Exception
  */
 class BotException extends Exception
 {

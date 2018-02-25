@@ -35,6 +35,8 @@ define("SRC_PATH", ROOT_PATH . '/src');
  * Class BotKernel
  *
  * This is the master loader kernel class, contains console commands and essential code for bootstrapping the bot
+ *
+ * @package jacklul\inlinegamesbot
  */
 class BotKernel
 {

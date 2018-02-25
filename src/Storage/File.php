@@ -17,7 +17,7 @@ use jacklul\inlinegamesbot\Exception\StorageException;
  *
  * Stores data in json formatted text files
  *
- * @package jacklul\inlinegamesbot\Storage\Driver
+ * @package jacklul\inlinegamesbot\Storage
  */
 class File
 {

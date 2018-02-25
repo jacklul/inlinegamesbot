@@ -14,6 +14,8 @@ use Exception;
 
 /**
  * Exception class used for bot storage related exception handling
+ *
+ * @package jacklul\inlinegamesbot\Exception
  */
 class StorageException extends Exception
 {
