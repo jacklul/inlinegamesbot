@@ -11,6 +11,11 @@
 use jacklul\inlinegamesbot\BotKernel;
 
 /**
+ * Do not display errors
+ */
+ini_set("display_errors", false);
+
+/**
  * Handle webhook request only when it's a POST request
  */
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') {
