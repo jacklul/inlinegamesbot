@@ -68,7 +68,7 @@ class Cache
                     self::$cache = null;
                 }
             } catch (\Throwable $e) {
-                error_log($e);
+                TelegramLog::error($e);
                 self::$cache = null;
             }
         }
