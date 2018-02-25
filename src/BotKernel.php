@@ -17,7 +17,6 @@ use jacklul\inlinegamesbot\Helper\Utilities;
 use Dotenv\Dotenv;
 use Gettext\Translator;
 use GuzzleHttp\Client;
-use jacklul\inlinegamesbot\Helper\Cache;
 use jacklul\MonologTelegramHandler\TelegramFormatter;
 use jacklul\MonologTelegramHandler\TelegramHandler;
 use Longman\IPTools\Ip;
@@ -330,8 +329,6 @@ class BotKernel
                 $this->telegram->enableLimiter();
             }
         }
-
-        Cache::initialize();
     }
 
     /**

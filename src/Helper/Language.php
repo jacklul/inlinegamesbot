@@ -46,7 +46,7 @@ class Language
         $t = new Translator();
 
         if (file_exists(APP_PATH . '/language/messages.' . $language . '.po')) {
-            if (defined('DATA_PATH') && is_writable(DATA_PATH . '/language/')) {
+            if (defined('DATA_PATH')) {
                 if (!file_exists(DATA_PATH . '/language/messages.' . $language . '.cache') || md5_file(APP_PATH . '/language/messages.' . $language . '.po') != file_get_contents(DATA_PATH . '/language/messages.' . $language . '.cache')) {
                     self::compileToArray($language);
                 }
