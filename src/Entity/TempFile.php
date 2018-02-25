@@ -47,17 +47,23 @@ class TempFile
      */
     public function __construct($name, $delete = true)
     {
-        $this->file = sys_get_temp_dir() . '/' . md5(__DIR__);
         $this->delete = $delete;
+
+        if (defined('DATA_PATH')) {
+            $this->file = DATA_PATH . '/tmp/' . $name . '.tmp';
+        } else {
+            $this->file = sys_get_temp_dir() . '/' . md5(__DIR__) . '/' . $name . '.tmp';
+        }
 
         if (!is_dir(dirname($this->file))) {
             mkdir(dirname($this->file), 0755, true);
         }
 
-        if (!touch($this->file)) {
-            throw new BotException('Couldn\'t create file: ' . $this->file);
+        if (!is_writable(dirname($this->file))) {
+            throw new BotException('Destination path is not writable: ' . dirname($this->file));
         }
 
+        touch($this->file);
         $this->file = new SplFileInfo($this->file);
 
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint('File: ' . realpath($this->file));
