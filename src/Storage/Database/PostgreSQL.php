@@ -236,7 +236,7 @@ class PostgreSQL
     }
 
     /**
-     * Basic file-power lock to prevent other process accessing same game
+     * Basic file-powered lock to prevent other process accessing same game
      *
      * @param string $id
      *
@@ -282,7 +282,7 @@ class PostgreSQL
             throw new StorageException('No lock file object!');
         }
 
-        return flock(fopen(self::$lock->getFile(), "a+"), LOCK_UN);
+        return flock(fopen(self::$lock->getFile()->getPathname(), "a+"), LOCK_UN);
     }
 
     /**
@@ -319,7 +319,6 @@ class PostgreSQL
             );
 
             $date = date('Y-m-d H:i:s', strtotime('-' . abs($time) . ' seconds'));
-
             $sth->bindParam(':date', $date, PDO::PARAM_STR);
 
             if ($result = $sth->execute()) {

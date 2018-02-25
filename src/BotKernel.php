@@ -18,6 +18,7 @@ use Dotenv\Dotenv;
 use Gettext\Translator;
 use GuzzleHttp\Client;
 use jacklul\inlinegamesbot\Helper\Cache;
+use jacklul\MonologTelegramHandler\TelegramFormatter;
 use jacklul\MonologTelegramHandler\TelegramHandler;
 use Longman\IPTools\Ip;
 use Longman\TelegramBot\Request;
@@ -126,6 +127,9 @@ class BotKernel
             $env = new Dotenv(ROOT_PATH, file_exists(ROOT_PATH . '/.env_dev') ? '.env_dev' : '.env');
             $env->load();
         }
+
+        // Do not display errors by default
+        ini_set('display_errors', (getenv("DEBUG") ? 1 : 0));
 
         // Set custom data path if variable exists, otherwise do not use anything
         if (!empty($data_path = getenv('DATA_PATH'))) {
@@ -278,7 +282,9 @@ class BotKernel
             $this->telegram->enableAdmins($this->config['admins']);
 
             $monolog = new Logger($this->config['bot_username']);
-            $monolog->pushHandler(new DeduplicationHandler(new TelegramHandler($this->config['api_key'], $this->config['admins'][0], Logger::ERROR)));
+            $telegram_handler = new TelegramHandler($this->config['api_key'], $this->config['admins'][0], Logger::ERROR);
+            $telegram_handler->setFormatter(new TelegramFormatter());
+            $monolog->pushHandler(new DeduplicationHandler($telegram_handler, defined('DATA_PATH') ? DATA_PATH . '/monolog-dedup.log' : null));
 
             TelegramLog::initialize($monolog);
         }
@@ -384,7 +390,7 @@ class BotKernel
                 return false;
             }
 
-            if (!empty($this->config['valid_ip'] && is_array($this->config['valid_ip']))) {
+            if (isset($this->config['valid_ip']) && !empty($this->config['valid_ip'] && is_array($this->config['valid_ip']))) {
                 if ($this->config['validate_request'] && 'cli' !== PHP_SAPI) {
                     $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
                     foreach (['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR'] as $key) {

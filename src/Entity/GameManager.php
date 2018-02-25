@@ -157,10 +157,7 @@ class GameManager
     {
         $callback_query = $this->getUpdate()->getCallbackQuery();
         $chosen_inline_result = $this->getUpdate()->getChosenInlineResult();
-
-        if (!$storage_class = $this->storage) {
-            return $this->notifyAboutStorageFailure();
-        }
+        $storage_class = $this->storage;
 
         if (!$storage_class::lockGame($this->id)) {
             return $this->notifyAboutStorageLock();
@@ -191,7 +188,7 @@ class GameManager
             $this->notifyAboutStorageFailure();
             throw $e;
         } catch (\Throwable $e) {
-            $this->notifyAboutBotFailure();
+            $this->notifyAboutUnknownFailure();
             throw $e;
         }
 
@@ -203,36 +200,10 @@ class GameManager
     }
 
     /**
-     * Show information to user that storage is not accessible
-     *
-     * @return ServerResponse
-     *
-     * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     */
-    private function notifyAboutStorageFailure()
-    {
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Storage failure');
-
-        if ($callback_query = $this->update->getCallbackQuery()) {
-            return Request::answerCallbackQuery(
-                [
-                    'callback_query_id' => $callback_query->getId(),
-                    'text'              => __('Database error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."),
-                    'show_alert'        => true,
-                ]
-            );
-        }
-
-        return Request::emptyResponse();
-    }
-
-    /**
      * Returns notice about storage lock
      *
      * @return ServerResponse
      *
-     * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function notifyAboutStorageLock()
@@ -253,22 +224,63 @@ class GameManager
     }
 
     /**
+     * Show information to user that storage is not accessible
+     *
+     * @return ServerResponse
+     *
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     */
+    private function notifyAboutStorageFailure()
+    {
+        if ($callback_query = $this->update->getCallbackQuery()) {
+            return Request::answerCallbackQuery(
+                [
+                    'callback_query_id' => $callback_query->getId(),
+                    'text'              => __('Database error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."),
+                    'show_alert'        => true,
+                ]
+            );
+        }
+
+        return Request::emptyResponse();
+    }
+
+    /**
      * Returns notice about bot failure
      *
      * @return ServerResponse
      *
-     * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function notifyAboutBotFailure()
     {
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Bot failure');
-
         if ($callback_query = $this->update->getCallbackQuery()) {
             return Request::answerCallbackQuery(
                 [
                     'callback_query_id' => $callback_query->getId(),
                     'text'              => __('Bot error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."),
+                    'show_alert'        => true,
+                ]
+            );
+        }
+
+        return Request::emptyResponse();
+    }
+
+    /**
+     * Returns notice about unknown failure
+     *
+     * @return ServerResponse
+     *
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     */
+    protected function notifyAboutUnknownFailure()
+    {
+        if ($callback_query = $this->update->getCallbackQuery()) {
+            return Request::answerCallbackQuery(
+                [
+                    'callback_query_id' => $callback_query->getId(),
+                    'text'              => __('Unhandled error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."),
                     'show_alert'        => true,
                 ]
             );
