@@ -12,6 +12,7 @@ namespace jacklul\inlinegamesbot\Entity;
 
 use jacklul\inlinegamesbot\Exception\BotException;
 use jacklul\inlinegamesbot\Helper\Utilities;
+use SplFileInfo;
 
 /**
  * Class TempFile
@@ -25,7 +26,7 @@ class TempFile
     /**
      * The temporary file, or false
      *
-     * @var null|string
+     * @var null|SplFileInfo
      */
     private $file = null;
 
@@ -46,24 +47,24 @@ class TempFile
      */
     public function __construct($name, $delete = true)
     {
-        $this->file = DATA_PATH . '/tmp/' . $name . '.tmp';
+        $this->file = sys_get_temp_dir() . '/' . md5(__DIR__);
         $this->delete = $delete;
 
         if (!is_dir(dirname($this->file))) {
             mkdir(dirname($this->file), 0755, true);
         }
 
-        if (!is_writable(dirname($this->file))) {
+        if (!touch($this->file)) {
             throw new BotException('Couldn\'t create file: ' . $this->file);
         }
 
-        touch($this->file);
+        $this->file = new SplFileInfo($this->file);
 
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint('File: ' . realpath($this->file));
     }
 
     /**
-     * Delete the file when script ends
+     * Delete the file when script ends (unless specified to not)
      */
     public function __destruct()
     {
@@ -75,7 +76,7 @@ class TempFile
     /**
      * Get the file path or false
      *
-     * @return null|string
+     * @return null|SplFileInfo
      */
     public function getFile()
     {

@@ -256,7 +256,7 @@ class PostgreSQL
         }
 
         self::$lock = new TempFile($id);
-        return flock(fopen(self::$lock->getFile(), "a+"), LOCK_EX);
+        return flock(fopen(self::$lock->getFile()->getPathname(), "a+"), LOCK_EX);
     }
 
     /**
