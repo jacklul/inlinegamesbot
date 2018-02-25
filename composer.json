@@ -28,6 +28,9 @@
     "google/cloud-datastore": "^1.3",
     "squizlabs/php_codesniffer": "*"
   },
+  "suggest": {
+    "google/cloud-datastore": "Required for GoogleCloudDatastore storage handler"
+  },
   "autoload": {
     "psr-4": {
       "jacklul\\inlinegamesbot\\": "src/"
