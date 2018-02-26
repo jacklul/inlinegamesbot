@@ -171,11 +171,11 @@ class Rockpaperscissors extends Game
             $guestPick = ' (' . $this->symbols[$data['guest_pick'] . '_short'] . ')';
         }
 
-        if ($data['host_wins'] >= 5 || $data['host_wins'] >= $data['guest_wins'] + 3 || ($data['round'] >= 5 && $data['host_wins'] > $data['guest_wins'])) {
+        if (($data['host_wins'] >= 3 && $data['host_wins'] > $data['guest_wins']) || $data['host_wins'] >= $data['guest_wins'] + 3 || ($data['round'] > 5 && $data['host_wins'] > $data['guest_wins'])) {
             $gameOutput = '<b>' . __("{PLAYER} won the game!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>';
 
             $data['current_turn'] = 'E';
-        } elseif ($data['guest_wins'] >= 5 || $data['guest_wins'] >= $data['host_wins'] + 3 || ($data['round'] >= 5 && $data['guest_wins'] > $data['host_wins'])) {
+        } elseif (($data['guest_wins'] >= 3 && $data['guest_wins'] > $data['host_wins']) || $data['guest_wins'] >= $data['host_wins'] + 3 || ($data['round'] > 5 && $data['guest_wins'] > $data['host_wins'])) {
             $gameOutput = '<b>' . __("{PLAYER} won the game!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>';
 
             $data['current_turn'] = 'E';
