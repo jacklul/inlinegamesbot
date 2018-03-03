@@ -56,7 +56,6 @@ class GoogleCloudDatastore
             if (isset($_SERVER['CURRENT_VERSION_ID']) || isset($_SERVER['GAE_VERSION'])) {
                 $config['httpHandler'] = new Guzzle6HttpHandler(
                     new Client([
-                        'base_uri' => 'https://api.telegram.org',
                         'handler'  => new \GuzzleHttp\Handler\StreamHandler(),
                         'verify'   => false,
                     ])
