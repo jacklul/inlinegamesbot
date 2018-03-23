@@ -281,9 +281,14 @@ class BotKernel
             $this->telegram->enableAdmins($this->config['admins']);
 
             $monolog = new Logger($this->config['bot_username']);
-            $telegram_handler = new TelegramHandler($this->config['api_key'], $this->config['admins'][0], Logger::ERROR);
+            $telegram_handler = new TelegramHandler($this->config['api_key'], (int)$this->config['admins'][0], Logger::ERROR);
             $telegram_handler->setFormatter(new TelegramFormatter());
-            $monolog->pushHandler(new DeduplicationHandler($telegram_handler, defined('DATA_PATH') ? DATA_PATH . '/monolog-dedup.log' : null));
+
+            if (defined('DATA_PATH')) {
+                $monolog->pushHandler(new DeduplicationHandler($telegram_handler, DATA_PATH . '/monolog-dedup.log'));
+            } else {
+                $monolog->pushHandler($telegram_handler);
+            }
 
             TelegramLog::initialize($monolog);
         }
