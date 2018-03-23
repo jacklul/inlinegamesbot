@@ -1,17 +1,13 @@
-# PHPStorm
-.idea/
-
 # Composer
-vendor/
+/vendor/
 
 # Configuration files
-bot/config.php
-.env*
-!.env.example
-bot/language/*.mo
+/bot/config.php
+/.env*
+/!.env.example
 
-# Bot data directory
-data/
+# Data directory
+/data/
 
 # Other
-.htaccess
+/bot/language/*.mo
