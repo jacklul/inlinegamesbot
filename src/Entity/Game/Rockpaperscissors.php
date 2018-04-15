@@ -210,6 +210,7 @@ class Rockpaperscissors extends Game
      * @param bool $isOver
      *
      * @return InlineKeyboard
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function customGameKeyboard(bool $isOver = false)
     {

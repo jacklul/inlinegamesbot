@@ -213,6 +213,7 @@ class Russianroulette extends Game
      * @param string $hit
      *
      * @return InlineKeyboard
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function customGameKeyboard(string $hit = null)
     {

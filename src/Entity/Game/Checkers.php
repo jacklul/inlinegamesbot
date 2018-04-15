@@ -340,8 +340,7 @@ class Checkers extends Game
      * @param int $moveCounter
      *
      * @return InlineKeyboard
-     *
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function gameKeyboard(array $board, string $winner = null, int $moveCounter = 0)
     {

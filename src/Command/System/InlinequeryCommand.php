@@ -111,6 +111,7 @@ class InlinequeryCommand extends SystemCommand
      * @param string $game_code
      *
      * @return InlineKeyboard
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     private function createInlineKeyboard(string $game_code)
     {

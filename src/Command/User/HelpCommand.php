@@ -86,6 +86,7 @@ class HelpCommand extends UserCommand
      * Create inline keyboard
      *
      * @return InlineKeyboard
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     private function createInlineKeyboard()
     {

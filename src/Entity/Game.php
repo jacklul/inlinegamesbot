@@ -186,7 +186,7 @@ class Game
         $action = strtolower(preg_replace("/[^a-zA-Z]+/", "", $action));
         $action = $action . 'Action';
 
-        // Do not throw exception on method not found as users can potentialy manipulate callback data
+        // Do not throw exception on method not found as users can potentially manipulate callback data
         if (!method_exists($this, $action)) {
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Method \'' . $action . '\' doesn\'t exist');
 
@@ -782,6 +782,7 @@ class Game
      * @param string $inline_keyboard
      *
      * @return InlineKeyboard
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function getReplyMarkup(string $inline_keyboard = null)
     {
@@ -809,6 +810,7 @@ class Game
      * Game empty keyboard
      *
      * @return array
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function emptyKeyboard()
     {
@@ -828,6 +830,7 @@ class Game
      * Game in lobby without guest keyboard
      *
      * @return array
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function lobbyKeyboard()
     {
@@ -866,6 +869,7 @@ class Game
      * Game in lobby with guest keyboard
      *
      * @return array
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function pregameKeyboard()
     {
@@ -916,6 +920,7 @@ class Game
      * @param string $winner
      *
      * @return InlineKeyboard|bool
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     protected function gameKeyboard(array $board, string $winner = null)
     {

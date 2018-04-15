@@ -129,6 +129,7 @@ class StatsCommand extends AdminCommand
      * Create inline keyboard that will refresh this message
      *
      * @return InlineKeyboard
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     private function createInlineKeyboard()
     {
