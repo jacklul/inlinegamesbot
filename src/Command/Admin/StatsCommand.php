@@ -20,6 +20,8 @@ use Longman\TelegramBot\Request;
 /**
  * Class StatsCommand
  *
+ * @noinspection PhpUndefinedClassInspection
+ *
  * Extremely simple stats command
  *
  * @package Longman\TelegramBot\Commands\AdminCommands

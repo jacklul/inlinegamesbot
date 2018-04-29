@@ -17,6 +17,8 @@ use Longman\TelegramBot\Commands\SystemCommand;
 /**
  * Class ChoseninlineresultCommand
  *
+ * @noinspection PhpUndefinedClassInspection
+ *
  * Handle event when inline message is pasted into chat, instantly put a player into game
  *
  * @package Longman\TelegramBot\Commands\SystemCommands

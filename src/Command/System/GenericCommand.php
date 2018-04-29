@@ -15,6 +15,8 @@ use Longman\TelegramBot\Commands\SystemCommand;
 /**
  * Class GenericCommand
  *
+ * @noinspection PhpUndefinedClassInspection
+ *
  * Handle unknown commands, basically redirect to /help
  *
  * @package Longman\TelegramBot\Commands\SystemCommands

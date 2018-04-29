@@ -20,6 +20,8 @@ use Longman\TelegramBot\Request;
 /**
  * Class InlinequeryCommand
  *
+ * @noinspection PhpUndefinedClassInspection
+ *
  * Handle incoming inline queries, shows game list no matter what user enters
  *
  * @package Longman\TelegramBot\Commands\SystemCommands

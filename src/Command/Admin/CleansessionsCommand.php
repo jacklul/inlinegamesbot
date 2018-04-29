@@ -20,6 +20,8 @@ use Longman\TelegramBot\Request;
 /**
  * Class CleansessionsCommand
  *
+ * @noinspection PhpUndefinedClassInspection
+ *
  * This command will clean games that were inactive for a longer period and edit their message to indicate that they expired
  *
  * @package Longman\TelegramBot\Commands\AdminCommands

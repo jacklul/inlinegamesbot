@@ -15,6 +15,8 @@ use Longman\TelegramBot\Commands\SystemCommand;
 /**
  * Class StartCommand
  *
+ * @noinspection PhpUndefinedClassInspection
+ *
  * Start command...
  *
  * @package Longman\TelegramBot\Commands\SystemCommands

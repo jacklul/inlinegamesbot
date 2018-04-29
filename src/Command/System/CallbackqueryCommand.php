@@ -18,6 +18,8 @@ use Longman\TelegramBot\Request;
 /**
  * Class CallbackqueryCommand
  *
+ * @noinspection PhpUndefinedClassInspection
+ *
  * Handle button presses
  *
  * @package Longman\TelegramBot\Commands\SystemCommands

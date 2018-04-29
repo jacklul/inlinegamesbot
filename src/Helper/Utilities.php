@@ -11,7 +11,6 @@
 namespace jacklul\inlinegamesbot\Helper;
 
 use AD7six\Dsn\Dsn;
-use jacklul\inlinegamesbot\Exception\BotException;
 use jacklul\inlinegamesbot\Exception\StorageException;
 use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Entities\Update;
@@ -67,6 +66,7 @@ class Utilities
         }
 
         if (empty($storage) || !class_exists($storage)) {
+            /** @noinspection PhpUndefinedVariableInspection */
             throw new StorageException('Storage class doesn\'t exist: ' . $storage);
         }
 

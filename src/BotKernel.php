@@ -148,6 +148,7 @@ class BotKernel
         $config_file = APP_PATH . '/config.php';
         if (file_exists($config_file)) {
             $config = $this->config;
+            /** @noinspection PhpIncludeInspection */
             include $config_file;
 
             if (isset($config) && is_array($config)) {
@@ -366,6 +367,8 @@ class BotKernel
     /**
      * Handle webhook method request
      *
+     * @noinspection PhpUnusedPrivateMethodInspection
+     *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     private function handleWebhook(): void
@@ -411,6 +414,8 @@ class BotKernel
 
     /**
      * Set webhook
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -467,6 +472,8 @@ class BotKernel
     /**
      * Delete webhook
      *
+     * @noinspection PhpUnusedPrivateMethodInspection
+     *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
     private function deleteWebhook(): void
@@ -480,6 +487,11 @@ class BotKernel
         }
     }
 
+    /**
+     * Get webhook info
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection
+     */
     private function webhookInfo(): void
     {
         $result = Request::getWebhookInfo();
@@ -493,6 +505,8 @@ class BotKernel
 
     /**
      * Handle getUpdates method
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
@@ -531,6 +545,8 @@ class BotKernel
 
     /**
      * Handle worker process
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection
      *
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -632,6 +648,8 @@ class BotKernel
 
     /**
      * Handle installing database structure
+     *
+     * @noinspection PhpUnusedPrivateMethodInspection
      *
      * @throws StorageException
      */
