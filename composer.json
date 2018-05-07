@@ -20,7 +20,7 @@
     "gettext/gettext": "^4.3.0",
     "jacklul/monolog-telegram": "^1.0",
     "longman/ip-tools": "^1.2",
-    "longman/telegram-bot": "^0.52.0",
+    "longman/telegram-bot": "^0.53.0",
     "spatie/emoji": "^1.0.6",
     "vlucas/phpdotenv": "^2.4.0"
   },
