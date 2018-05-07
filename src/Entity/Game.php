@@ -277,7 +277,7 @@ class Game
         /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
         $storage_class = $this->manager->getStorage();
 
-        // Make sure we have the game code in the data array for /cleansessions command!
+        // Make sure we have the game code in the data array for /cleansessions and /stats command!
         $data['game_code'] = static::getCode();
 
         // Sort it

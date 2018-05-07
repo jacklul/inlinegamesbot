@@ -23,7 +23,7 @@ use Longman\TelegramBot\Request;
 /**
  * Class GameManager
  *
- * This the 'manager', it does everything what's required before running a game
+ * This is the 'manager', it does everything what's required before running a game
  *
  * @package jacklul\inlinegamesbot\Entity
  */
