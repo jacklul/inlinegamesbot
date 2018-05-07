@@ -337,12 +337,13 @@ class Poolcheckers extends Game
     /**
      * Keyboard for game in progress
      *
-     * @param array $board
+     * @param array  $board
      * @param string $winner
-     * @param int $moveCounter
+     * @param int    $moveCounter
      *
      * @return InlineKeyboard
      * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
      */
     protected function gameKeyboard(array $board, string $winner = null, int $moveCounter = 0)
     {
@@ -434,7 +435,7 @@ class Poolcheckers extends Game
             ),
         ];
 
-        if (getenv('DEBUG')) {
+        if (getenv('DEBUG') && $this->getCurrentUserId() == getenv('BOT_ADMIN')) {
             $this->boardPrint($board);
 
             $inline_keyboard[] = [

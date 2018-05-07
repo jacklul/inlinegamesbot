@@ -916,11 +916,12 @@ class Game
     /**
      * Keyboard for game in progress
      *
-     * @param array $board
+     * @param array  $board
      * @param string $winner
      *
      * @return InlineKeyboard|bool
      * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws BotException
      */
     protected function gameKeyboard(array $board, string $winner = null)
     {
@@ -988,7 +989,7 @@ class Game
             ),
         ];
 
-        if (getenv('DEBUG')) {
+        if (getenv('DEBUG') && $this->getCurrentUserId() == getenv('BOT_ADMIN')) {
             $this->boardPrint($board);
 
             $inline_keyboard[] = [

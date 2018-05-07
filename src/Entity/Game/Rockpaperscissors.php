@@ -211,6 +211,7 @@ class Rockpaperscissors extends Game
      *
      * @return InlineKeyboard
      * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
      */
     protected function customGameKeyboard(bool $isOver = false)
     {
@@ -246,7 +247,7 @@ class Rockpaperscissors extends Game
             ];
         }
 
-        if (getenv('DEBUG')) {
+        if (getenv('DEBUG') && $this->getCurrentUserId() == getenv('BOT_ADMIN')) {
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [

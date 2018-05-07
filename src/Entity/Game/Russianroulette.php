@@ -214,6 +214,7 @@ class Russianroulette extends Game
      *
      * @return InlineKeyboard
      * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
      */
     protected function customGameKeyboard(string $hit = null)
     {
@@ -324,7 +325,7 @@ class Russianroulette extends Game
             ];
         }
 
-        if (getenv('DEBUG')) {
+        if (getenv('DEBUG') && $this->getCurrentUserId() == getenv('BOT_ADMIN')) {
             $inline_keyboard[] = [
                 new InlineKeyboardButton(
                     [
