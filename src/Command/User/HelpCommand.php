@@ -59,7 +59,7 @@ class HelpCommand extends UserCommand
         $text = Emoji::wavingHandSign() . ' ';
         $text .= '<b>' . __('Hi!') . '</b>' . PHP_EOL;
         $text .= __('To begin, start a message with {USAGE} in any of your chats or click the {BUTTON} button and then select a chat.', ['{USAGE}' => '<b>\'@' . $this->getTelegram()->getBotUsername() . ' ...\'</b>', '{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']) . PHP_EOL . PHP_EOL;
-        $text .= __('This bot is open source - click the {BUTTON} button to go the repository.', ['{BUTTON}' => '<b>\'Github\'</b>']) . ' <b>' . __('Please report all issues there!') . '</b>';
+        $text .= __('This bot is open source - click the {BUTTON} button to go to the repository.', ['{BUTTON}' => '<b>\'Github\'</b>']) . ' <b>' . __('Please report all issues there!') . '</b>';
 
         $data = [
             'chat_id'                  => $chat_id,
