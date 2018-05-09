@@ -137,8 +137,7 @@ class File
         }
 
         if (!file_exists(STORAGE_GAME_PATH . '/' . $id . '.json')) {
-            $timestamp = time();
-            file_put_contents(STORAGE_GAME_PATH . '/' . $id . '.json', json_encode(['created_at' => $timestamp, 'updated_at' => $timestamp]));
+            file_put_contents(STORAGE_GAME_PATH . '/' . $id . '.json', "[]");
         }
 
         if (flock(fopen(STORAGE_GAME_PATH . '/' . $id . '.json', "a+"), LOCK_EX)) {
