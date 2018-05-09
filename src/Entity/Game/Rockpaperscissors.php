@@ -113,10 +113,6 @@ class Rockpaperscissors extends Game
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint('No move data received');
         }
 
-        if (empty($data)) {
-            return $this->handleEmptyData();
-        }
-
         if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
             return $this->answerCallbackQuery(__("This game has ended!"), true);
         }

@@ -202,6 +202,12 @@ class Game
             Language::set(Language::getDefaultLanguage());
         }
 
+
+        if (empty($this->data) && $action !== 'newAction') {
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Empty game data found with action expecting it to not be');
+            $action = "handleEmptyData";
+        }
+
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Executing: ' . $action);
 
         $result = $this->$action();
@@ -1045,13 +1051,7 @@ class Game
     {
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Empty game data');
 
-        if ($this->getUser('host') && !$this->getUser('guest')) {
-            $result = $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
-        } elseif ($this->getUser('host') && $this->getUser('guest')) {
-            $result = $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
-        } else {
-            $result = $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
-        }
+        $result = $this->editMessage('<i>' . __("This game session has expired.") . '</i>', $this->getReplyMarkup('empty'));
 
         if (!$result->isOk()) {
             return $result;
