@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-use jacklul\inlinegamesbot\BotKernel;
+use jacklul\inlinegamesbot\BotCore;
 
 /**
  * Composer autoloader
@@ -20,7 +20,7 @@ require_once __DIR__ . ' /../vendor/autoload.php';
  * Run console interface
  */
 try {
-    $app = new BotKernel();
+    $app = new BotCore();
     $app->run();
 } catch (\Throwable $e) {
     print $e;

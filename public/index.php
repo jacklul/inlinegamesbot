@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-use jacklul\inlinegamesbot\BotKernel;
+use jacklul\inlinegamesbot\BotCore;
 
 /**
  * Do not display errors
@@ -22,7 +22,7 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
     require_once __DIR__ . ' /../vendor/autoload.php';
 
     try {
-        $app = new BotKernel(true);
+        $app = new BotCore(true);
         $app->run();
     } catch (\Throwable $e) {
         header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);    // On error return HTTP 500 so that Telegram API can retry request later

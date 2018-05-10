@@ -31,13 +31,13 @@ define("APP_PATH", ROOT_PATH . '/bot');
 define("SRC_PATH", ROOT_PATH . '/src');
 
 /**
- * Class BotKernel
+ * Class BotCore
  *
- * This is the master loader kernel class, contains console commands and essential code for bootstrapping the bot
+ * This is the master loader class, contains console commands and essential code for bootstrapping the bot
  *
  * @package jacklul\inlinegamesbot
  */
-class BotKernel
+class BotCore
 {
     /**
      * Argument passed
