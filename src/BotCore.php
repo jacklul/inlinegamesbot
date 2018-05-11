@@ -127,21 +127,26 @@ class BotCore
             $env->load();
         }
 
+        // Debug mode
+        if (getenv('DEBUG')) {
+            Utilities::setDebugPrint(true);
+        }
+
         // Do not display errors by default
         ini_set('display_errors', (getenv("DEBUG") ? 1 : 0));
+
+        // Set timezone
+        date_default_timezone_set(getenv('TIMEZONE') ?: 'UTC');
 
         // Set custom data path if variable exists, otherwise do not use anything
         if (!empty($data_path = getenv('DATA_PATH'))) {
             define('DATA_PATH', str_replace('"', '', str_replace('./', ROOT_PATH . '/', $data_path)));
         }
 
-        if (getenv('DEBUG')) {
-            Utilities::setDebugPrint(true);
-        }
-
         // gettext '__()' function must be initialized as all public messages are using it
         (new Translator())->register();
 
+        // Load DEFAULT config
         $this->loadDefaultConfig();
 
         // Merge default config with user config
