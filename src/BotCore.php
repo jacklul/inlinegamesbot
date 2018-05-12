@@ -115,7 +115,7 @@ class BotCore
      *
      * @throws BotException
      */
-    public function __construct(bool $web = false)
+    public function __construct(bool $webhook = false)
     {
         if (!defined('ROOT_PATH')) {
             throw new BotException('Root path not defined!');
@@ -162,7 +162,7 @@ class BotCore
         }
 
         // Get passed parameter
-        if (is_bool($web) && $web) {
+        if (is_bool($webhook) && $webhook === true) {
             $this->arg = 'handle';    // from webspace allow only handling webhook
         } elseif (isset($_SERVER['argv'][1])) {
             $this->arg = strtolower(trim($_SERVER['argv'][1]));
