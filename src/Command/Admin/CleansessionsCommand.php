@@ -167,7 +167,7 @@ class CleansessionsCommand extends AdminCommand
         if ($chat_id != $bot_id) {
             return Request::sendMessage($data);
         } elseif (PHP_SAPI === 'cli') {
-            echo $data['text'] . PHP_EOL;
+            print $data['text'] . PHP_EOL;
         }
 
         return Request::emptyResponse();

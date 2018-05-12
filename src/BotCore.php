@@ -615,7 +615,7 @@ class BotCore
         $fh = fopen($file, 'w');
         if (!$fh || !flock($fh, LOCK_EX | LOCK_NB)) {
             if (PHP_SAPI === 'cli') {
-                echo "There is already another cron task running in the background!" . PHP_EOL;
+                print "There is already another cron task running in the background!" . PHP_EOL;
             }
 
             exit;
