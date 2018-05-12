@@ -40,13 +40,6 @@ define("SRC_PATH", ROOT_PATH . '/src');
 class BotCore
 {
     /**
-     * Argument passed
-     *
-     * @var string
-     */
-    private $arg = '';
-
-    /**
      * Config array
      *
      * @var array
@@ -65,39 +58,35 @@ class BotCore
         ],
         'set'        => [
             'function'    => 'setWebhook',
-            'description' => 'Sets the webhook',
+            'description' => 'Set the webhook',
         ],
         'unset'      => [
             'function'    => 'deleteWebhook',
-            'description' => 'Deletes the webhook',
+            'description' => 'Delete the webhook',
         ],
         'info'       => [
             'function'    => 'webhookInfo',
-            'description' => 'Prints webhookInfo request result',
+            'description' => 'Print webhookInfo request result',
         ],
         'install'    => [
             'function'    => 'installDb',
-            'description' => 'Executes database creation script',
+            'description' => 'Execute database creation script',
         ],
         'handle'     => [
             'function'    => 'handleWebhook',
-            'description' => 'Handles incoming webhook update',
+            'description' => 'Handle incoming webhook update',
         ],
         'cron'       => [
             'function'    => 'handleCron',
-            'description' => 'Runs scheduled commands once',
+            'description' => 'Run scheduled commands once',
         ],
         'loop'       => [
             'function'    => 'handleLongPolling',
-            'description' => 'Runs using getUpdates in a loop',
+            'description' => 'Run the bot using getUpdates in a loop',
         ],
         'worker'     => [
             'function'    => 'handleWorker',
-            'description' => 'Runs scheduled commands every minute',
-        ],
-        'getupdates' => [
-            'function' => 'handleLongPolling',
-            'hidden'   => true,
+            'description' => 'Run scheduled commands every minute',
         ],
     ];
 
@@ -264,6 +253,10 @@ class BotCore
      */
     private function initialize(): void
     {
+        if ($this->telegram instanceof Telegram) {
+            return;
+        }
+
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint('DEBUG MODE');
 
         $this->telegram = new Telegram($this->config['api_key'], $this->config['bot_username']);
@@ -352,15 +345,11 @@ class BotCore
                 $commands .= PHP_EOL;
             }
 
-            if (isset($data['hidden']) && $data['hidden'] === true) {
-                continue;
-            }
-
             if (!isset($data['description'])) {
                 $data['description'] = 'No description available';
             }
 
-            $commands .= ' ' . $command . str_repeat(' ', 10 - strlen($command)) . '- ' . $data['description'];
+            $commands .= ' ' . $command . str_repeat(' ', 10 - strlen($command)) . '- ' . trim($data['description']);
         }
 
         print $commands . PHP_EOL;
@@ -388,7 +377,7 @@ class BotCore
      */
     private function validateRequest(): bool
     {
-        if ('cli' !== PHP_SAPI) {
+        if (PHP_SAPI !== 'cli') {
             $secret = getenv('BOT_SECRET');
             $secret_get = isset($_GET['s']) ? $_GET['s'] : '';
 
@@ -397,7 +386,7 @@ class BotCore
             }
 
             if (isset($this->config['valid_ip']) && !empty($this->config['valid_ip'] && is_array($this->config['valid_ip']))) {
-                if ($this->config['validate_request'] && 'cli' !== PHP_SAPI) {
+                if ($this->config['validate_request'] && PHP_SAPI !== 'cli') {
                     $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
                     foreach (['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR'] as $key) {
                         if (filter_var(isset($_SERVER[$key]) ? $_SERVER[$key] : null, FILTER_VALIDATE_IP)) {
@@ -425,11 +414,7 @@ class BotCore
     private function setWebhook(): void
     {
         if (empty($this->config['webhook']['url'])) {
-            if (!empty($herokuAppName = getenv('HEROKU_APP_NAME'))) {
-                $this->config['webhook']['url'] = 'https://' . $herokuAppName . '.herokuapp.com';
-            } else {
-                throw new BotException('Webhook URL is empty!');
-            }
+            throw new BotException('Webhook URL is empty!');
         }
 
         $options = [];
@@ -499,7 +484,11 @@ class BotCore
         $result = Request::getWebhookInfo();
 
         if ($result->isOk()) {
-            print print_r($result->getResult(), true) . PHP_EOL;
+            if (PHP_SAPI !== 'cli') {
+                print '<pre>' . print_r($result->getResult(), true) . '</pre>' . PHP_EOL;
+            } else {
+                print print_r($result->getResult(), true) . PHP_EOL;
+            }
         } else {
             print 'Request failed: ' . $result->getDescription() . PHP_EOL;
         }
@@ -514,7 +503,7 @@ class BotCore
      */
     private function handleLongPolling(): void
     {
-        if ('cli' !== PHP_SAPI) {
+        if (PHP_SAPI !== 'cli') {
             print 'Cannot run this from the webspace!' . PHP_EOL;
             return;
         }
@@ -559,7 +548,7 @@ class BotCore
      */
     private function handleWorker(): void
     {
-        if ('cli' !== PHP_SAPI) {
+        if (PHP_SAPI !== 'cli') {
             print 'Cannot run this from the webspace!' . PHP_EOL;
             return;
         }
@@ -625,7 +614,7 @@ class BotCore
 
         $fh = fopen($file, 'w');
         if (!$fh || !flock($fh, LOCK_EX | LOCK_NB)) {
-            if ('cli' === PHP_SAPI) {
+            if (PHP_SAPI === 'cli') {
                 echo "There is already another cron task running in the background!" . PHP_EOL;
             }
 

@@ -127,7 +127,7 @@ class Utilities
      */
     public static function isDebugPrintEnabled(): bool
     {
-        if ('cli' === PHP_SAPI) {
+        if (PHP_SAPI === 'cli') {
             return self::$debug_print_enabled;
         }
 

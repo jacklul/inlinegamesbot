@@ -67,7 +67,7 @@ class CleansessionsCommand extends AdminCommand
         }
 
         // Bug workaround: When run from the webhook and script just keeps going for too long Bot API will resend the update triggering the command again... and again...
-        if ('cli' !== PHP_SAPI) {
+        if (PHP_SAPI !== 'cli') {
             set_time_limit(10);
         }
 
@@ -92,7 +92,7 @@ class CleansessionsCommand extends AdminCommand
 
                 if ($chat_id != $bot_id) {
                     Request::sendMessage($data);
-                } elseif ('cli' === PHP_SAPI) {
+                } elseif (PHP_SAPI === 'cli') {
                     print $data['text'] . PHP_EOL;
                 }
 
@@ -112,7 +112,7 @@ class CleansessionsCommand extends AdminCommand
 
                     $inactive_game['id'] = trim($inactive_game['id']);
 
-                    if ('cli' === PHP_SAPI && $chat_id == $bot_id) {
+                    if (PHP_SAPI === 'cli' && $chat_id == $bot_id) {
                         print 'Cleaning: \'' . $inactive_game['id'] . '\'' . PHP_EOL;
                     }
 
@@ -166,7 +166,7 @@ class CleansessionsCommand extends AdminCommand
 
         if ($chat_id != $bot_id) {
             return Request::sendMessage($data);
-        } elseif ('cli' === PHP_SAPI) {
+        } elseif (PHP_SAPI === 'cli') {
             echo $data['text'] . PHP_EOL;
         }
 
