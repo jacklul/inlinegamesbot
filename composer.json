@@ -27,9 +27,6 @@
   "require-dev": {
     "squizlabs/php_codesniffer": "*"
   },
-  "suggest": {
-    "google/cloud-datastore": "Required for GoogleCloudDatastore storage handler"
-  },
   "autoload": {
     "psr-4": {
       "jacklul\\inlinegamesbot\\": "src/"
