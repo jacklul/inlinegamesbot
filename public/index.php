@@ -17,8 +17,8 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
     require_once __DIR__ . ' /../vendor/autoload.php';
 
     try {
-        $app = new BotCore(true);
-        $app->run();
+        $app = new BotCore();
+        $app->run(true);
     } catch (\Throwable $e) {
         header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);    // On error return HTTP 500 so that Telegram API can retry request later
     }

@@ -111,11 +111,9 @@ class BotCore
     /**
      * Bot constructor
      *
-     * @param bool $web
-     *
      * @throws BotException
      */
-    public function __construct(bool $webhook = false)
+    public function __construct()
     {
         if (!defined('ROOT_PATH')) {
             throw new BotException('Root path not defined!');
@@ -160,15 +158,6 @@ class BotCore
                 $this->config = $config;
             }
         }
-
-        // Get passed parameter
-        if (is_bool($webhook) && $webhook === true) {
-            $this->arg = 'handle';    // from webspace allow only handling webhook
-        } elseif (isset($_SERVER['argv'][1])) {
-            $this->arg = strtolower(trim($_SERVER['argv'][1]));
-        }
-
-        return $this;
     }
 
     /**
@@ -230,25 +219,33 @@ class BotCore
     /**
      * Run the bot
      *
+     * @param bool $webhook
+     *
      * @throws \Throwable
      */
-    public function run()
+    public function run(bool $webhook = false)
     {
+        if (is_bool($webhook) && $webhook === true) {
+            $arg = 'handle';    // from webspace allow only handling webhook
+        } elseif (isset($_SERVER['argv'][1])) {
+            $arg = strtolower(trim($_SERVER['argv'][1]));
+        }
+
         try {
             if (!$this->telegram instanceof Telegram) {
                 $this->initialize();
             }
 
-            if (!empty($this->arg) && isset($this->commands[$this->arg]['function'])) {
-                $function = $this->commands[$this->arg]['function'];
+            if (!empty($arg) && isset($this->commands[$arg]['function'])) {
+                $function = $this->commands[$arg]['function'];
                 $this->$function();
             } else {
                 $this->showHelp();
 
-                if (!empty($this->arg)) {
-                    print 'ERROR: Invalid parameter specified!' . PHP_EOL . PHP_EOL;
+                if (!empty($arg)) {
+                    print PHP_EOL . 'Invalid parameter specified!' . PHP_EOL;
                 } else {
-                    print 'ERROR: No parameter specified!' . PHP_EOL . PHP_EOL;
+                    print PHP_EOL . 'No parameter specified!' . PHP_EOL;
                 }
             }
         } catch (\Throwable $e) {
