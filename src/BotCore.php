@@ -508,12 +508,11 @@ class BotCore
             return;
         }
 
-        print '[' . date('Y-m-d H:i:s', time()) . '] Running with getUpdates method...' . PHP_EOL;
-
         if (!isset($this->config['mysql']['host']) || empty($this->config['mysql']['host'])) {
             $this->telegram->useGetUpdatesWithoutDatabase(true);
         }
 
+        print '[' . date('Y-m-d H:i:s', time()) . '] Running with getUpdates method...' . PHP_EOL;
         while (true) {
             set_time_limit(0);
 
