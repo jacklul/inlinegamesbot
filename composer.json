@@ -3,6 +3,11 @@
   "type": "project",
   "description": "A Telegram bot providing games that can be played in any chat.",
   "license": "AGPL-3.0",
+  "keywords": [
+    "telegram",
+    "bot",
+    "games"
+  ],
   "authors": [
     {
       "name": "Jack'lul",
