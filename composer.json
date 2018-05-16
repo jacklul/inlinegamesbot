@@ -17,18 +17,18 @@
     }
   ],
   "require": {
-    "php": "^7.1.0",
+    "php": "^7.1",
     "ext-curl": "*",
     "ext-gettext": "*",
     "ext-mbstring": "*",
     "ext-pdo": "*",
-    "ad7six/dsn": "^0.4.0",
-    "gettext/gettext": "^4.3.0",
+    "ad7six/dsn": "^0.4",
+    "gettext/gettext": "^4.3",
     "jacklul/monolog-telegram": "^1.0",
     "longman/ip-tools": "^1.2",
-    "longman/telegram-bot": "^0.53.0",
-    "spatie/emoji": "^1.0.6",
-    "vlucas/phpdotenv": "^2.4.0"
+    "longman/telegram-bot": "^0.53",
+    "spatie/emoji": "^1.0",
+    "vlucas/phpdotenv": "^2.4"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "^3.2"
