@@ -20,7 +20,7 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
         $app = new BotCore();
         $app->run(true);
     } catch (\Throwable $e) {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);    // On error return HTTP 500 so that Telegram API can retry request later
+        // Prevent Telegram from retrying
     }
 } else {
     header("Location: https://github.com/jacklul/inlinegamesbot");    // Redirect non-POST requests to Github repository
