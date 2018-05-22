@@ -30,21 +30,13 @@ class GenericmessageCommand extends SystemCommand
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    public function executeNoDb()
-    {
-        $this->leaveGroupChat();
-
-        return $this->getTelegram()->executeCommand('help');
-    }
-
-    /**
-     * @return mixed
-     *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     */
     public function execute()
     {
         $this->leaveGroupChat();
+
+        if (strpos($this->getMessage()->getText(true), 'This game session is empty.') !== false) {
+            return Request::emptyResponse();
+        }
 
         $conversation = new Conversation(
             $this->getMessage()->getFrom()->getId(),
@@ -55,11 +47,7 @@ class GenericmessageCommand extends SystemCommand
             return $this->telegram->executeCommand($command);
         }
 
-        if (strpos($this->getMessage()->getText(true), 'This game session is empty.') !== false) {
-            return Request::emptyResponse();
-        }
-
-        return $this->getTelegram()->executeCommand('help');
+        return $this->executeNoDb();
     }
 
     /**
