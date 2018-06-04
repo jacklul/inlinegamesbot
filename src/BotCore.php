@@ -10,13 +10,13 @@
 
 namespace jacklul\inlinegamesbot;
 
+use Dotenv\Dotenv;
+use Gettext\Translator;
+use GuzzleHttp\Client;
 use jacklul\inlinegamesbot\Entity\TempFile;
 use jacklul\inlinegamesbot\Exception\BotException;
 use jacklul\inlinegamesbot\Exception\StorageException;
 use jacklul\inlinegamesbot\Helper\Utilities;
-use Dotenv\Dotenv;
-use Gettext\Translator;
-use GuzzleHttp\Client;
 use jacklul\MonologTelegramHandler\TelegramFormatter;
 use jacklul\MonologTelegramHandler\TelegramHandler;
 use Longman\IPTools\Ip;
@@ -139,12 +139,11 @@ class BotCore
         // Merge default config with user config
         $config_file = APP_PATH . '/config.php';
         if (file_exists($config_file)) {
-            $config = $this->config;
             /** @noinspection PhpIncludeInspection */
-            include $config_file;
+            $config = include $config_file;
 
-            if (isset($config) && is_array($config)) {
-                $this->config = $config;
+            if (is_array($config)) {
+                $this->config = array_replace_recursive($this->config, $config);
             }
         }
     }
