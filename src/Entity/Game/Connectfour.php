@@ -199,8 +199,8 @@ class Connectfour extends Game
     private function isGameOver(array &$board)
     {
         $empty = 0;
-        for ($x = 0; $x < $this->max_x; $x++) {
-            for ($y = 0; $y < $this->max_y; $y++) {
+        for ($x = 0; $x <= $this->max_x; $x++) {
+            for ($y = 0; $y <= $this->max_y; $y++) {
                 if (isset($board[$x][$y]) && $board[$x][$y] == '') {
                     $empty++;
                 }
