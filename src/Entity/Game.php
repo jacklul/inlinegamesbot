@@ -1023,10 +1023,18 @@ class Game
         if (!empty($board) && is_array($board) && isset($this->max_y) && isset($this->max_x)) {
             $board_out = str_repeat(' ---', $this->max_x) . PHP_EOL;
 
-            for ($x = 0; $x < $this->max_x; $x++) {
+            for ($x = 0; $x <= $this->max_x; $x++) {
+                if (!isset($board[$x])) {
+                    continue;
+                }
+
                 $line = '';
 
-                for ($y = 0; $y < $this->max_y; $y++) {
+                for ($y = 0; $y <= $this->max_y; $y++) {
+                    if (!isset($board[$x][$y])) {
+                        continue;
+                    }
+
                     $line .= '|' . (!empty($board[$x][$y]) ? ' ' . $board[$x][$y] . ' ' : '   ');
                 }
 
