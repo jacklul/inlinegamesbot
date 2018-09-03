@@ -7,10 +7,10 @@ You can see the bot in action by messaging [@inlinegamesbot](https://telegram.me
 #### Currently available games:
 
 - Tic-Tac-Toe
-- Tic-Tac-Four (@DO97)
+- Tic-Tac-Four ([@DO97](https://github.com/DO97))
 - Connect Four
 - Rock-Paper-Scissors
-- Rock-Paper-Scissors-Lizard-Spock (@DO97)
+- Rock-Paper-Scissors-Lizard-Spock ([@DO97](https://github.com/DO97))
 - Russian Roulette
 - Checkers
 - Pool Checkers
