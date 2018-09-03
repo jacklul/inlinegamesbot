@@ -56,12 +56,12 @@ class Russianroulette extends Game
      *
      * @var int
      */
-    protected static $order = 4;
+    protected static $order = 30;
 
     /**
      * Define game symbols (emojis)
      */
-    private function defineSymbols()
+    protected function defineSymbols()
     {
         $this->symbols['empty'] = '.';
 

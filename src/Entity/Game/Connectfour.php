@@ -54,12 +54,26 @@ class Connectfour extends Game
      *
      * @var int
      */
-    protected static $order = 2;
+    protected static $order = 10;
+
+    /**
+     * Base starting board
+     *
+     * @var array
+     */
+    protected $board = [
+        ['', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', ''],
+    ];
 
     /**
      * Define game symbols
      */
-    private function defineSymbols()
+    protected function defineSymbols()
     {
         $this->symbols['empty'] = Emoji::mediumWhiteCircle();
 
@@ -111,14 +125,7 @@ class Connectfour extends Game
             }
 
             $data['current_turn'] = 'X';
-            $data['board'] = [
-                ['', '', '', '', '', '', ''],
-                ['', '', '', '', '', '', ''],
-                ['', '', '', '', '', '', ''],
-                ['', '', '', '', '', '', ''],
-                ['', '', '', '', '', '', ''],
-                ['', '', '', '', '', '', ''],
-            ];
+            $data['board'] = $this->board;
 
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game initialization');
         } elseif (!isset($args)) {
@@ -196,7 +203,7 @@ class Connectfour extends Game
      *
      * @return string
      */
-    private function isGameOver(array &$board)
+    protected function isGameOver(array &$board)
     {
         $empty = 0;
         for ($x = 0; $x <= $this->max_x; $x++) {

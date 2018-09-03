@@ -1,4 +1,4 @@
- <?php
+<?php
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
@@ -10,30 +10,26 @@
 
 namespace jacklul\inlinegamesbot\Entity\Game;
 
-use jacklul\inlinegamesbot\Entity\Game;
-use jacklul\inlinegamesbot\Helper\Utilities;
-use Spatie\Emoji\Emoji;
-
 /**
  * Class Tictacfour
  *
  * @package jacklul\inlinegamesbot\Entity\Game
  */
-class Tictacfour extends Game
+class Tictacfour extends Tictactoe
 {
     /**
      * Game unique ID
      *
      * @var string
      */
-    protected static $code = 'TTF';
+    protected static $code = 'ttf';
 
     /**
      * Game name / title
      *
      * @var string
      */
-    protected static $title = 'Tic-Tac-Four';
+    protected static $title = 'Tic-Tac-Four *beta* (please report issues!)';
 
     /**
      * Game description
@@ -47,140 +43,28 @@ class Tictacfour extends Game
      *
      * @var string
      */
-    protected static $image = 'http://i.imgur.com/yU2uexr.png';
+    protected static $image = 'https://i.imgur.com/t4FQuSz.png';
 
     /**
      * Order on the games list
      *
      * @var int
      */
-    protected static $order = 8;
+    protected static $order = 2;
 
     /**
-     * Define game symbols (emojis)
-     */
-    private function defineSymbols()
-    {
-        $this->symbols['empty'] = '.';
-
-        $this->symbols['X'] = Emoji::crossMark();
-        $this->symbols['O'] = Emoji::heavyLargeCircle();
-
-        $this->symbols['X_won'] = $this->symbols['X'];
-        $this->symbols['O_won'] = $this->symbols['O'];
-
-        $this->symbols['X_lost'] = Emoji::heavyMultiplicationX();
-        $this->symbols['O_lost'] = Emoji::radioButton();
-    }
-
-    /**
-     * Game handler
+     * Base starting board
      *
-     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
-     *
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @var array
      */
-    protected function gameAction()
-    {
-        if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
-            return $this->answerCallbackQuery(__("You're not in this game!"), true);
-        }
-
-        $data = &$this->data['game_data'];
-
-        $this->defineSymbols();
-
-        $callbackquery_data = $this->manager->getUpdate()->getCallbackQuery()->getData();
-        $callbackquery_data = explode(';', $callbackquery_data);
-
-        $command = $callbackquery_data[1];
-
-        $args = null;
-        if (isset($callbackquery_data[2])) {
-            $args = explode('-', $callbackquery_data[2]);
-        }
-
-        if ($command === 'start') {
-            if (isset($data['settings']) && $data['settings']['X'] == 'host') {
-                $data['settings']['X'] = 'guest';
-                $data['settings']['O'] = 'host';
-            } else {
-                $data['settings']['X'] = 'host';
-                $data['settings']['O'] = 'guest';
-            }
-
-            $data['current_turn'] = 'X';
-            $data['board'] = [
-                ['', '', '', '', '', ''],
-                ['', '', '', '', '', ''],
-                ['', '', '', '', '', ''],
-                ['', '', '', '', '', ''],
-                ['', '', '', '', '', ''],
-                ['', '', '', '', '', ''],
-            ];
-
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game initialization');
-        } elseif ($args === null) {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('No move data received');
-        }
-
-        if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
-            return $this->answerCallbackQuery(__("This game has ended!"), true);
-        }
-
-        if ($this->getCurrentUserId() !== $this->getUserId($data['settings'][$data['current_turn']]) && $command !== 'start') {
-            return $this->answerCallbackQuery(__("It's not your turn!"), true);
-        }
-
-        if (isset($args) && isset($data['board'][$args[0]][$args[1]]) && $data['board'][$args[0]][$args[1]] !== '') {
-            return $this->answerCallbackQuery(__("Invalid move!"), true);
-        }
-
-        $this->max_y = count($data['board']);
-        $this->max_x = count($data['board'][0]);
-
-        if (isset($args)) {
-            if ($data['current_turn'] == 'X') {
-                $data['board'][$args[0]][$args[1]] = 'X';
-                $data['current_turn'] = 'O';
-            } elseif ($data['current_turn'] == 'O') {
-                $data['board'][$args[0]][$args[1]] = 'O';
-                $data['current_turn'] = 'X';
-            } else {
-                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Invalid move data: ' . ($args[0]) . ' - ' . ($args[1]));
-
-                return $this->answerCallbackQuery(__("Invalid move!"), true);
-            }
-
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($args[0]));
-        }
-
-        $isOver = $this->isGameOver($data['board']);
-        $gameOutput = '';
-
-        if (!empty($isOver) && in_array($isOver, ['X', 'O'])) {
-            $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings'][$isOver]) . '<b>']) . '</b>';
-        } elseif ($isOver == 'T') {
-            $gameOutput = '<b>' . __("Game ended with a draw!") . '</b>';
-        }
-
-        if (!empty($isOver) && in_array($isOver, ['X', 'O', 'T'])) {
-            $data['current_turn'] = 'E';
-        } else {
-            $gameOutput = __("Current turn:") . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
-        }
-
-        if ($this->saveData($this->data)) {
-            return $this->editMessage(
-                $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
-                $this->gameKeyboard($data['board'], $isOver)
-            );
-        } else {
-            return $this->returnStorageFailure();
-        }
-    }
+    protected $board = [
+        ['', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', ''],
+    ];
 
     /**
      * Check whenever game is over
@@ -189,7 +73,7 @@ class Tictacfour extends Game
      *
      * @return string
      */
-    private function isGameOver(array &$board)
+    protected function isGameOver(array &$board)
     {
         $empty = 0;
         for ($x = 0; $x <= $this->max_x; $x++) {
@@ -251,7 +135,6 @@ class Tictacfour extends Game
         if ($empty == 0) {
             return 'T';
         }
-
 
         return null;
     }

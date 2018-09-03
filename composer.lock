@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "db4a8437d6b604e672928f77ea278724",
+    "content-hash": "b8aec0892b41ff1f67c218caebf6b645",
     "packages": [
         {
             "name": "ad7six/dsn",
@@ -51,16 +51,16 @@
         },
         {
             "name": "gettext/gettext",
-            "version": "v4.5.0",
+            "version": "v4.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oscarotero/Gettext.git",
-                "reference": "81c05cb213e8e4828db7aabd9dd363367ebca9f2"
+                "reference": "854ff5f5aaf92d2af7080ba8fc15718b27b5c89a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oscarotero/Gettext/zipball/81c05cb213e8e4828db7aabd9dd363367ebca9f2",
-                "reference": "81c05cb213e8e4828db7aabd9dd363367ebca9f2",
+                "url": "https://api.github.com/repos/oscarotero/Gettext/zipball/854ff5f5aaf92d2af7080ba8fc15718b27b5c89a",
+                "reference": "854ff5f5aaf92d2af7080ba8fc15718b27b5c89a",
                 "shasum": ""
             },
             "require": {
@@ -69,7 +69,7 @@
             },
             "require-dev": {
                 "illuminate/view": "*",
-                "phpunit/phpunit": "^4.8|^5.7",
+                "phpunit/phpunit": "^4.8|^5.7|^6.5",
                 "squizlabs/php_codesniffer": "^3.0",
                 "symfony/yaml": "~2",
                 "twig/extensions": "*",
@@ -109,20 +109,20 @@
                 "po",
                 "translation"
             ],
-            "time": "2018-04-23T17:22:10+00:00"
+            "time": "2018-08-27T15:40:19+00:00"
         },
         {
             "name": "gettext/languages",
-            "version": "2.3.0",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mlocati/cldr-to-gettext-plural-rules.git",
-                "reference": "49c39e51569963cc917a924b489e7025bfb9d8c7"
+                "reference": "1b74377bd0c4cd87e8d72b948f5d8867e23505a5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mlocati/cldr-to-gettext-plural-rules/zipball/49c39e51569963cc917a924b489e7025bfb9d8c7",
-                "reference": "49c39e51569963cc917a924b489e7025bfb9d8c7",
+                "url": "https://api.github.com/repos/mlocati/cldr-to-gettext-plural-rules/zipball/1b74377bd0c4cd87e8d72b948f5d8867e23505a5",
+                "reference": "1b74377bd0c4cd87e8d72b948f5d8867e23505a5",
                 "shasum": ""
             },
             "require": {
@@ -170,7 +170,7 @@
                 "translations",
                 "unicode"
             ],
-            "time": "2017-03-23T17:02:28+00:00"
+            "time": "2018-06-21T15:58:36+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -688,16 +688,16 @@
         },
         {
             "name": "spatie/emoji",
-            "version": "1.0.6",
+            "version": "1.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/emoji.git",
-                "reference": "6d63a951db1f23a5af521f449bf0e3f7a688bfca"
+                "reference": "4118159d432887f71628accc8bb907980e82e48e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/emoji/zipball/6d63a951db1f23a5af521f449bf0e3f7a688bfca",
-                "reference": "6d63a951db1f23a5af521f449bf0e3f7a688bfca",
+                "url": "https://api.github.com/repos/spatie/emoji/zipball/4118159d432887f71628accc8bb907980e82e48e",
+                "reference": "4118159d432887f71628accc8bb907980e82e48e",
                 "shasum": ""
             },
             "require": {
@@ -730,32 +730,32 @@
                 "emoji",
                 "spatie"
             ],
-            "time": "2017-05-23T07:39:03+00:00"
+            "time": "2018-07-04T23:55:57+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
-            "version": "v2.4.0",
+            "version": "v2.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vlucas/phpdotenv.git",
-                "reference": "3cc116adbe4b11be5ec557bf1d24dc5e3a21d18c"
+                "reference": "8abb4f9aa89ddea9d52112c65bbe8d0125e2fa8e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/3cc116adbe4b11be5ec557bf1d24dc5e3a21d18c",
-                "reference": "3cc116adbe4b11be5ec557bf1d24dc5e3a21d18c",
+                "url": "https://api.github.com/repos/vlucas/phpdotenv/zipball/8abb4f9aa89ddea9d52112c65bbe8d0125e2fa8e",
+                "reference": "8abb4f9aa89ddea9d52112c65bbe8d0125e2fa8e",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.9"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8 || ^5.0"
+                "phpunit/phpunit": "^4.8.35 || ^5.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.4-dev"
+                    "dev-master": "2.5-dev"
                 }
             },
             "autoload": {
@@ -765,7 +765,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "BSD-3-Clause-Attribution"
+                "BSD-3-Clause"
             ],
             "authors": [
                 {
@@ -780,22 +780,22 @@
                 "env",
                 "environment"
             ],
-            "time": "2016-09-01T10:05:43+00:00"
+            "time": "2018-07-29T20:33:41+00:00"
         }
     ],
     "packages-dev": [
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.2.3",
+            "version": "3.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "4842476c434e375f9d3182ff7b89059583aa8b27"
+                "reference": "628a481780561150481a9ec74709092b9759b3ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/4842476c434e375f9d3182ff7b89059583aa8b27",
-                "reference": "4842476c434e375f9d3182ff7b89059583aa8b27",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/628a481780561150481a9ec74709092b9759b3ec",
+                "reference": "628a481780561150481a9ec74709092b9759b3ec",
                 "shasum": ""
             },
             "require": {
@@ -833,7 +833,7 @@
                 "phpcs",
                 "standards"
             ],
-            "time": "2018-02-20T21:35:23+00:00"
+            "time": "2018-07-26T23:47:18+00:00"
         }
     ],
     "aliases": [],
@@ -842,7 +842,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.1.0",
+        "php": "^7.1",
         "ext-curl": "*",
         "ext-gettext": "*",
         "ext-mbstring": "*",

@@ -10,7 +10,6 @@
 
 namespace jacklul\inlinegamesbot\Entity\Game;
 
-use jacklul\inlinegamesbot\Entity\Game;
 use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
@@ -21,7 +20,7 @@ use Spatie\Emoji\Emoji;
  *
  * @package jacklul\inlinegamesbot\Entity\Game
  */
-class Poolcheckers extends Game
+class Poolcheckers extends Checkers
 {
     /**
      * Game unique ID
@@ -63,7 +62,23 @@ class Poolcheckers extends Game
      *
      * @var int
      */
-    protected static $order = 6;
+    protected static $order = 41;
+
+    /**
+     * Base starting board
+     *
+     * @var array
+     */
+    protected $board = [
+        ['', 'X', '', '', '', 'O', '', 'O'],
+        ['X', '', 'X', '', '', '', 'O', ''],
+        ['', 'X', '', '', '', 'O', '', 'O'],
+        ['X', '', 'X', '', '', '', 'O', ''],
+        ['', 'X', '', '', '', 'O', '', 'O'],
+        ['X', '', 'X', '', '', '', 'O', ''],
+        ['', 'X', '', '', '', 'O', '', 'O'],
+        ['X', '', 'X', '', '', '', 'O', ''],
+    ];
 
     /**
      * Game related variables
@@ -81,7 +96,7 @@ class Poolcheckers extends Game
     /**
      * Define game symbols (emojis)
      */
-    private function defineSymbols()
+    protected function defineSymbols()
     {
         $this->symbols['empty'] = '.';
 
@@ -138,16 +153,7 @@ class Poolcheckers extends Game
             $data['vote']['guest']['draw'] = false;
             $data['vote']['guest']['surrender'] = false;
 
-            $data['board'] = [
-                ['', 'X', '', '', '', 'O', '', 'O'],
-                ['X', '', 'X', '', '', '', 'O', ''],
-                ['', 'X', '', '', '', 'O', '', 'O'],
-                ['X', '', 'X', '', '', '', 'O', ''],
-                ['', 'X', '', '', '', 'O', '', 'O'],
-                ['X', '', 'X', '', '', '', 'O', ''],
-                ['', 'X', '', '', '', 'O', '', 'O'],
-                ['X', '', 'X', '', '', '', 'O', ''],
-            ];
+            $data['board'] = $this->board;
 
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game initialization');
         } elseif ($args === null && $command === 'game') {
@@ -473,7 +479,7 @@ class Poolcheckers extends Game
      * @return array|bool
      */
 
-    private function possibleMoves(array $board, string $selection, bool $onlykill = false, string $char = null, string $backmultijumpblock = null)
+    protected function possibleMoves(array $board, string $selection, bool $onlykill = false, string $char = null, string $backmultijumpblock = null)
     {
         $valid_moves = [];
         $kill = [];
@@ -788,7 +794,7 @@ class Poolcheckers extends Game
      *
      * @return array
      */
-    private function piecesLeft(array $board)
+    protected function piecesLeft(array $board)
     {
         $xs = 0;
         $ys = 0;
@@ -883,7 +889,7 @@ class Poolcheckers extends Game
      *
      * @return mixed
      */
-    private function invertBoard(array $board)
+    protected function invertBoard(array $board)
     {
         array_unshift($board, null);
 

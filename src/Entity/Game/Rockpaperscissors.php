@@ -56,12 +56,12 @@ class Rockpaperscissors extends Game
      *
      * @var int
      */
-    protected static $order = 3;
+    protected static $order = 20;
 
     /**
      * Define game symbols (emojis)
      */
-    private function defineSymbols()
+    protected function defineSymbols()
     {
         $this->symbols['R'] = 'ROCK';
         $this->symbols['R_short'] = Emoji::raisedFist();
@@ -69,6 +69,7 @@ class Rockpaperscissors extends Game
         $this->symbols['P_short'] = Emoji::raisedHand();
         $this->symbols['S'] = 'SCISSORS';
         $this->symbols['S_short'] = Emoji::victoryHand();
+        $this->symbols['valid'] = ['R', 'P', 'S'];
     }
 
     /**
@@ -120,7 +121,7 @@ class Rockpaperscissors extends Game
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Argument: ' . $arg);
 
         if (isset($arg)) {
-            if (in_array($arg, ['R', 'P', 'S'])) {
+            if (in_array($arg, $this->symbols['valid'])) {
                 if ($this->getCurrentUserId() === $this->getUserId('host') && $data['host_pick'] == '') {
                     $data['host_pick'] = $arg;
                 } elseif ($this->getCurrentUserId() === $this->getUserId('guest') && $data['guest_pick'] == '') {
@@ -282,7 +283,7 @@ class Rockpaperscissors extends Game
      *
      * @return string
      */
-    private function isGameOver(string $x, string $y)
+    protected function isGameOver(string $x, string $y)
     {
         if ($x == 'P' && $y == 'R') {
             return 'X';
