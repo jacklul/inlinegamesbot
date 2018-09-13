@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b8aec0892b41ff1f67c218caebf6b645",
+    "content-hash": "a5783a4d42f1f89a3753ab34aff85e84",
     "packages": [
         {
             "name": "ad7six/dsn",
@@ -845,6 +845,8 @@
         "php": "^7.1",
         "ext-curl": "*",
         "ext-gettext": "*",
+        "ext-intl": "*",
+        "ext-json": "*",
         "ext-mbstring": "*",
         "ext-pdo": "*"
     },

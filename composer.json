@@ -20,6 +20,8 @@
     "php": "^7.1",
     "ext-curl": "*",
     "ext-gettext": "*",
+    "ext-intl": "*",
+    "ext-json": "*",
     "ext-mbstring": "*",
     "ext-pdo": "*",
     "ad7six/dsn": "^0.4",
