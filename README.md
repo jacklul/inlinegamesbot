@@ -17,7 +17,7 @@ You can see the bot in action by messaging [@inlinegamesbot](https://telegram.me
 
 ## Notes
 
-Translations support is implemented but is not used mainly because same translated text would displayed to both players, can be problematic in 'gaming' groups - people setting language that other player can't understand!
+Translations support is implemented but it is not used mainly because same translated text would be displayed to both players, can be problematic in 'gaming' groups - people setting language that other player can't understand!
 
 ## Contributing
 
