@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,9 +11,7 @@
 namespace jacklul\inlinegamesbot\Entity\Game;
 
 /**
- * Class Tictacfour
- *
- * @package jacklul\inlinegamesbot\Entity\Game
+ * Tic-Tac-Four
  */
 class Tictacfour extends Tictactoe
 {
@@ -29,7 +27,7 @@ class Tictacfour extends Tictactoe
      *
      * @var string
      */
-    protected static $title = 'Tic-Tac-Four *beta* (please report issues!)';
+    protected static $title = 'Tic-Tac-Four';
 
     /**
      * Game description

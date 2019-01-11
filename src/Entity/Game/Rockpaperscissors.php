@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,15 +11,14 @@
 namespace jacklul\inlinegamesbot\Entity\Game;
 
 use jacklul\inlinegamesbot\Entity\Game;
+use jacklul\inlinegamesbot\Exception\StorageException;
 use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Spatie\Emoji\Emoji;
 
 /**
- * Class Rockpaperscissors
- *
- * @package jacklul\inlinegamesbot\Entity\Game
+ * Rock-Paper-Scissors
  */
 class Rockpaperscissors extends Game
 {
@@ -59,20 +58,6 @@ class Rockpaperscissors extends Game
     protected static $order = 20;
 
     /**
-     * Define game symbols (emojis)
-     */
-    protected function defineSymbols()
-    {
-        $this->symbols['R'] = 'ROCK';
-        $this->symbols['R_short'] = Emoji::raisedFist();
-        $this->symbols['P'] = 'PAPER';
-        $this->symbols['P_short'] = Emoji::raisedHand();
-        $this->symbols['S'] = 'SCISSORS';
-        $this->symbols['S_short'] = Emoji::victoryHand();
-        $this->symbols['valid'] = ['R', 'P', 'S'];
-    }
-
-    /**
      * Game handler
      *
      * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
@@ -109,16 +94,16 @@ class Rockpaperscissors extends Game
             $data['round'] = 1;
             $data['current_turn'] = '';
 
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game initialization');
+            Utilities::debugPrint('Game initialization');
         } elseif ($arg === null) {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('No move data received');
+            Utilities::debugPrint('No move data received');
         }
 
         if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
             return $this->answerCallbackQuery(__("This game has ended!"), true);
         }
 
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Argument: ' . $arg);
+        Utilities::debugPrint('Argument: ' . $arg);
 
         if (isset($arg)) {
             if (in_array($arg, $this->symbols['valid'])) {
@@ -131,10 +116,10 @@ class Rockpaperscissors extends Game
                 if ($this->saveData($this->data)) {
                     Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' picked ' . $arg);
                 } else {
-                    return $this->returnStorageFailure();
+                    throw new StorageException();
                 }
             } else {
-                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Invalid move data: ' . $arg);
+                Utilities::debugPrint('Invalid move data: ' . $arg);
 
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
@@ -154,13 +139,13 @@ class Rockpaperscissors extends Game
                 if ($isOver == 'X') {
                     $data['host_wins'] = $data['host_wins'] + 1;
 
-                    $gameOutput = '<b>' . __("{PLAYER} won this round!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
+                    $gameOutput = Emoji::sportsMedal() . ' <b>' . __("{PLAYER} won this round!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
                 } elseif ($isOver == 'O') {
                     $data['guest_wins'] = $data['guest_wins'] + 1;
 
-                    $gameOutput = '<b>' . __("{PLAYER} won this round!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
+                    $gameOutput = Emoji::sportsMedal() . ' <b>' . __("{PLAYER} won this round!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
                 } else {
-                    $gameOutput = '<b>' . __("This round ended with a draw!") . '</b>' . PHP_EOL;
+                    $gameOutput = Emoji::chequeredFlag() . ' <b>' . __("This round ended with a draw!") . '</b>' . PHP_EOL;
                 }
             }
 
@@ -169,11 +154,11 @@ class Rockpaperscissors extends Game
         }
 
         if (($data['host_wins'] >= 3 && $data['host_wins'] > $data['guest_wins']) || $data['host_wins'] >= $data['guest_wins'] + 3 || ($data['round'] > 5 && $data['host_wins'] > $data['guest_wins'])) {
-            $gameOutput = '<b>' . __("{PLAYER} won the game!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>';
+            $gameOutput = Emoji::trophy() . ' <b>' . __("{PLAYER} won the game!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>';
 
             $data['current_turn'] = 'E';
         } elseif (($data['guest_wins'] >= 3 && $data['guest_wins'] > $data['host_wins']) || $data['guest_wins'] >= $data['host_wins'] + 3 || ($data['round'] > 5 && $data['guest_wins'] > $data['host_wins'])) {
-            $gameOutput = '<b>' . __("{PLAYER} won the game!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>';
+            $gameOutput = Emoji::trophy() . '<b>' . __("{PLAYER} won the game!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>';
 
             $data['current_turn'] = 'E';
         } else {
@@ -193,12 +178,67 @@ class Rockpaperscissors extends Game
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(
-                $this->getUserMention('host') . (($data['host_wins'] > 0 || $data['guest_wins'] > 0) ? ' (' . $data['host_wins'] . ')' : '') . $hostPick . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . (($data['guest_wins'] > 0 || $data['host_wins'] > 0) ? ' (' . $data['guest_wins'] . ')' : '') . $guestPick . PHP_EOL . PHP_EOL . $gameOutput,
+                $this->getUserMention('host') . (($data['host_wins'] > 0 || $data['guest_wins'] > 0) ? ' (' . $data['host_wins'] . ')' : '') . $hostPick . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . (($data['guest_wins'] > 0 || $data['host_wins'] > 0) ? ' (' . $data['guest_wins'] . ')' : '') . $guestPick . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->customGameKeyboard($isOver)
             );
         } else {
-            return $this->returnStorageFailure();
+            throw new StorageException();
         }
+    }
+
+    /**
+     * Define game symbols (emojis)
+     */
+    protected function defineSymbols()
+    {
+        $this->symbols['R'] = 'ROCK';
+        $this->symbols['R_short'] = Emoji::raisedFist();
+        $this->symbols['P'] = 'PAPER';
+        $this->symbols['P_short'] = Emoji::raisedHand();
+        $this->symbols['S'] = 'SCISSORS';
+        $this->symbols['S_short'] = Emoji::victoryHand();
+        $this->symbols['valid'] = ['R', 'P', 'S'];
+    }
+
+    /**
+     * Check whenever game is over
+     *
+     * @param string $x
+     * @param string $y
+     *
+     * @return string
+     */
+    protected function isGameOver(string $x, string $y)
+    {
+        if ($x == 'P' && $y == 'R') {
+            return 'X';
+        }
+
+        if ($y == 'P' && $x == 'R') {
+            return 'O';
+        }
+
+        if ($x == 'R' && $y == 'S') {
+            return 'X';
+        }
+
+        if ($y == 'R' && $x == 'S') {
+            return 'O';
+        }
+
+        if ($x == 'S' && $y == 'P') {
+            return 'X';
+        }
+
+        if ($y == 'S' && $x == 'P') {
+            return 'O';
+        }
+
+        if ($y == $x) {
+            return 'T';
+        }
+
+        return null;
     }
 
     /**
@@ -273,46 +313,5 @@ class Rockpaperscissors extends Game
         $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
 
         return $inline_keyboard_markup;
-    }
-
-    /**
-     * Check whenever game is over
-     *
-     * @param string $x
-     * @param string $y
-     *
-     * @return string
-     */
-    protected function isGameOver(string $x, string $y)
-    {
-        if ($x == 'P' && $y == 'R') {
-            return 'X';
-        }
-
-        if ($y == 'P' && $x == 'R') {
-            return 'O';
-        }
-
-        if ($x == 'R' && $y == 'S') {
-            return 'X';
-        }
-
-        if ($y == 'R' && $x == 'S') {
-            return 'O';
-        }
-
-        if ($x == 'S' && $y == 'P') {
-            return 'X';
-        }
-
-        if ($y == 'S' && $x == 'P') {
-            return 'O';
-        }
-
-        if ($y == $x) {
-            return 'T';
-        }
-
-        return null;
     }
 }

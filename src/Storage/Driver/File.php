@@ -2,27 +2,24 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Storage;
+namespace jacklul\inlinegamesbot\Storage\Driver;
 
 use jacklul\inlinegamesbot\Exception\StorageException;
 
 /**
- * Class File
- *
  * Stores data in json formatted text files
- *
- * @package jacklul\inlinegamesbot\Storage
  */
 class File
 {
     /**
      * Initialize - define paths
+     *
      * @throws StorageException
      */
     public static function initializeStorage(): bool
@@ -77,7 +74,7 @@ class File
      * Place data to the file
      *
      * @param string $id
-     * @param array $data
+     * @param array  $data
      *
      * @return bool
      * @throws StorageException

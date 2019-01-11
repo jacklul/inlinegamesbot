@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,71 +10,14 @@
 
 namespace jacklul\inlinegamesbot\Helper;
 
-use AD7six\Dsn\Dsn;
-use jacklul\inlinegamesbot\Exception\StorageException;
-use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\TelegramLog;
 
 /**
- * Utilities
- *
  * Extra functions
- *
- * @package jacklul\inlinegamesbot\Helper
  */
 class Utilities
 {
-    /**
-     * Supported database engines
-     */
-    private static $storage_drivers = [
-        'mysql'    => 'MySQL',
-        'pgsql'    => 'PostgreSQL',
-        'postgres' => 'PostgreSQL',
-    ];
-
-    /**
-     * Return which driver class to use
-     *
-     * @return string
-     *
-     * @throws StorageException
-     */
-    public static function getStorageClass(): string
-    {
-        if (!empty($debug_storage = getenv('STORAGE_CLASS'))) {
-            $storage = str_replace('"', '', $debug_storage);
-            self::isDebugPrintEnabled() && self::debugPrint('Forcing storage: \'' . $storage . '\'');
-        } elseif (DB::isDbConnected()) {
-            $storage = 'jacklul\inlinegamesbot\Storage\BotDB';
-        } elseif (getenv('DATABASE_URL')) {
-            try {
-                $dsn = Dsn::parse(getenv('DATABASE_URL'));
-                $dsn = $dsn->toArray();
-            } catch (\Exception $e) {
-                throw new StorageException($e);
-            }
-
-            if (!isset(self::$storage_drivers[$dsn['engine']])) {
-                throw new StorageException('Unsupported database type!');
-            }
-
-            $storage = 'jacklul\inlinegamesbot\Storage\Database\\' . self::$storage_drivers[$dsn['engine']] ?: '';
-        } elseif (defined('DATA_PATH')) {
-            $storage = 'jacklul\inlinegamesbot\Storage\File';
-        }
-
-        if (empty($storage) || !class_exists($storage)) {
-            /** @noinspection PhpUndefinedVariableInspection */
-            throw new StorageException('Storage class doesn\'t exist: ' . $storage);
-        }
-
-        self::isDebugPrintEnabled() && self::debugPrint('Using storage: \'' . $storage . '\'');
-
-        return $storage;
-    }
-
     /**
      * Is debug print enabled?
      *
@@ -89,7 +32,7 @@ class Utilities
      */
     public static function debugPrint(string $text): void
     {
-        if (self::$debug_print_enabled) {
+        if (PHP_SAPI === 'cli' && self::$debug_print_enabled) {
             if ($text === '') {
                 return;
             }
@@ -138,7 +81,7 @@ class Utilities
      * Make a debug dump from array of debug data
      *
      * @param string $message
-     * @param array $data
+     * @param array  $data
      *
      * @return string
      */
@@ -162,8 +105,8 @@ class Utilities
      * https://stackoverflow.com/a/9220624
      *
      * @param string $haystack
-     * @param array $needle
-     * @param int $offset
+     * @param array  $needle
+     * @param int    $offset
      *
      * @return bool|mixed
      */

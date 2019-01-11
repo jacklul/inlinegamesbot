@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,15 +11,14 @@
 namespace jacklul\inlinegamesbot\Entity\Game;
 
 use jacklul\inlinegamesbot\Entity\Game;
+use jacklul\inlinegamesbot\Exception\StorageException;
 use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Spatie\Emoji\Emoji;
 
 /**
- * Class Russianroulette
- *
- * @package jacklul\inlinegamesbot\Entity\Game
+ * Russian Roulette
  */
 class Russianroulette extends Game
 {
@@ -57,17 +56,6 @@ class Russianroulette extends Game
      * @var int
      */
     protected static $order = 30;
-
-    /**
-     * Define game symbols (emojis)
-     */
-    protected function defineSymbols()
-    {
-        $this->symbols['empty'] = '.';
-
-        $this->symbols['chamber'] = Emoji::radioButton();
-        $this->symbols['chamber_hit'] = Emoji::largeRedCircle();
-    }
 
     /**
      * Game handler
@@ -111,9 +99,9 @@ class Russianroulette extends Game
             $data['cylinder'] = ['', '', '', '', '', ''];
             $data['cylinder'][mt_rand(0, 5)] = 'X';
 
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game initialization');
+            Utilities::debugPrint('Game initialization');
         } elseif ($arg === null) {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('No move data received');
+            Utilities::debugPrint('No move data received');
         }
 
         if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
@@ -133,19 +121,21 @@ class Russianroulette extends Game
             }
 
             if (!isset($data['cylinder'][$arg - 1])) {
-                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Bad move data received: ' . $arg);
+                Utilities::debugPrint('Bad move data received: ' . $arg);
 
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
 
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Chamber selected: ' . $arg);
+            Utilities::debugPrint('Chamber selected: ' . $arg);
 
             if ($data['cylinder'][$arg - 1] === 'X') {
-                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Chamber contains bullet, player is dead');
+                Utilities::debugPrint('Chamber contains bullet, player is dead');
 
                 if ($data['current_turn'] == 'X') {
-                    $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['O']) . '<b>']) . '</b>' . PHP_EOL;
-                    $gameOutput .= '<b>' . __("{PLAYER} died! (kicked from the game)", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['X']) . '<b>']) . '</b>';
+                    $gameOutput = Emoji::skull() . ' <b>' . __("{PLAYER} died! (kicked)", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['X']) . '<b>']) . '</b>' . PHP_EOL;
+                    $gameOutput .= Emoji::trophy() . ' <b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['O']) . '<b>']) . '</b>' . PHP_EOL;
+
+
                     if ($data['settings']['X'] === 'host') {
                         $this->data['players']['host'] = $this->data['players']['guest'];
                         $this->data['players']['guest'] = null;
@@ -155,8 +145,9 @@ class Russianroulette extends Game
 
                     $data['current_turn'] = 'E';
                 } elseif ($data['current_turn'] == 'O') {
-                    $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['X']) . '<b>']) . '</b>' . PHP_EOL;
-                    $gameOutput .= '<b>' . __("{PLAYER} died! (kicked from the game)", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['O']) . '<b>']) . '</b>';
+                    $gameOutput = Emoji::skull() . ' <b>' . __("{PLAYER} died! (kicked)", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['O']) . '<b>']) . '</b>' . PHP_EOL;
+                    $gameOutput .= Emoji::trophy() . ' <b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['X']) . '<b>']) . '</b>';
+
 
                     if ($data['settings']['X'] === 'host') {
                         $this->data['players']['host'] = $this->data['players']['guest'];
@@ -173,10 +164,10 @@ class Russianroulette extends Game
                 if ($this->saveData($this->data)) {
                     return $this->editMessage($gameOutput . PHP_EOL . PHP_EOL . __('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->customGameKeyboard($hit));
                 } else {
-                    return $this->returnStorageFailure();
+                    throw new StorageException();
                 }
             } else {
-                $gameOutput = '<b>' . __("{PLAYER} survived!", ['{PLAYER}' => '</b>' . $this->getCurrentUserMention() . '<b>']) . '</b>' . PHP_EOL;
+                $gameOutput = Emoji::smilingFaceWithSunglasses() . ' <b>' . __("{PLAYER} survived!", ['{PLAYER}' => '</b>' . $this->getCurrentUserMention() . '<b>']) . '</b>' . PHP_EOL;
 
                 if ($data['current_turn'] == 'X') {
                     $data['current_turn'] = 'O';
@@ -189,18 +180,29 @@ class Russianroulette extends Game
             }
         }
 
-        $gameOutput .= __("Current turn:") . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]);
+        $gameOutput .= Emoji::blackRightwardsArrow() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]);
 
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Cylinder: |' . implode('|', $data['cylinder']) . '|');
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(
-                $this->getUserMention('host') . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . PHP_EOL . PHP_EOL . $gameOutput,
+                $this->getUserMention('host') . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->customGameKeyboard($hit)
             );
         } else {
-            return $this->returnStorageFailure();
+            throw new StorageException();
         }
+    }
+
+    /**
+     * Define game symbols (emojis)
+     */
+    protected function defineSymbols()
+    {
+        $this->symbols['empty'] = '.';
+
+        $this->symbols['chamber'] = Emoji::radioButton();
+        $this->symbols['chamber_hit'] = Emoji::largeRedCircle();
     }
 
     /**

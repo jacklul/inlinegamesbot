@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,21 +10,15 @@
 
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
-use jacklul\inlinegamesbot\Entity\GameManager;
-use jacklul\inlinegamesbot\Helper\Utilities;
+use jacklul\inlinegamesbot\GameCore;
+use jacklul\inlinegamesbot\Storage\Storage;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Request;
 
 /**
- * Class StatsCommand
- *
- * @noinspection PhpUndefinedClassInspection
- *
  * Extremely simple stats command
- *
- * @package Longman\TelegramBot\Commands\AdminCommands
  */
 class StatsCommand extends AdminCommand
 {
@@ -62,8 +56,8 @@ class StatsCommand extends AdminCommand
             $data_query['callback_query_id'] = $callback_query->getId();
         }
 
-        /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
-        $storage_class = Utilities::getStorageClass();
+        /** @var \jacklul\inlinegamesbot\Storage\Driver\File $storage_class */
+        $storage_class = Storage::getClass();
         $storage_class::initializeStorage();
 
         $games = $storage_class::listFromGame(0);
@@ -76,7 +70,7 @@ class StatsCommand extends AdminCommand
 
         foreach ($games as $game) {
             $data = json_decode($game['data'], true);
-            $game_obj = new GameManager($game['id'], $data['game_code'], $this);
+            $game_obj = new GameCore($game['id'], $data['game_code'], $this);
             $game_class = $game_obj->getGame();
             $game_title = $game_class::getTitle();
 

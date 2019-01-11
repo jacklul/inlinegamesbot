@@ -2,38 +2,21 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Storage;
+namespace jacklul\inlinegamesbot\Storage\Driver;
 
-use jacklul\inlinegamesbot\Storage\Database\MySQL;
 use Longman\TelegramBot\DB;
 
 /**
- * Class BotDB
- *
  * Pulls PDO connection from \Longman\TelegramBot\DB and redirects all calls to \jacklul\inlinegamesbot\Storage\MySQL
- *
- * @package jacklul\inlinegamesbot\Storage
  */
 class BotDB extends DB
 {
-    /**
-     * Initialize PDO connection
-     *
-     * @return bool
-     *
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
-     */
-    public static function initializeStorage(): bool
-    {
-        return MySQL::initializeStorage(self::$pdo);
-    }
-
     /**
      * Create table structure
      *
@@ -46,6 +29,18 @@ class BotDB extends DB
         self::initializeStorage();
 
         return MySQL::createStructure();
+    }
+
+    /**
+     * Initialize PDO connection
+     *
+     * @return bool
+     *
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     */
+    public static function initializeStorage(): bool
+    {
+        return MySQL::initializeStorage(self::$pdo);
     }
 
     /**
@@ -66,7 +61,7 @@ class BotDB extends DB
      * Insert data to database
      *
      * @param string $id
-     * @param array $data
+     * @param array  $data
      *
      * @return bool
      *

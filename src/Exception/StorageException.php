@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,13 +10,24 @@
 
 namespace jacklul\inlinegamesbot\Exception;
 
-use Exception;
+use jacklul\inlinegamesbot\Storage\Storage;
 
 /**
  * Exception class used for bot storage related exception handling
- *
- * @package jacklul\inlinegamesbot\Exception
  */
-class StorageException extends Exception
+class StorageException extends BotException
 {
+    /**
+     * @param string          $message
+     * @param int             $code
+     * @param \Throwable|null $previous
+     */
+    public function __construct($message = "", $code = 0, \Throwable $previous = null)
+    {
+        try {
+            parent::__construct($message . ' [' . Storage::getClass() . ']', $code, $previous);
+        } catch (\Exception $e) {
+            parent::__construct($message, $code, $previous);
+        }
+    }
 }

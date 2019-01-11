@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,11 +15,7 @@ use jacklul\inlinegamesbot\Helper\Utilities;
 use SplFileInfo;
 
 /**
- * Class TempFile
- *
  * A temporary file handler, with removal after it's not used
- *
- * @package jacklul\inlinegamesbot\Entity
  */
 class TempFile
 {
@@ -41,7 +37,7 @@ class TempFile
      * TempFile constructor
      *
      * @param string $name
-     * @param bool $delete
+     * @param bool   $delete
      *
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      */

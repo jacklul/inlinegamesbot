@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,15 +10,14 @@
 
 namespace jacklul\inlinegamesbot\Entity\Game;
 
+use jacklul\inlinegamesbot\Exception\StorageException;
 use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Spatie\Emoji\Emoji;
 
 /**
- * Class Poolcheckers
- *
- * @package jacklul\inlinegamesbot\Entity\Game
+ * Pool Checkers
  */
 class Poolcheckers extends Checkers
 {
@@ -94,6 +93,93 @@ class Poolcheckers extends Checkers
     }
 
     /**
+     * Handle user surrender
+     *
+     * @return bool|\Longman\TelegramBot\Entities\ServerResponse|mixed
+     *
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     */
+    protected function forfeitAction()
+    {
+        if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
+            return $this->answerCallbackQuery(__("You're not in this game!"), true);
+        }
+
+        $data = &$this->data['game_data'];
+
+        if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
+            return $this->answerCallbackQuery(__("This game has ended!", true));
+        }
+
+        $this->defineSymbols();
+
+        $this->max_y = count($data['board']);
+        $this->max_x = count($data['board'][0]);
+
+        if ($this->getUser('host') && $this->getCurrentUserId() === $this->getUserId('host')) {
+            if ($data['vote']['host']['surrender']) {
+                Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' surrendered');
+
+                $gameOutput = Emoji::trophy() . ' <b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
+                $gameOutput .= Emoji::wavingWhiteFlag() . ' <b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
+
+                $data['current_turn'] = 'E';
+
+                if ($this->saveData($this->data)) {
+                    return $this->editMessage(
+                        $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
+                        $this->gameKeyboard($data['board'], 'surrender')
+                    );
+                } else {
+                    throw new StorageException();
+                }
+            }
+
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to surrender');
+            $data['vote']['host']['surrender'] = true;
+
+            if ($this->saveData($this->data)) {
+                return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
+            } else {
+                throw new StorageException();
+            }
+        } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
+            if ($data['vote']['guest']['surrender']) {
+                Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' surrendered');
+
+                $gameOutput = Emoji::trophy() . ' <b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
+                $gameOutput .= Emoji::wavingWhiteFlag() . ' <b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
+
+                $data['current_turn'] = 'E';
+
+                if ($this->saveData($this->data)) {
+                    return $this->editMessage(
+                        $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
+                        $this->gameKeyboard($data['board'], 'surrender')
+                    );
+                } else {
+                    throw new StorageException();
+                }
+            }
+
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to surrender');
+            $data['vote']['guest']['surrender'] = true;
+
+            if ($this->saveData($this->data)) {
+                return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
+            } else {
+                throw new StorageException();
+            }
+        } else {
+            Utilities::debugPrint('Someone else executed forfeit action');
+
+            return $this->answerCallbackQuery();
+        }
+    }
+
+    /**
      * Define game symbols (emojis)
      */
     protected function defineSymbols()
@@ -104,236 +190,6 @@ class Poolcheckers extends Checkers
         $this->symbols['XK'] = Emoji::blackMediumSquare();
         $this->symbols['O'] = Emoji::mediumWhiteCircle();
         $this->symbols['OK'] = Emoji::whiteMediumSquare();
-    }
-
-    /**
-     * Game handler
-     *
-     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
-     *
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
-     */
-    protected function gameAction()
-    {
-        if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
-            return $this->answerCallbackQuery(__("You're not in this game!"), true);
-        }
-
-        $data = &$this->data['game_data'];
-
-        $this->defineSymbols();
-
-        $callbackquery_data = $this->manager->getUpdate()->getCallbackQuery()->getData();
-        $callbackquery_data = explode(';', $callbackquery_data);
-
-        $command = $callbackquery_data[1];
-
-        $args = null;
-        if (isset($callbackquery_data[2])) {
-            $args = explode('-', $callbackquery_data[2]);
-        }
-
-        if ($command === 'start') {
-            if (isset($data['settings']) && $data['settings']['X'] == 'host') {
-                $data['settings']['X'] = 'guest';
-                $data['settings']['O'] = 'host';
-            } else {
-                $data['settings']['X'] = 'host';
-                $data['settings']['O'] = 'guest';
-            }
-
-            $data['current_turn'] = 'X';
-            $data['move_counter'] = 0;
-            $data['current_selection'] = '';
-
-            $data['vote']['host']['draw'] = false;
-            $data['vote']['host']['surrender'] = false;
-            $data['vote']['guest']['draw'] = false;
-            $data['vote']['guest']['surrender'] = false;
-
-            $data['board'] = $this->board;
-
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game initialization');
-        } elseif ($args === null && $command === 'game') {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('No move data received');
-        }
-
-        if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
-            return $this->answerCallbackQuery(__("This game has ended!", true));
-        }
-
-        $this->max_y = count($data['board']);
-        $this->max_x = count($data['board'][0]);
-
-        $killed = false;
-        $forcedJump = false;
-        $moveLimit = 25;
-        $moveLimitReached = false;
-        $piecesLeft = null;
-
-        if ($command === 'game') {
-            if ($this->getCurrentUserId() === $this->getUserId($data['settings'][$data['current_turn']])) {
-                if ($data['current_selection'] != '') {
-                    Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Current selection: ' . $data['current_selection']);
-
-                    if ($data['current_selection'] == $args[0] . $args[1]) {
-                        if ($data['current_selection_lock'] == false) {
-                            return $this->answerCallbackQuery();
-                        } else {
-                            return $this->answerCallbackQuery(__("You must make a jump when possible!"), true);
-                        }
-                    } else {
-                        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Listing possible moves');
-
-                        $possibleMoves = $this->possibleMoves($data['board'], $data['current_selection']);
-
-                        for ($x = 0; $x < $this->max_x; $x++) {
-                            for ($y = 0; $y < $this->max_y; $y++) {
-                                if (strpos($data['board'][$x][$y], $data['current_turn']) !== false && $this->possibleMoves($data['board'], $x . $y, true)) {
-                                    $forcedJump = true;
-                                    $availableMoves = $this->possibleMoves($data['board'], $x . $y);
-
-                                    if (isset($availableMoves['kills'][$args[0] . $args[1]]) && $data['current_selection'] == $x . $y) {
-                                        $forcedJump = false;
-                                        break 2;
-                                    }
-                                }
-                            }
-                        }
-
-                        if (in_array($args[0] . $args[1], $possibleMoves['valid_moves']) && $data['board'][$args[0]][$args[1]] == '') {
-                            if ($forcedJump) {
-                                return $this->answerCallbackQuery(__("You must make a jump when possible!"), true);
-                            }
-
-                            $data['board'][$args[0]][$args[1]] = $data['board'][$data['current_selection'][0]][$data['current_selection'][1]];
-                            $data['board'][$data['current_selection'][0]][$data['current_selection'][1]] = '';
-
-                            $data['vote'][$data['settings'][$data['current_turn']]]['surrender'] = false;
-                            $data['vote'][$data['settings'][$data['current_turn']]]['draw'] = false;
-
-                            if (strpos($data['board'][$args[0]][$args[1]], 'K') === false && (($data['current_turn'] == 'X' && $args[1] == 7) || ($data['current_turn'] == 'O' && $args[1] == 0))) {
-                                $data['board'][$args[0]][$args[1]] .= 'K';
-                            }
-
-                            if ($possibleMoves['kills'][$args[0] . $args[1]] != '') {
-                                $data['board'][$possibleMoves['kills'][$args[0] . $args[1]][0]][$possibleMoves['kills'][$args[0] . $args[1]][1]] = '';
-                                $killed = true;
-                            }
-
-                            if ($killed == true && $this->possibleMoves($data['board'], $args[0] . $args[1], true, null, $data['current_selection'][0] . $data['current_selection'][1])) {
-                                $data['current_selection_lock'] = true;
-                                $data['current_selection'] = $args[0] . $args[1];
-                            } else {
-                                if (strpos($data['board'][$args[0]][$args[1]], 'K') === false && (($data['current_turn'] == 'X' && $args[1] == 7) || ($data['current_turn'] == 'O' && $args[1] == 0))) {
-                                    $data['board'][$args[0]][$args[1]] .= 'K';
-                                }
-
-                                if ($data['current_turn'] == 'X') {
-                                    $data['current_turn'] = 'O';
-                                } else {
-                                    $data['current_turn'] = 'X';
-                                }
-
-                                $data['current_selection'] = '';
-                                $data['current_selection_lock'] = false;
-                            }
-
-                            $piecesLeft = $this->piecesLeft($data['board']);
-
-                            if (($piecesLeft['X'] == 1 || $piecesLeft['O'] == 1) && $data['current_selection_lock'] == false) {
-                                if (!isset($data['move_counter'])) {
-                                    $data['move_counter'] = 1;
-                                } else {
-                                    $data['move_counter'] = $data['move_counter'] + 1;
-                                }
-
-                                if ($data['move_counter'] >= $moveLimit) {
-                                    $moveLimitReached = true;
-                                }
-                            }
-                        } else {
-                            if ($data['current_selection_lock'] == true) {
-                                return $this->answerCallbackQuery(__("You must make a jump when possible!"), true);
-                            } elseif ($this->getCurrentUserId() === $this->getUserId($data['settings'][$data['current_turn']]) && strpos($data['board'][$args[0]][$args[1]], $data['current_turn']) !== false) {
-                                $data['current_selection'] = $args[0] . $args[1];
-                            } else {
-                                return $this->answerCallbackQuery(__("Invalid move!"), true);
-                            }
-                        }
-                    }
-                } elseif ($args[0] !== '' && $args[1] !== '') {
-                    if ($this->getCurrentUserId() == $this->getUserId($data['settings'][$data['current_turn']]) && strpos($data['board'][$args[0]][$args[1]], $data['current_turn']) !== false) {
-                        $data['current_selection'] = $args[0] . $args[1];
-                    } elseif ($command === 'game') {
-                        return $this->answerCallbackQuery(__("Invalid selection!"), true);
-                    } else {
-                        return $this->answerCallbackQuery(__("Invalid move!"), true);
-                    }
-                }
-            } else {
-                return $this->answerCallbackQuery(__("It's not your turn!"), true);
-            }
-        }
-
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Checking if game is over');
-
-        $isOver = $this->isGameOver($data['board']);
-
-        if ($data['vote']['host']['draw'] && $data['vote']['guest']['draw']) {
-            $isOver = 'T';
-        }
-
-        $gameOutput = '';
-        if (in_array($isOver, ['X', 'O', 'T']) || $moveLimitReached) {
-            if ($isOver == 'X' || $piecesLeft['X'] > $piecesLeft['O']) {
-                $gameOutput .= '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>';
-            } elseif ($isOver == 'O' || $piecesLeft['O'] > $piecesLeft['X']) {
-                $gameOutput .= '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>';
-            } else {
-                $gameOutput .= '<b>' . __("Game ended with a draw!") . '</b>';
-            }
-
-            $data['current_turn'] = 'E';
-            $data['current_selection'] = '';
-
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game ended');
-        } else {
-            $this->selection = $data['current_selection'];
-
-            if ($data['vote']['host']['draw']) {
-                $gameOutput .= '<b>' . __("{PLAYER} voted to draw!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL . PHP_EOL;
-            } elseif ($data['vote']['guest']['draw']) {
-                $gameOutput .= '<b>' . __("{PLAYER} voted to draw!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL . PHP_EOL;
-            }
-
-            $gameOutput .= __("Current turn:") . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
-
-            if ($data['current_selection'] == '') {
-                $gameOutput .= "\n" . __("(Select the piece you want to move)");
-            } else {
-                $gameOutput .= "\n" . __("(Selected: {COORDINATES})", ['{COORDINATES}' => ($data['current_selection'][0] + 1) . '-' . ($data['current_selection'][1] + 1)]);
-
-                if ($data['current_selection_lock'] == false) {
-                    $gameOutput .= "\n" . __("(Make your move or select different piece)");
-                } else {
-                    $gameOutput .= "\n" . __("(Your move must continue)");
-                }
-            }
-
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game is still in progress');
-        }
-
-        if ($this->saveData($this->data)) {
-            return $this->editMessage(
-                $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
-                $this->gameKeyboard($data['board'], $isOver, $data['move_counter'])
-            );
-        } else {
-            return $this->returnStorageFailure();
-        }
     }
 
     /**
@@ -468,11 +324,346 @@ class Poolcheckers extends Checkers
     }
 
     /**
-     * Generate list of possible moves
+     * Invert the array table for display
      *
      * @param array $board
+     *
+     * @return mixed
+     */
+    protected function invertBoard(array $board)
+    {
+        array_unshift($board, null);
+
+        return call_user_func_array('array_map', $board);
+    }
+
+    /**
+     * Check how many pieces is left
+     *
+     * @param array $board
+     *
+     * @return array
+     */
+    protected function piecesLeft(array $board)
+    {
+        $xs = 0;
+        $ys = 0;
+        $xks = 0;
+        $yks = 0;
+
+        for ($x = 0; $x < $this->max_x; $x++) {
+            for ($y = 0; $y < $this->max_y; $y++) {
+                if (strpos($board[$x][$y], 'X') !== false) {
+                    $xs++;
+                } elseif (strpos($board[$x][$y], 'O') !== false) {
+                    $ys++;
+                }
+
+                if (strpos($board[$x][$y], 'XK') !== false) {
+                    $xks++;
+                } elseif (strpos($board[$x][$y], 'OK') !== false) {
+                    $yks++;
+                }
+            }
+        }
+
+        return [
+            'X'  => $xs,
+            'O'  => $ys,
+            'XK' => $xks,
+            'OK' => $yks,
+        ];
+    }
+
+    /**
+     * Handle votes for draw
+     *
+     * @return bool|\Longman\TelegramBot\Entities\ServerResponse|mixed
+     *
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     */
+    protected function drawAction()
+    {
+        if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
+            return $this->answerCallbackQuery(__("You're not in this game!"), true);
+        }
+
+        $data = &$this->data['game_data'];
+
+        if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
+            return $this->answerCallbackQuery(__("This game has ended!", true));
+        }
+
+        $this->defineSymbols();
+
+        $this->max_y = count($data['board']);
+        $this->max_x = count($data['board'][0]);
+
+        if ($this->getUser('host') && $this->getCurrentUserId() === $this->getUserId('host') && !$data['vote']['host']['draw']) {
+            $data['vote']['host']['draw'] = true;
+
+            if ($this->saveData($this->data)) {
+                Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to draw');
+
+                return $this->gameAction();
+            } else {
+                throw new StorageException();
+            }
+        } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest') && !$data['vote']['guest']['draw']) {
+            $data['vote']['guest']['draw'] = true;
+
+            if ($this->saveData($this->data)) {
+                Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to draw');
+
+                return $this->gameAction();
+            } else {
+                throw new StorageException();
+            }
+        } elseif ($this->getUser('host') && $this->getCurrentUserId() === $this->getUserId('host') || $this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
+            return $this->answerCallbackQuery(__("You already voted!"), true);
+        } else {
+            return $this->answerCallbackQuery();
+        }
+    }
+
+    /**
+     * Game handler
+     *
+     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     *
+     * @throws \jacklul\inlinegamesbot\Exception\BotException
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     */
+    protected function gameAction()
+    {
+        if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
+            return $this->answerCallbackQuery(__("You're not in this game!"), true);
+        }
+
+        $data = &$this->data['game_data'];
+
+        $this->defineSymbols();
+
+        $callbackquery_data = $this->manager->getUpdate()->getCallbackQuery()->getData();
+        $callbackquery_data = explode(';', $callbackquery_data);
+
+        $command = $callbackquery_data[1];
+
+        $args = null;
+        if (isset($callbackquery_data[2])) {
+            $args = explode('-', $callbackquery_data[2]);
+        }
+
+        if ($command === 'start') {
+            if (isset($data['settings']) && $data['settings']['X'] == 'host') {
+                $data['settings']['X'] = 'guest';
+                $data['settings']['O'] = 'host';
+            } else {
+                $data['settings']['X'] = 'host';
+                $data['settings']['O'] = 'guest';
+            }
+
+            $data['current_turn'] = 'X';
+            $data['move_counter'] = 0;
+            $data['current_selection'] = '';
+
+            $data['vote']['host']['draw'] = false;
+            $data['vote']['host']['surrender'] = false;
+            $data['vote']['guest']['draw'] = false;
+            $data['vote']['guest']['surrender'] = false;
+
+            $data['board'] = $this->board;
+
+            Utilities::debugPrint('Game initialization');
+        } elseif ($args === null && $command === 'game') {
+            Utilities::debugPrint('No move data received');
+        }
+
+        if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
+            return $this->answerCallbackQuery(__("This game has ended!", true));
+        }
+
+        $this->max_y = count($data['board']);
+        $this->max_x = count($data['board'][0]);
+
+        $killed = false;
+        $forcedJump = false;
+        $moveLimit = 25;
+        $moveLimitReached = false;
+        $piecesLeft = null;
+
+        if ($command === 'game') {
+            if ($this->getCurrentUserId() === $this->getUserId($data['settings'][$data['current_turn']])) {
+                if ($data['current_selection'] != '') {
+                    Utilities::debugPrint('Current selection: ' . $data['current_selection']);
+
+                    if ($data['current_selection'] == $args[0] . $args[1]) {
+                        if ($data['current_selection_lock'] == false) {
+                            return $this->answerCallbackQuery();
+                        } else {
+                            return $this->answerCallbackQuery(__("You must make a jump when possible!"), true);
+                        }
+                    } else {
+                        Utilities::debugPrint('Listing possible moves');
+
+                        $possibleMoves = $this->possibleMoves($data['board'], $data['current_selection']);
+
+                        for ($x = 0; $x < $this->max_x; $x++) {
+                            for ($y = 0; $y < $this->max_y; $y++) {
+                                if (strpos($data['board'][$x][$y], $data['current_turn']) !== false && $this->possibleMoves($data['board'], $x . $y, true)) {
+                                    $forcedJump = true;
+                                    $availableMoves = $this->possibleMoves($data['board'], $x . $y);
+
+                                    if (isset($availableMoves['kills'][$args[0] . $args[1]]) && $data['current_selection'] == $x . $y) {
+                                        $forcedJump = false;
+                                        break 2;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (in_array($args[0] . $args[1], $possibleMoves['valid_moves']) && $data['board'][$args[0]][$args[1]] == '') {
+                            if ($forcedJump) {
+                                return $this->answerCallbackQuery(__("You must make a jump when possible!"), true);
+                            }
+
+                            $data['board'][$args[0]][$args[1]] = $data['board'][$data['current_selection'][0]][$data['current_selection'][1]];
+                            $data['board'][$data['current_selection'][0]][$data['current_selection'][1]] = '';
+
+                            $data['vote'][$data['settings'][$data['current_turn']]]['surrender'] = false;
+                            $data['vote'][$data['settings'][$data['current_turn']]]['draw'] = false;
+
+                            if (strpos($data['board'][$args[0]][$args[1]], 'K') === false && (($data['current_turn'] == 'X' && $args[1] == 7) || ($data['current_turn'] == 'O' && $args[1] == 0))) {
+                                $data['board'][$args[0]][$args[1]] .= 'K';
+                            }
+
+                            if ($possibleMoves['kills'][$args[0] . $args[1]] != '') {
+                                $data['board'][$possibleMoves['kills'][$args[0] . $args[1]][0]][$possibleMoves['kills'][$args[0] . $args[1]][1]] = '';
+                                $killed = true;
+                            }
+
+                            if ($killed == true && $this->possibleMoves($data['board'], $args[0] . $args[1], true, null, $data['current_selection'][0] . $data['current_selection'][1])) {
+                                $data['current_selection_lock'] = true;
+                                $data['current_selection'] = $args[0] . $args[1];
+                            } else {
+                                if (strpos($data['board'][$args[0]][$args[1]], 'K') === false && (($data['current_turn'] == 'X' && $args[1] == 7) || ($data['current_turn'] == 'O' && $args[1] == 0))) {
+                                    $data['board'][$args[0]][$args[1]] .= 'K';
+                                }
+
+                                if ($data['current_turn'] == 'X') {
+                                    $data['current_turn'] = 'O';
+                                } else {
+                                    $data['current_turn'] = 'X';
+                                }
+
+                                $data['current_selection'] = '';
+                                $data['current_selection_lock'] = false;
+                            }
+
+                            $piecesLeft = $this->piecesLeft($data['board']);
+
+                            if (($piecesLeft['X'] == 1 || $piecesLeft['O'] == 1) && $data['current_selection_lock'] == false) {
+                                if (!isset($data['move_counter'])) {
+                                    $data['move_counter'] = 1;
+                                } else {
+                                    $data['move_counter'] = $data['move_counter'] + 1;
+                                }
+
+                                if ($data['move_counter'] >= $moveLimit) {
+                                    $moveLimitReached = true;
+                                }
+                            }
+                        } else {
+                            if ($data['current_selection_lock'] == true) {
+                                return $this->answerCallbackQuery(__("You must make a jump when possible!"), true);
+                            } elseif ($this->getCurrentUserId() === $this->getUserId($data['settings'][$data['current_turn']]) && strpos($data['board'][$args[0]][$args[1]], $data['current_turn']) !== false) {
+                                $data['current_selection'] = $args[0] . $args[1];
+                            } else {
+                                return $this->answerCallbackQuery(__("Invalid move!"), true);
+                            }
+                        }
+                    }
+                } elseif ($args[0] !== '' && $args[1] !== '') {
+                    if ($this->getCurrentUserId() == $this->getUserId($data['settings'][$data['current_turn']]) && strpos($data['board'][$args[0]][$args[1]], $data['current_turn']) !== false) {
+                        $data['current_selection'] = $args[0] . $args[1];
+                    } elseif ($command === 'game') {
+                        return $this->answerCallbackQuery(__("Invalid selection!"), true);
+                    } else {
+                        return $this->answerCallbackQuery(__("Invalid move!"), true);
+                    }
+                }
+            } else {
+                return $this->answerCallbackQuery(__("It's not your turn!"), true);
+            }
+        }
+
+        Utilities::debugPrint('Checking if game is over');
+
+        $isOver = $this->isGameOver($data['board']);
+
+        if ($data['vote']['host']['draw'] && $data['vote']['guest']['draw']) {
+            $isOver = 'T';
+        }
+
+        $gameOutput = '';
+        if (in_array($isOver, ['X', 'O', 'T']) || $moveLimitReached) {
+            if ($isOver == 'X' || $piecesLeft['X'] > $piecesLeft['O']) {
+                $gameOutput .= Emoji::trophy() . ' <b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>';
+            } elseif ($isOver == 'O' || $piecesLeft['O'] > $piecesLeft['X']) {
+                $gameOutput .= Emoji::trophy() . ' <b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>';
+            } else {
+                $gameOutput .= Emoji::chequeredFlag() . ' <b>' . __("Game ended with a draw!") . '</b>';
+            }
+
+            $data['current_turn'] = 'E';
+            $data['current_selection'] = '';
+
+            Utilities::debugPrint('Game ended');
+        } else {
+            $this->selection = $data['current_selection'];
+
+            if ($data['vote']['host']['draw']) {
+                $gameOutput .= '<b>' . __("{PLAYER} voted to draw!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL . PHP_EOL;
+            } elseif ($data['vote']['guest']['draw']) {
+                $gameOutput .= '<b>' . __("{PLAYER} voted to draw!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL . PHP_EOL;
+            }
+
+            $gameOutput .= Emoji::blackRightwardsArrow() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
+
+            if ($data['current_selection'] == '') {
+                $gameOutput .= "\n" . __("(Select the piece you want to move)");
+            } else {
+                $gameOutput .= "\n" . __("(Selected: {COORDINATES})", ['{COORDINATES}' => ($data['current_selection'][0] + 1) . '-' . ($data['current_selection'][1] + 1)]);
+
+                if ($data['current_selection_lock'] == false) {
+                    $gameOutput .= "\n" . __("(Make your move or select different piece)");
+                } else {
+                    $gameOutput .= "\n" . __("(Your move must continue)");
+                }
+            }
+
+            Utilities::debugPrint('Game is still in progress');
+        }
+
+        if ($this->saveData($this->data)) {
+            return $this->editMessage(
+                $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
+                $this->gameKeyboard($data['board'], $isOver, $data['move_counter'])
+            );
+        } else {
+            throw new StorageException();
+        }
+    }
+
+    /**
+     * Generate list of possible moves
+     *
+     * @param array  $board
      * @param string $selection
-     * @param bool $onlykill
+     * @param bool   $onlykill
      * @param string $char
      * @param string $backmultijumpblock
      *
@@ -788,44 +979,6 @@ class Poolcheckers extends Checkers
     }
 
     /**
-     * Check how many pieces is left
-     *
-     * @param array $board
-     *
-     * @return array
-     */
-    protected function piecesLeft(array $board)
-    {
-        $xs = 0;
-        $ys = 0;
-        $xks = 0;
-        $yks = 0;
-
-        for ($x = 0; $x < $this->max_x; $x++) {
-            for ($y = 0; $y < $this->max_y; $y++) {
-                if (strpos($board[$x][$y], 'X') !== false) {
-                    $xs++;
-                } elseif (strpos($board[$x][$y], 'O') !== false) {
-                    $ys++;
-                }
-
-                if (strpos($board[$x][$y], 'XK') !== false) {
-                    $xks++;
-                } elseif (strpos($board[$x][$y], 'OK') !== false) {
-                    $yks++;
-                }
-            }
-        }
-
-        return [
-            'X'  => $xs,
-            'O'  => $ys,
-            'XK' => $xks,
-            'OK' => $yks,
-        ];
-    }
-
-    /**
      * Check whenever game is over
      *
      * @param array $board
@@ -880,159 +1033,5 @@ class Poolcheckers extends Checkers
         }
 
         return null;
-    }
-
-    /**
-     * Invert the array table for display
-     *
-     * @param array $board
-     *
-     * @return mixed
-     */
-    protected function invertBoard(array $board)
-    {
-        array_unshift($board, null);
-
-        return call_user_func_array('array_map', $board);
-    }
-
-    /**
-     * Handle user surrender
-     *
-     * @return bool|\Longman\TelegramBot\Entities\ServerResponse|mixed
-     *
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
-     */
-    protected function forfeitAction()
-    {
-        if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
-            return $this->answerCallbackQuery(__("You're not in this game!"), true);
-        }
-
-        $data = &$this->data['game_data'];
-
-        if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
-            return $this->answerCallbackQuery(__("This game has ended!", true));
-        }
-
-        $this->defineSymbols();
-
-        $this->max_y = count($data['board']);
-        $this->max_x = count($data['board'][0]);
-
-        if ($this->getUser('host') && $this->getCurrentUserId() === $this->getUserId('host')) {
-            if ($data['vote']['host']['surrender']) {
-                Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' surrendered');
-
-                $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
-                $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
-
-                $data['current_turn'] = 'E';
-
-                if ($this->saveData($this->data)) {
-                    return $this->editMessage(
-                        $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
-                        $this->gameKeyboard($data['board'], 'surrender')
-                    );
-                } else {
-                    return $this->returnStorageFailure();
-                }
-            }
-
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to surrender');
-            $data['vote']['host']['surrender'] = true;
-
-            if ($this->saveData($this->data)) {
-                return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
-            } else {
-                return $this->returnStorageFailure();
-            }
-        } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
-            if ($data['vote']['guest']['surrender']) {
-                Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' surrendered');
-
-                $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
-                $gameOutput .= '<b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
-
-                $data['current_turn'] = 'E';
-
-                if ($this->saveData($this->data)) {
-                    return $this->editMessage(
-                        $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
-                        $this->gameKeyboard($data['board'], 'surrender')
-                    );
-                } else {
-                    return $this->returnStorageFailure();
-                }
-            }
-
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to surrender');
-            $data['vote']['guest']['surrender'] = true;
-
-            if ($this->saveData($this->data)) {
-                return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
-            } else {
-                return $this->returnStorageFailure();
-            }
-        } else {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Someone else executed forfeit action');
-
-            return $this->answerCallbackQuery();
-        }
-    }
-
-    /**
-     * Handle votes for draw
-     *
-     * @return bool|\Longman\TelegramBot\Entities\ServerResponse|mixed
-     *
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
-     */
-    protected function drawAction()
-    {
-        if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
-            return $this->answerCallbackQuery(__("You're not in this game!"), true);
-        }
-
-        $data = &$this->data['game_data'];
-
-        if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
-            return $this->answerCallbackQuery(__("This game has ended!", true));
-        }
-
-        $this->defineSymbols();
-
-        $this->max_y = count($data['board']);
-        $this->max_x = count($data['board'][0]);
-
-        if ($this->getUser('host') && $this->getCurrentUserId() === $this->getUserId('host') && !$data['vote']['host']['draw']) {
-            $data['vote']['host']['draw'] = true;
-
-            if ($this->saveData($this->data)) {
-                Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to draw');
-
-                return $this->gameAction();
-            } else {
-                return $this->returnStorageFailure();
-            }
-        } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest') && !$data['vote']['guest']['draw']) {
-            $data['vote']['guest']['draw'] = true;
-
-            if ($this->saveData($this->data)) {
-                Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to draw');
-
-                return $this->gameAction();
-            } else {
-                return $this->returnStorageFailure();
-            }
-        } elseif ($this->getUser('host') && $this->getCurrentUserId() === $this->getUserId('host') || $this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
-            return $this->answerCallbackQuery(__("You already voted!"), true);
-        } else {
-            return $this->answerCallbackQuery();
-        }
     }
 }

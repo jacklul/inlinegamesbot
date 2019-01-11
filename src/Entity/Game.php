@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,6 +11,9 @@
 namespace jacklul\inlinegamesbot\Entity;
 
 use jacklul\inlinegamesbot\Exception\BotException;
+use jacklul\inlinegamesbot\Exception\StorageException;
+use jacklul\inlinegamesbot\Exception\TelegramApiException;
+use jacklul\inlinegamesbot\GameCore;
 use jacklul\inlinegamesbot\Helper\Language;
 use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
@@ -18,14 +21,9 @@ use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Entities\User;
 use Longman\TelegramBot\Request;
-use Longman\TelegramBot\TelegramLog;
 
 /**
- * Class Game
- *
  * The "master" class for all games, contains shared methods
- *
- * @package jacklul\inlinegamesbot\Entity
  */
 class Game
 {
@@ -81,7 +79,7 @@ class Game
     /**
      * Game Manager object
      *
-     * @var GameManager
+     * @var GameCore
      */
     protected $manager;
 
@@ -107,19 +105,13 @@ class Game
     protected $symbols = [];
 
     /**
-     * @return string
+     * Game constructor
+     *
+     * @param GameCore $manager
      */
-    public static function getCode(): string
+    public function __construct(GameCore $manager)
     {
-        return static::$code;
-    }
-
-    /**
-     * @return string
-     */
-    public static function getTitle(): string
-    {
-        return static::$title;
+        $this->manager = $manager;
     }
 
     /**
@@ -147,39 +139,29 @@ class Game
     }
 
     /**
-     * Game constructor
-     *
-     * @param GameManager $manager
-     */
-    public function __construct(GameManager $manager)
-    {
-        $this->manager = $manager;
-    }
-
-    /**
      * Handle game action
      *
      * @param string $action
      *
      * @return ServerResponse|mixed
      *
+     * @throws TelegramApiException
+     * @throws StorageException
      * @throws BotException
-     *
      * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
     public function handleAction(string $action)
     {
         $game_id = $this->manager->getId();
         if (class_exists($storage_class = $this->manager->getStorage()) && $this->data === null) {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Reading game data from the database');
+            Utilities::debugPrint('Reading game data from the database');
 
-            /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
+            /** @var \jacklul\inlinegamesbot\Storage\Driver\File $storage_class */
             $this->data = $storage_class::selectFromGame($game_id);
         }
 
-        if ($this->data === null || $this->data === false) {
-            return $this->returnStorageFailure();
+        if (!is_array($this->data)) {
+            throw new StorageException();
         }
 
         $this->data_old = $this->data;
@@ -188,7 +170,7 @@ class Game
 
         // Do not throw exception on method not found as users can potentially manipulate callback data
         if (!method_exists($this, $action)) {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Method \'' . $action . '\' doesn\'t exist');
+            Utilities::debugPrint('Method \'' . $action . '\' doesn\'t exist');
 
             return $this->answerCallbackQuery();
         }
@@ -197,18 +179,18 @@ class Game
 
         if (isset($this->data['settings']['language']) && $language = $this->data['settings']['language']) {
             Language::set($language);
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Set language: ' . $language);
+            Utilities::debugPrint('Set language: ' . $language);
         } else {
             Language::set(Language::getDefaultLanguage());
         }
 
 
         if (empty($this->data) && $action !== 'newAction') {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Empty game data found with action expecting it to not be');
+            Utilities::debugPrint('Empty game data found with action expecting it to not be');
             $action = "handleEmptyData";
         }
 
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Executing: ' . $action);
+        Utilities::debugPrint('Executing: ' . $action);
 
         $result = $this->$action();
 
@@ -222,14 +204,14 @@ class Game
             ];
 
             if ($result->isOk() || Utilities::strposa($result->getDescription(), $allowedAPIErrors) !== false) {
-                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Server response is ok');
+                Utilities::debugPrint('Server response is ok');
 
                 return $this->answerCallbackQuery();
             }
 
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Server response is not ok: ' . $result->getDescription() . ' (' . $result->getErrorCode() . ')');
+            Utilities::debugPrint('Server response is not ok: ' . $result->getDescription() . ' (' . $result->getErrorCode() . ')');
 
-            TelegramLog::error(
+            throw new TelegramApiException(
                 Utilities::debugDump(
                     'Telegram API error: ' . $result->getDescription() . ' (' . $result->getErrorCode() . ')',
                     [
@@ -238,13 +220,14 @@ class Game
                     ]
                 )
             );
-
-            return $this->answerCallbackQuery(__('Telegram API error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."), true);
         }
 
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('CRASHED (Game result is not a ServerResponse object!)');
+        Utilities::debugPrint('CRASHED (Game result is not a ServerResponse object!)');
 
-        TelegramLog::error(
+        $this->saveData([]);
+        $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
+
+        throw new BotException(
             Utilities::debugDump(
                 'CRASH' . ($this->manager->getId() ? ' (Session ID: ' . $this->manager->getId() . ')' : ''),
                 [
@@ -257,46 +240,21 @@ class Game
                 ]
             )
         );
-
-        $this->saveData([]);
-        $this->editMessage('<i>' . __("This game session has crashed.") . '</i>' . PHP_EOL . '(ID: ' . $this->manager->getId() . ')', $this->getReplyMarkup('empty'));
-        return $this->answerCallbackQuery(__('Critical error!', true));
     }
 
     /**
-     * Save game data
-     *
-     * @param array $data
-     *
-     * @return bool
-     *
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @return string
      */
-    protected function saveData(array $data = null): bool
+    public static function getCode(): string
     {
-        if ($data == null) {
-            $data = [];
-        }
-
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Saving game data to database');
-
-        /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
-        $storage_class = $this->manager->getStorage();
-
-        // Make sure we have the game code in the data array for /cleansessions and /stats command!
-        $data['game_code'] = static::getCode();
-
-        // Sort it
-        ksort($data);
-
-        return $storage_class::insertToGame($this->manager->getId(), $data);
+        return static::$code;
     }
 
     /**
      * Answer to callback query helper
      *
      * @param string $text
-     * @param bool $alert
+     * @param bool   $alert
      *
      * @return ServerResponse
      *
@@ -320,11 +278,37 @@ class Game
     }
 
     /**
+     * Save game data
+     *
+     * @param array $data
+     *
+     * @return bool
+     *
+     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     */
+    protected function saveData(array $data = null): bool
+    {
+        if ($data == null) {
+            $data = [];
+        }
+
+        // Make sure we have the game code in the data array for /cleansessions and /stats command!
+        $data['game_code'] = static::getCode();
+
+        Utilities::debugPrint('Saving game data to database');
+
+        /** @var \jacklul\inlinegamesbot\Storage\Driver\File $storage_class */
+        $storage_class = $this->manager->getStorage();
+
+        return $storage_class::insertToGame($this->manager->getId(), $data);
+    }
+
+    /**
      * Edit message helper
      *
-     * @param string $text
+     * @param string         $text
      * @param InlineKeyboard $reply_markup
-     * @param bool $ignore_mention_error
+     * @param bool           $ignore_mention_error
      *
      * @return ServerResponse
      *
@@ -349,7 +333,8 @@ class Game
             $this->data['settings']['use_old_mentions'] = true;
 
             if ($this->saveData($this->data)) {
-                if (preg_match_all("/<a\shref=\"tg:\/\/user\?id=(.*)\">.*<\/a>/Us", $text, $matches)) {
+                //if (preg_match_all("/<a\shref=\"tg:\/\/user\?id=(.*)\">.*<\/a>/Us", $text, $matches)) {
+                if (preg_match_all('/<a\\shref="tg:\\/\\/user\\?id=(.*)">.*<\\/a>/Us', $text, $matches)) {
                     for ($i = 0; $i < count($matches[1]); $i++) {
                         if ($matches[1][$i] == $this->getUserId('host')) {
                             $text = str_replace($matches[0][$i], $this->getUser('host')->tryMention(), $text);
@@ -376,84 +361,11 @@ class Game
     }
 
     /**
-     * Returns notice about storage failure (error while saving mostly)
-     *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @return string
      */
-    protected function returnStorageFailure()
+    public static function getTitle(): string
     {
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Storage failure');
-
-        return $this->answerCallbackQuery(__('Database error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."), true);
-    }
-
-    /**
-     * Get player's user object
-     *
-     * @param string $user
-     * @param bool $as_json
-     *
-     * @return User|bool
-     *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     */
-    protected function getUser(string $user = null, bool $as_json = false)
-    {
-        if ($user === null) {
-            return false;
-        }
-
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint($user . ' (as_json: ' . ($as_json ? 'true' : 'false') . ')');
-
-        if ($as_json) {
-            $result = isset($this->data['players'][$user]['id']) ? $this->data['players'][$user] : false;
-
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('JSON: ' . json_encode($result));
-
-            return $result;
-        }
-
-        $result = isset($this->data['players'][$user]['id']) ? new User($this->data['players'][$user]) : false;
-
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint((($result instanceof User) ? 'OBJ->JSON: ' . $result->toJson() : 'false'));
-
-        return $result;
-    }
-
-    /**
-     * Get current player's user object
-     *
-     * @param bool $as_json
-     *
-     * @return User|string|null
-     *
-     * @throws BotException
-     */
-    protected function getCurrentUser(bool $as_json = false)
-    {
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('(as_json: ' . ($as_json ? 'true' : 'false') . ')');
-
-        if ($callback_query = $this->manager->getUpdate()->getCallbackQuery()) {
-            $update_object = $callback_query;
-        } elseif ($chosen_inline_result = $this->manager->getUpdate()->getChosenInlineResult()) {
-            $update_object = $chosen_inline_result;
-        } else {
-            throw new BotException('No current user found!?');
-        }
-
-        if ($as_json) {
-            $json = $update_object->getFrom();
-
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('JSON: ' . $json);
-
-            return json_decode($json, true);
-        }
-
-        $result = $update_object->getFrom();
-
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint((($result instanceof User) ? 'OBJ->JSON: ' . $result->toJson() : 'false'));
-
-        return $result;
+        return static::$title;
     }
 
     /**
@@ -471,49 +383,66 @@ class Game
     }
 
     /**
-     * Get current user id safely (prevent getId() on null)
-     *
-     * @return int|bool
-     *
-     * @throws BotException
-     */
-    protected function getCurrentUserId()
-    {
-        return $this->getCurrentUser() ? $this->getCurrentUser()->getId() : false;
-    }
-
-    /**
-     * Get specific user mention (host or guest)
+     * Get player's user object
      *
      * @param string $user
+     * @param bool   $as_json
      *
-     * @return string|bool
+     * @return User|bool
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function getUserMention(string $user = null)
+    protected function getUser(string $user = null, bool $as_json = false)
     {
-        if (isset($this->data['settings']['use_old_mentions']) && $this->data['settings']['use_old_mentions'] === true) {
-            return $this->getUser($user) ? filter_var($this->getUser($user)->tryMention(), FILTER_SANITIZE_SPECIAL_CHARS) : false;
+        if ($user === null) {
+            return false;
         }
 
-        return $this->getUser($user) ? '<a href="tg://user?id=' . $this->getUser($user)->getId() . '">' . filter_var($this->getUser($user)->getFirstName(), FILTER_SANITIZE_SPECIAL_CHARS) . '</a>' : false;
+        Utilities::debugPrint($user . ' (as_json: ' . ($as_json ? 'true' : 'false') . ')');
+
+        if ($as_json) {
+            $result = isset($this->data['players'][$user]['id']) ? $this->data['players'][$user] : false;
+
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('JSON: ' . json_encode($result));
+
+            return $result;
+        }
+
+        $result = isset($this->data['players'][$user]['id']) ? new User($this->data['players'][$user]) : false;
+
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint((($result instanceof User) ? 'OBJ->JSON: ' . $result->toJson() : 'false'));
+
+        return $result;
     }
 
     /**
-     * Get current user mention
+     * Get specified reply markup
      *
-     * @return string|bool
+     * @param string $inline_keyboard
      *
-     * @throws BotException
+     * @return InlineKeyboard
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function getCurrentUserMention()
+    protected function getReplyMarkup(string $inline_keyboard = null)
     {
-        if (isset($this->data['settings']['use_old_mentions']) && $this->data['settings']['use_old_mentions'] === true) {
-            return $this->getCurrentUser() ? filter_var($this->getCurrentUser()->tryMention(), FILTER_SANITIZE_SPECIAL_CHARS) : false;
+        if (empty($inline_keyboard)) {
+            $inline_keyboard = 'empty';
         }
 
-        return $this->getCurrentUser() ? '<a href="tg://user?id=' . $this->getCurrentUser()->getId() . '">' . filter_var($this->getCurrentUser()->getFirstName(), FILTER_SANITIZE_SPECIAL_CHARS) . '</a>' : false;
+        $inline_keyboard = strtolower(preg_replace("/[^a-zA-Z]+/", "", $inline_keyboard));
+        $inline_keyboard = $inline_keyboard . 'Keyboard';
+
+        Utilities::debugPrint($inline_keyboard);
+
+        if (!method_exists($this, $inline_keyboard)) {
+            Utilities::debugPrint('Method \'' . $inline_keyboard . '\ doesn\'t exist');
+            $inline_keyboard = 'emptyKeyboard';
+        }
+
+        $inline_keyboard = $this->$inline_keyboard();
+        $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
+
+        return $inline_keyboard_markup;
     }
 
     /**
@@ -543,8 +472,62 @@ class Game
         if ($this->saveData($this->data)) {
             return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
         } else {
-            return $this->returnStorageFailure();
+            throw new StorageException();
         }
+    }
+
+    /**
+     * Get current player's user object
+     *
+     * @param bool $as_json
+     *
+     * @return User|string|null
+     *
+     * @throws BotException
+     */
+    protected function getCurrentUser(bool $as_json = false)
+    {
+        Utilities::debugPrint('(as_json: ' . ($as_json ? 'true' : 'false') . ')');
+
+        if ($callback_query = $this->manager->getUpdate()->getCallbackQuery()) {
+            $update_object = $callback_query;
+        } elseif ($chosen_inline_result = $this->manager->getUpdate()->getChosenInlineResult()) {
+            $update_object = $chosen_inline_result;
+        } else {
+            throw new BotException('No current user found!?');
+        }
+
+        if ($as_json) {
+            $json = $update_object->getFrom();
+
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('JSON: ' . $json);
+
+            return json_decode($json, true);
+        }
+
+        $result = $update_object->getFrom();
+
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint((($result instanceof User) ? 'OBJ->JSON: ' . $result->toJson() : 'false'));
+
+        return $result;
+    }
+
+    /**
+     * Get specific user mention (host or guest)
+     *
+     * @param string $user
+     *
+     * @return string|bool
+     *
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     */
+    protected function getUserMention(string $user = null)
+    {
+        if (isset($this->data['settings']['use_old_mentions']) && $this->data['settings']['use_old_mentions'] === true) {
+            return $this->getUser($user) ? filter_var($this->getUser($user)->tryMention(), FILTER_SANITIZE_SPECIAL_CHARS) : false;
+        }
+
+        return $this->getUser($user) ? '<a href="tg://user?id=' . $this->getUser($user)->getId() . '">' . filter_var($this->getUser($user)->getFirstName(), FILTER_SANITIZE_SPECIAL_CHARS) . '</a>' : false;
     }
 
     /**
@@ -566,7 +549,7 @@ class Game
             if ($this->saveData($this->data)) {
                 return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
             } else {
-                return $this->returnStorageFailure();
+                throw new StorageException();
             }
         } elseif (!$this->getUser('guest')) {
             if ($this->getCurrentUserId() != $this->getUserId('host') || (getenv('DEBUG') && $this->getCurrentUserId() == getenv('BOT_ADMIN'))) {
@@ -577,7 +560,7 @@ class Game
                 if ($this->saveData($this->data)) {
                     return $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
                 } else {
-                    return $this->returnStorageFailure();
+                    throw new StorageException();
                 }
             } else {
                 return $this->answerCallbackQuery(__("You cannot play with yourself!"), true);
@@ -585,6 +568,34 @@ class Game
         } else {
             return $this->answerCallbackQuery(__("This game is full!"));
         }
+    }
+
+    /**
+     * Get current user mention
+     *
+     * @return string|bool
+     *
+     * @throws BotException
+     */
+    protected function getCurrentUserMention()
+    {
+        if (isset($this->data['settings']['use_old_mentions']) && $this->data['settings']['use_old_mentions'] === true) {
+            return $this->getCurrentUser() ? filter_var($this->getCurrentUser()->tryMention(), FILTER_SANITIZE_SPECIAL_CHARS) : false;
+        }
+
+        return $this->getCurrentUser() ? '<a href="tg://user?id=' . $this->getCurrentUser()->getId() . '">' . filter_var($this->getCurrentUser()->getFirstName(), FILTER_SANITIZE_SPECIAL_CHARS) . '</a>' : false;
+    }
+
+    /**
+     * Get current user id safely (prevent getId() on null)
+     *
+     * @return int|bool
+     *
+     * @throws BotException
+     */
+    protected function getCurrentUserId()
+    {
+        return $this->getCurrentUser() ? $this->getCurrentUser()->getId() : false;
     }
 
     /**
@@ -614,7 +625,7 @@ class Game
                 if ($this->saveData($this->data)) {
                     return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $currentUserMention]) . PHP_EOL . __("{PLAYER_HOST} is now the host.", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
                 } else {
-                    return $this->returnStorageFailure();
+                    throw new StorageException();
                 }
             } else {
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Quit (host): ' . $this->getCurrentUserMention());
@@ -624,7 +635,7 @@ class Game
                 if ($this->saveData($this->data)) {
                     return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
                 } else {
-                    return $this->returnStorageFailure();
+                    throw new StorageException();
                 }
             }
         } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
@@ -637,10 +648,10 @@ class Game
             if ($this->saveData($this->data)) {
                 return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $currentUserMention]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
             } else {
-                return $this->returnStorageFailure();
+                throw new StorageException();
             }
         } else {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('User quitting an empty game?');
+            Utilities::debugPrint('User quitting an empty game?');
 
             return $this->answerCallbackQuery();
         }
@@ -674,10 +685,10 @@ class Game
             if ($this->saveData($this->data)) {
                 return $this->editMessage(__('{PLAYER_GUEST} was kicked...', ['{PLAYER_GUEST}' => $user]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
             } else {
-                return $this->returnStorageFailure();
+                throw new StorageException();
             }
         } else {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Kick executed on a game without a host');
+            Utilities::debugPrint('Kick executed on a game without a host');
 
             return $this->answerCallbackQuery();
         }
@@ -707,7 +718,7 @@ class Game
         }
 
         if (!$this->getUser('host') || !$this->getUser('guest')) {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Received request to start the game but one of the players wasn\'t in the game');
+            Utilities::debugPrint('Received request to start the game but one of the players wasn\'t in the game');
 
             return $this->answerCallbackQuery();
         }
@@ -771,7 +782,7 @@ class Game
         $this->data['settings']['language'] = $selected_language;
 
         if ($this->saveData($this->data)) {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Set language: ' . $selected_language);
+            Utilities::debugPrint('Set language: ' . $selected_language);
             Language::set($selected_language);
         }
 
@@ -780,36 +791,6 @@ class Game
         } else {
             return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
         }
-    }
-
-    /**
-     * Get specified reply markup
-     *
-     * @param string $inline_keyboard
-     *
-     * @return InlineKeyboard
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     */
-    protected function getReplyMarkup(string $inline_keyboard = null)
-    {
-        if (empty($inline_keyboard)) {
-            $inline_keyboard = 'empty';
-        }
-
-        $inline_keyboard = strtolower(preg_replace("/[^a-zA-Z]+/", "", $inline_keyboard));
-        $inline_keyboard = $inline_keyboard . 'Keyboard';
-
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint($inline_keyboard);
-
-        if (!method_exists($this, $inline_keyboard)) {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Method \'' . $inline_keyboard . '\ doesn\'t exist');
-            $inline_keyboard = 'emptyKeyboard';
-        }
-
-        $inline_keyboard = $this->$inline_keyboard();
-        $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
-
-        return $inline_keyboard_markup;
     }
 
     /**
@@ -1057,7 +1038,7 @@ class Game
      */
     protected function handleEmptyData()
     {
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Empty game data');
+        Utilities::debugPrint('Empty game data');
 
         $result = $this->editMessage('<i>' . __("This game session has expired.") . '</i>', $this->getReplyMarkup('empty'));
 

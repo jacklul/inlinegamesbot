@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,9 +15,7 @@ use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Spatie\Emoji\Emoji;
 
 /**
- * Class Rockpaperscissorslizardspock
- *
- * @package jacklul\inlinegamesbot\Entity\Game
+ * Rock-Paper-Scissors-Lizard-Spock
  */
 class Rockpaperscissorslizardspock extends Rockpaperscissors
 {
@@ -33,14 +31,14 @@ class Rockpaperscissorslizardspock extends Rockpaperscissors
      *
      * @var string
      */
-    protected static $title = 'Rock-Paper-Scissors-Lizard-Spock *beta* (please report issues!)';
+    protected static $title = 'Rock-Paper-Scissors-Lizard-Spock';
 
     /**
      * Game description
      *
      * @var string
      */
-    protected static $description = 'Rock-paper-scissors-lizard-spock is a game in which each player simultaneously forms one of three shapes with an outstretched hand.';
+    protected static $description = 'Rock-paper-scissors-lizard-spock is a game in which each player simultaneously forms one of five shapes with an outstretched hand.';
 
     /**
      * Game thumbnail image

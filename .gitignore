@@ -2,7 +2,7 @@
 /vendor/
 
 # Configuration files
-/bot/config.php
+/config.php
 /.env*
 /!.env.example
 
@@ -10,4 +10,4 @@
 /data/
 
 # Other
-/bot/language/*.mo
+/language/*.mo

@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,21 +10,17 @@
 
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
-use jacklul\inlinegamesbot\Entity\GameManager;
+use jacklul\inlinegamesbot\GameCore;
 use jacklul\inlinegamesbot\Helper\Utilities;
+use jacklul\inlinegamesbot\Storage\Storage;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Request;
 
 /**
- * Class CleansessionsCommand
- *
- * @noinspection PhpUndefinedClassInspection
- *
- * This command will clean games that were inactive for a longer period and edit their message to indicate that they expired
- *
- * @package Longman\TelegramBot\Commands\AdminCommands
+ * This command will clean games that were inactive for a longer period and
+ * edit their message to indicate that they expired
  */
 class CleansessionsCommand extends AdminCommand
 {
@@ -71,8 +67,8 @@ class CleansessionsCommand extends AdminCommand
             set_time_limit(10);
         }
 
-        /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
-        $storage_class = Utilities::getStorageClass();
+        /** @var \jacklul\inlinegamesbot\Storage\Driver\File $storage_class */
+        $storage_class = Storage::getClass();
 
         if (class_exists($storage_class)) {
             $storage_class::initializeStorage();
@@ -101,7 +97,7 @@ class CleansessionsCommand extends AdminCommand
 
                 foreach ($inactive as $inactive_game) {
                     if (time() >= $start_time + $timelimit - 1) {
-                        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Time limit reached');
+                        Utilities::debugPrint('Time limit reached');
                         break;
                     }
 
@@ -119,11 +115,11 @@ class CleansessionsCommand extends AdminCommand
                     $game_data = $storage_class::selectFromGame($inactive_game['id']);
 
                     if (isset($game_data['game_code'])) {
-                        $game = new GameManager($inactive_game['id'], $game_data['game_code'], $this);
+                        $game = new GameCore($inactive_game['id'], $game_data['game_code'], $this);
 
                         if ($game->canRun()) {
                             while (time() <= $last_request_time) {
-                                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Delaying next request');
+                                Utilities::debugPrint('Delaying next request');
                                 sleep(1);
                             }
 
@@ -143,16 +139,16 @@ class CleansessionsCommand extends AdminCommand
 
                             if (isset($result) && $result->isOk()) {
                                 $edited++;
-                                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Message edited successfully');
+                                Utilities::debugPrint('Message edited successfully');
                             } else {
-                                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Failed to edit message: ' . (isset($result) ? $result->getDescription() : '<unknown error>'));
+                                Utilities::debugPrint('Failed to edit message: ' . (isset($result) ? $result->getDescription() : '<unknown error>'));
                             }
                         }
                     }
 
                     if ($storage_class::deleteFromGame($inactive_game['id'])) {
                         $cleaned++;
-                        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Record removed from the database');
+                        Utilities::debugPrint('Record removed from the database');
                     }
                 }
 

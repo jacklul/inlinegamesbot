@@ -2,32 +2,30 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Entity;
+namespace jacklul\inlinegamesbot;
 
+use jacklul\inlinegamesbot\Entity\Game;
 use jacklul\inlinegamesbot\Exception\BotException;
 use jacklul\inlinegamesbot\Exception\StorageException;
-use jacklul\inlinegamesbot\Helper\Botan;
+use jacklul\inlinegamesbot\Exception\TelegramApiException;
 use jacklul\inlinegamesbot\Helper\Language;
 use jacklul\inlinegamesbot\Helper\Utilities;
+use jacklul\inlinegamesbot\Storage\Storage;
 use Longman\TelegramBot\Commands\Command;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\Request;
 
 /**
- * Class GameManager
- *
  * This is the 'manager', it does everything what's required before running a game
- *
- * @package jacklul\inlinegamesbot\Entity
  */
-class GameManager
+class GameCore
 {
     /**
      * Game session ID (inline_message_id)
@@ -46,7 +44,7 @@ class GameManager
     /**
      * Currently used storage class name
      *
-     * @var string|\jacklul\inlinegamesbot\Storage\File
+     * @var string|\jacklul\inlinegamesbot\Storage\Driver\File
      */
     private $storage;
 
@@ -60,8 +58,8 @@ class GameManager
     /**
      * GameManager constructor
      *
-     * @param string $id
-     * @param string $game_code
+     * @param string  $id
+     * @param string  $game_code
      * @param Command $command
      *
      * @throws BotException
@@ -78,14 +76,14 @@ class GameManager
             throw new BotException('Game code is empty!');
         }
 
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('ID: ' . $id);
+        Utilities::debugPrint('ID: ' . $id);
 
         $this->id = $id;
         $this->update = $command->getUpdate();
 
         try {
-            /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
-            $this->storage = $storage_class = Utilities::getStorageClass();
+            /** @var \jacklul\inlinegamesbot\Storage\Driver\File $storage_class */
+            $this->storage = $storage_class = Storage::getClass();
             $storage_class::initializeStorage();
         } catch (StorageException $e) {
             $this->notifyAboutStorageFailure();
@@ -96,12 +94,36 @@ class GameManager
             /** @var \jacklul\inlinegamesbot\Entity\Game $game_class */
             $this->game = $game_class = $game;
 
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game: ' . $game_class::getTitle());
+            Utilities::debugPrint('Game: ' . $game_class::getTitle());
         } else {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game not found');
+            Utilities::debugPrint('Game not found');
         }
 
         return $this;
+    }
+
+    /**
+     * Show information to user that storage is not accessible
+     *
+     * @return ServerResponse
+     *
+     * @throws \Longman\TelegramBot\Exception\TelegramException
+     */
+    protected function notifyAboutStorageFailure()
+    {
+        Utilities::debugPrint('Database error');
+
+        if ($callback_query = $this->update->getCallbackQuery()) {
+            return Request::answerCallbackQuery(
+                [
+                    'callback_query_id' => $callback_query->getId(),
+                    'text'              => __('Database error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."),
+                    'show_alert'        => true,
+                ]
+            );
+        }
+
+        return Request::emptyResponse();
     }
 
     /**
@@ -148,6 +170,7 @@ class GameManager
      *
      * @return ServerResponse
      *
+     * @throws TelegramApiException
      * @throws BotException
      * @throws StorageException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -163,40 +186,47 @@ class GameManager
             return $this->notifyAboutStorageLock();
         }
 
-        $game_class = $this->game;
-
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('BEGIN HANDLING THE GAME');
+        Utilities::debugPrint('BEGIN HANDLING THE GAME');
 
         try {
             if ($callback_query) {
                 $result = $this->game->handleAction(explode(';', $callback_query->getData())[1]);
                 $storage_class::unlockGame($this->id);
-
-                Botan::track($this->getUpdate(), $game_class::getTitle());  // track game traffic
             } elseif ($chosen_inline_result) {
                 $result = $this->game->handleAction('new');
                 $storage_class::unlockGame($this->id);
-
-                Botan::track($this->getUpdate(), $game_class::getTitle() . ' (new session)');  // track new game initialized event
             } else {
                 throw new BotException('Unknown update received!');
             }
-        } catch (BotException $e) {
-            $this->notifyAboutBotFailure();
+        } catch (TelegramApiException $e) {
+            $this->notifyAboutTelegramApiFailure();
             throw $e;
         } catch (StorageException $e) {
             $this->notifyAboutStorageFailure();
+            throw $e;
+        } catch (BotException $e) {
+            $this->notifyAboutBotFailure();
             throw $e;
         } catch (\Throwable $e) {
             $this->notifyAboutUnknownFailure();
             throw $e;
         }
 
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('GAME HANDLED');
+        Utilities::debugPrint('GAME HANDLED');
 
         Language::set(Language::getDefaultLanguage());      // reset language in case running in getUpdates loop
 
         return $result;
+    }
+
+    /**
+     * Return Update object
+     *
+     * @return Update
+     */
+    public function getUpdate(): Update
+    {
+        return $this->update;
     }
 
     /**
@@ -208,7 +238,7 @@ class GameManager
      */
     protected function notifyAboutStorageLock()
     {
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Storage is locked');
+        Utilities::debugPrint('Storage is locked');
 
         if ($callback_query = $this->update->getCallbackQuery()) {
             return Request::answerCallbackQuery(
@@ -224,19 +254,21 @@ class GameManager
     }
 
     /**
-     * Show information to user that storage is not accessible
+     * Returns notice about bot failure
      *
      * @return ServerResponse
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    private function notifyAboutStorageFailure()
+    protected function notifyAboutTelegramApiFailure()
     {
+        Utilities::debugPrint('Telegram API error');
+
         if ($callback_query = $this->update->getCallbackQuery()) {
             return Request::answerCallbackQuery(
                 [
                     'callback_query_id' => $callback_query->getId(),
-                    'text'              => __('Database error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."),
+                    'text'              => __('Telegram API error!') . PHP_EOL . PHP_EOL . __("Try again in a few seconds."),
                     'show_alert'        => true,
                 ]
             );
@@ -254,6 +286,8 @@ class GameManager
      */
     protected function notifyAboutBotFailure()
     {
+        Utilities::debugPrint('Bot error');
+
         if ($callback_query = $this->update->getCallbackQuery()) {
             return Request::answerCallbackQuery(
                 [
@@ -276,6 +310,8 @@ class GameManager
      */
     protected function notifyAboutUnknownFailure()
     {
+        Utilities::debugPrint('Unknown error');
+
         if ($callback_query = $this->update->getCallbackQuery()) {
             return Request::answerCallbackQuery(
                 [
@@ -317,15 +353,5 @@ class GameManager
     public function getStorage(): string
     {
         return $this->storage;
-    }
-
-    /**
-     * Return Update object
-     *
-     * @return Update
-     */
-    public function getUpdate(): Update
-    {
-        return $this->update;
     }
 }

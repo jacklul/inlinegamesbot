@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,19 +10,13 @@
 
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
-use jacklul\inlinegamesbot\Entity\GameManager;
+use jacklul\inlinegamesbot\GameCore;
 use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Request;
 
 /**
- * Class CallbackqueryCommand
- *
- * @noinspection PhpUndefinedClassInspection
- *
  * Handle button presses
- *
- * @package Longman\TelegramBot\Commands\SystemCommands
  */
 class CallbackqueryCommand extends SystemCommand
 {
@@ -38,9 +32,10 @@ class CallbackqueryCommand extends SystemCommand
     /**
      * @return bool|\Longman\TelegramBot\Entities\ServerResponse|mixed
      *
+     * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws \jacklul\inlinegamesbot\Exception\TelegramApiException
      * @throws \Throwable
      */
     public function execute()
@@ -48,7 +43,7 @@ class CallbackqueryCommand extends SystemCommand
         $callback_query = $this->getUpdate()->getCallbackQuery();
         $data = $callback_query->getData();
 
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Data: ' . $data);
+        Utilities::debugPrint('Data: ' . $data);
 
         $command = explode(';', $data)[0];
 
@@ -57,7 +52,7 @@ class CallbackqueryCommand extends SystemCommand
         }
 
         if ($this->isDataValid($data)) {
-            $game = new GameManager($callback_query->getInlineMessageId(), explode(';', $data)[0], $this);
+            $game = new GameCore($callback_query->getInlineMessageId(), explode(';', $data)[0], $this);
 
             if ($game->canRun()) {
                 return $game->run();

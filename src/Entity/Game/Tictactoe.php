@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,13 +11,12 @@
 namespace jacklul\inlinegamesbot\Entity\Game;
 
 use jacklul\inlinegamesbot\Entity\Game;
+use jacklul\inlinegamesbot\Exception\StorageException;
 use jacklul\inlinegamesbot\Helper\Utilities;
 use Spatie\Emoji\Emoji;
 
 /**
- * Class Tictactoe
- *
- * @package jacklul\inlinegamesbot\Entity\Game
+ * Tic-Tac-Toe
  */
 class Tictactoe extends Game
 {
@@ -68,23 +67,6 @@ class Tictactoe extends Game
     ];
 
     /**
-     * Define game symbols (emojis)
-     */
-    protected function defineSymbols()
-    {
-        $this->symbols['empty'] = '.';
-
-        $this->symbols['X'] = Emoji::crossMark();
-        $this->symbols['O'] = Emoji::heavyLargeCircle();
-
-        $this->symbols['X_won'] = $this->symbols['X'];
-        $this->symbols['O_won'] = $this->symbols['O'];
-
-        $this->symbols['X_lost'] = Emoji::heavyMultiplicationX();
-        $this->symbols['O_lost'] = Emoji::radioButton();
-    }
-
-    /**
      * Game handler
      *
      * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
@@ -125,9 +107,9 @@ class Tictactoe extends Game
             $data['current_turn'] = 'X';
             $data['board'] = $this->board;
 
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Game initialization');
+            Utilities::debugPrint('Game initialization');
         } elseif ($args === null) {
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('No move data received');
+            Utilities::debugPrint('No move data received');
         }
 
         if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
@@ -153,37 +135,54 @@ class Tictactoe extends Game
                 $data['board'][$args[0]][$args[1]] = 'O';
                 $data['current_turn'] = 'X';
             } else {
-                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Invalid move data: ' . ($args[0]) . ' - ' . ($args[1]));
+                Utilities::debugPrint('Invalid move data: ' . ($args[0]) . ' - ' . ($args[1]));
 
                 return $this->answerCallbackQuery(__("Invalid move!"), true);
             }
 
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($args[0]));
+            Utilities::debugPrint($data['current_turn'] . ' placed at ' . ($args[1]) . ' - ' . ($args[0]));
         }
 
         $isOver = $this->isGameOver($data['board']);
         $gameOutput = '';
 
         if (!empty($isOver) && in_array($isOver, ['X', 'O'])) {
-            $gameOutput = '<b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings'][$isOver]) . '<b>']) . '</b>';
+            $gameOutput = Emoji::trophy() . ' <b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings'][$isOver]) . '<b>']) . '</b>';
         } elseif ($isOver == 'T') {
-            $gameOutput = '<b>' . __("Game ended with a draw!") . '</b>';
+            $gameOutput = Emoji::chequeredFlag() . ' <b>' . __("Game ended with a draw!") . '</b>';
         }
 
         if (!empty($isOver) && in_array($isOver, ['X', 'O', 'T'])) {
             $data['current_turn'] = 'E';
         } else {
-            $gameOutput = __("Current turn:") . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
+            $gameOutput = Emoji::blackRightwardsArrow() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
         }
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(
-                $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . __("vs.") . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
+                $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($data['board'], $isOver)
             );
         } else {
-            return $this->returnStorageFailure();
+            throw new StorageException();
         }
+    }
+
+    /**
+     * Define game symbols (emojis)
+     */
+    protected function defineSymbols()
+    {
+        $this->symbols['empty'] = '.';
+
+        $this->symbols['X'] = Emoji::crossMark();
+        $this->symbols['O'] = Emoji::heavyLargeCircle();
+
+        $this->symbols['X_won'] = $this->symbols['X'];
+        $this->symbols['O_won'] = $this->symbols['O'];
+
+        $this->symbols['X_lost'] = Emoji::heavyMultiplicationX();
+        $this->symbols['O_lost'] = Emoji::radioButton();
     }
 
     /**

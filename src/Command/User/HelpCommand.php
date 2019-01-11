@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,11 +17,7 @@ use Longman\TelegramBot\Request;
 use Spatie\Emoji\Emoji;
 
 /**
- * Class HelpCommand
- *
  * Shows the starting "help" message
- *
- * @package Longman\TelegramBot\Commands\UserCommands
  */
 class HelpCommand extends UserCommand
 {

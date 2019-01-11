@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,11 +14,7 @@ use Gettext\Translations;
 use Gettext\Translator;
 
 /**
- * Class Language
- *
  * Simple localization class
- *
- * @package jacklul\inlinegamesbot\Helper
  */
 class Language
 {
@@ -37,35 +33,6 @@ class Language
     private static $current_language = '';
 
     /**
-     * Set the language and load translation
-     *
-     * @param string $language
-     */
-    public static function set(string $language = ''): void
-    {
-        $t = new Translator();
-
-        if (file_exists(APP_PATH . '/language/messages.' . $language . '.po')) {
-            if (defined('DATA_PATH')) {
-                if (!file_exists(DATA_PATH . '/language/messages.' . $language . '.cache') || md5_file(APP_PATH . '/language/messages.' . $language . '.po') != file_get_contents(DATA_PATH . '/language/messages.' . $language . '.cache')) {
-                    self::compileToArray($language);
-                }
-
-                $t->loadTranslations(DATA_PATH . '/language/messages.' . $language . '.php');
-            } else {
-                $translations = Translations::fromPoFile(APP_PATH . '/language/messages.' . $language . '.po');
-                $t->loadTranslations($translations);
-            }
-
-            self::$current_language = $language;
-        } else {
-            self::$current_language = self::$default_language;
-        }
-
-        $t->register();
-    }
-
-    /**
      * Return language list
      *
      * @return array
@@ -74,8 +41,8 @@ class Language
     {
         $languages = [self::$default_language];
 
-        if (is_dir(APP_PATH . '/language')) {
-            foreach (new \DirectoryIterator(APP_PATH . '/language') as $fileInfo) {
+        if (is_dir(ROOT_PATH . '/language')) {
+            foreach (new \DirectoryIterator(ROOT_PATH . '/language') as $fileInfo) {
                 if (!$fileInfo->isDir() && !$fileInfo->isDot()) {
                     $language = explode('.', $fileInfo->getFilename());
 
@@ -87,25 +54,6 @@ class Language
         }
 
         return $languages;
-    }
-
-    /**
-     * Compile .po file into .php array file
-     *
-     * @param string $language
-     */
-    private static function compileToArray(string $language): void
-    {
-        if (defined('DATA_PATH') && !file_exists(DATA_PATH . '/language/messages.' . $language . '/.php')) {
-            $translation = Translations::fromPoFile(APP_PATH . '/language/messages.' . $language . '.po');
-
-            if (!is_dir(DATA_PATH . '/language/')) {
-                mkdir(DATA_PATH . '/language/', 0755, true);
-            }
-
-            $translation->toPhpArrayFile(DATA_PATH . '/language/messages.' . $language . '.php');
-            file_put_contents(DATA_PATH . '/language/messages.' . $language . '.cache', md5_file(APP_PATH . '/language/messages.' . $language . '.po'));
-        }
     }
 
     /**
@@ -127,6 +75,63 @@ class Language
     {
         self::$default_language = $default_language;
         self::set($default_language);
+    }
+
+    /**
+     * Set the language and load translation
+     *
+     * @param string $language
+     */
+    public static function set(string $language = ''): void
+    {
+        $t = new Translator();
+
+        if (file_exists(ROOT_PATH . '/translations/messages.' . $language . '.po')) {
+            if (defined('DATA_PATH')) {
+                if (!file_exists(DATA_PATH . '/translations/messages.' . $language . '.cache') || md5_file(ROOT_PATH . '/translations/messages.' . $language . '.po') != file_get_contents(DATA_PATH . '/translations/messages.' . $language . '.cache')) {
+                    if (!self::compileToArray($language)) {
+                        Utilities::debugPrint('Language compilation to PHP array failed!');
+                    }
+                }
+
+                if (file_exists(DATA_PATH . '/translations/messages.' . $language . '.php')) {
+                    $t->loadTranslations(DATA_PATH . '/translations/messages.' . $language . '.php');
+                }
+            } else {
+                $translations = Translations::fromPoFile(ROOT_PATH . '/translations/messages.' . $language . '.po');
+                $t->loadTranslations($translations);
+            }
+
+            self::$current_language = $language;
+        } else {
+            self::$current_language = self::$default_language;
+        }
+
+        $t->register();
+    }
+
+    /**
+     * Compile .po file into .php array file
+     *
+     * @param string $language
+     *
+     * @return bool
+     */
+    private static function compileToArray(string $language): bool
+    {
+        if (defined('DATA_PATH') && !file_exists(DATA_PATH . '/translations/messages.' . $language . '/.php')) {
+            $translation = Translations::fromPoFile(APP_PATH . '/translations/messages.' . $language . '.po');
+
+            if (!is_dir(DATA_PATH . '/translations/')) {
+                mkdir(DATA_PATH . '/translations/', 0755, true);
+            }
+
+            $translation->toPhpArrayFile(DATA_PATH . '/translations/messages.' . $language . '.php');
+
+            return file_put_contents(DATA_PATH . '/translations/messages.' . $language . '.cache', md5_file(APP_PATH . '/translations/messages.' . $language . '.po'));
+        }
+
+        return false;
     }
 
     /**

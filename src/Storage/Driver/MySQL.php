@@ -2,13 +2,13 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Storage\Database;
+namespace jacklul\inlinegamesbot\Storage\Driver;
 
 use AD7six\Dsn\Dsn;
 use jacklul\inlinegamesbot\Entity\TempFile;
@@ -17,11 +17,9 @@ use PDO;
 use PDOException;
 
 /**
- * Class PostgreSQL
- *
- * @package jacklul\inlinegamesbot\Storage\Database
+ * Class MySQL
  */
-class PostgreSQL
+class MySQL
 {
     /**
      * PDO object
@@ -42,46 +40,14 @@ class PostgreSQL
      *
      * @var string
      */
-    private static $structure = 'CREATE TABLE IF NOT EXISTS game (
-        id CHAR(255),
-        data TEXT NOT NULL,
-        created_at timestamp NULL DEFAULT NULL,
-        updated_at timestamp NULL DEFAULT NULL,
+    private static $structure = 'CREATE TABLE IF NOT EXISTS `game` (
+        `id` CHAR(255) COMMENT "Unique identifier for this entry",
+        `data` TEXT NOT NULL COMMENT "Stored data",
+        `created_at` timestamp NULL DEFAULT NULL COMMENT "Entry creation date",
+        `updated_at` timestamp NULL DEFAULT NULL COMMENT "Entry update date",
 
-        PRIMARY KEY (id)
+        PRIMARY KEY (`id`)
     );';
-
-    /**
-     * Initialize PDO connection
-     *
-     * @throws StorageException
-     */
-    public static function initializeStorage(): bool
-    {
-        if (self::isDbConnected()) {
-            return true;
-        }
-
-        if (!defined('TB_GAME')) {
-            define('TB_GAME', 'game');
-        }
-
-        try {
-            $dsn = Dsn::parse(getenv('DATABASE_URL'));
-            $dsn = $dsn->toArray();
-        } catch (\Exception $e) {
-            throw new StorageException($e);
-        }
-
-        try {
-            self::$pdo = new PDO('pgsql:' . 'host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
-            self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
-        } catch (PDOException $e) {
-            throw new StorageException('Connection to the database failed: ' . $e->getMessage());
-        }
-
-        return true;
-    }
 
     /**
      * Create table structure
@@ -113,6 +79,46 @@ class PostgreSQL
     }
 
     /**
+     * Initialize PDO connection
+     *
+     * @param $pdo
+     *
+     * @return bool
+     *
+     * @throws StorageException
+     */
+    public static function initializeStorage($pdo = null): bool
+    {
+        if (self::isDbConnected()) {
+            return true;
+        }
+
+        if (!defined('TB_GAME')) {
+            define('TB_GAME', 'game');
+        }
+
+        if ($pdo === null) {
+            try {
+                $dsn = Dsn::parse(getenv('DATABASE_URL'));
+                $dsn = $dsn->toArray();
+            } catch (\Exception $e) {
+                throw new StorageException($e);
+            }
+
+            try {
+                self::$pdo = new PDO('mysql:' . 'host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
+                self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+            } catch (PDOException $e) {
+                throw new StorageException('Connection to the database failed: ' . $e->getMessage());
+            }
+        } else {
+            self::$pdo = $pdo;
+        }
+
+        return true;
+    }
+
+    /**
      * Select data from database
      *
      * @param string $id
@@ -133,8 +139,8 @@ class PostgreSQL
         try {
             $sth = self::$pdo->prepare(
                 '
-                SELECT * FROM ' . TB_GAME . '
-                WHERE id = :id
+                SELECT * FROM `' . TB_GAME . '`
+                WHERE `id` = :id
             '
             );
 
@@ -156,7 +162,7 @@ class PostgreSQL
      * Insert data to database
      *
      * @param string $id
-     * @param array $data
+     * @param array  $data
      *
      * @return bool
      * @throws StorageException
@@ -178,13 +184,13 @@ class PostgreSQL
         try {
             $sth = self::$pdo->prepare(
                 '
-                INSERT INTO ' . TB_GAME . '
-                (id, data, created_at, updated_at)
+                INSERT INTO `' . TB_GAME . '`
+                (`id`, `data`, `created_at`, `updated_at`)
                 VALUES
                 (:id, :data, :date, :date)
-                ON CONFLICT (id) DO UPDATE
-                  SET   data       = :data,
-                        updated_at = :date
+                ON DUPLICATE KEY UPDATE
+                    `data`       = VALUES(`data`),
+                    `updated_at` = VALUES(`updated_at`)
             '
             );
 
@@ -206,7 +212,7 @@ class PostgreSQL
      *
      * @param string $id
      *
-     * @return array|bool|mixed
+     * @return bool
      * @throws StorageException
      */
     public static function deleteFromGame(string $id): bool
@@ -222,8 +228,8 @@ class PostgreSQL
         try {
             $sth = self::$pdo->prepare(
                 '
-                DELETE FROM ' . TB_GAME . '
-                WHERE id = :id
+                DELETE FROM `' . TB_GAME . '`
+                WHERE `id` = :id
             '
             );
 
@@ -256,6 +262,7 @@ class PostgreSQL
         }
 
         self::$lock = new TempFile($id);
+
         return flock(fopen(self::$lock->getFile()->getPathname(), "a+"), LOCK_EX);
     }
 
@@ -312,9 +319,9 @@ class PostgreSQL
         try {
             $sth = self::$pdo->prepare(
                 '
-                SELECT * FROM ' . TB_GAME . '
-                WHERE updated_at ' . $compare_sign . ' :date
-                ORDER BY updated_at ASC
+                SELECT * FROM `' . TB_GAME . '`
+                WHERE `updated_at` ' . $compare_sign . ' :date
+                ORDER BY `updated_at` ASC
             '
             );
 

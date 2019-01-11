@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,13 +18,7 @@ use Longman\TelegramBot\Entities\InputMessageContent\InputTextMessageContent;
 use Longman\TelegramBot\Request;
 
 /**
- * Class InlinequeryCommand
- *
- * @noinspection PhpUndefinedClassInspection
- *
  * Handle incoming inline queries, shows game list no matter what user enters
- *
- * @package Longman\TelegramBot\Commands\SystemCommands
  */
 class InlinequeryCommand extends SystemCommand
 {

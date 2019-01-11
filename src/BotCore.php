@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2018 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2019 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -17,6 +17,7 @@ use jacklul\inlinegamesbot\Entity\TempFile;
 use jacklul\inlinegamesbot\Exception\BotException;
 use jacklul\inlinegamesbot\Exception\StorageException;
 use jacklul\inlinegamesbot\Helper\Utilities;
+use jacklul\inlinegamesbot\Storage\Storage;
 use jacklul\MonologTelegramHandler\TelegramFormatter;
 use jacklul\MonologTelegramHandler\TelegramHandler;
 use Longman\IPTools\Ip;
@@ -31,11 +32,7 @@ define("APP_PATH", ROOT_PATH . '/bot');
 define("SRC_PATH", ROOT_PATH . '/src');
 
 /**
- * Class BotCore
- *
  * This is the master loader class, contains console commands and essential code for bootstrapping the bot
- *
- * @package jacklul\inlinegamesbot
  */
 class BotCore
 {
@@ -52,39 +49,39 @@ class BotCore
      * @var array
      */
     private $commands = [
-        'help'       => [
+        'help'    => [
             'function'    => 'showHelp',
             'description' => 'Shows this help message',
         ],
-        'set'        => [
+        'set'     => [
             'function'    => 'setWebhook',
             'description' => 'Set the webhook',
         ],
-        'unset'      => [
+        'unset'   => [
             'function'    => 'deleteWebhook',
             'description' => 'Delete the webhook',
         ],
-        'info'       => [
+        'info'    => [
             'function'    => 'webhookInfo',
             'description' => 'Print webhookInfo request result',
         ],
-        'install'    => [
+        'install' => [
             'function'    => 'installDb',
             'description' => 'Execute database creation script',
         ],
-        'handle'     => [
+        'handle'  => [
             'function'    => 'handleWebhook',
             'description' => 'Handle incoming webhook update',
         ],
-        'cron'       => [
+        'cron'    => [
             'function'    => 'handleCron',
             'description' => 'Run scheduled commands once',
         ],
-        'loop'       => [
+        'loop'    => [
             'function'    => 'handleLongPolling',
             'description' => 'Run the bot using getUpdates in a loop',
         ],
-        'worker'     => [
+        'worker'  => [
             'function'    => 'handleWorker',
             'description' => 'Run scheduled commands every minute',
         ],
@@ -110,7 +107,7 @@ class BotCore
 
         // Load environment variables from file if it exists
         if (class_exists('Dotenv\Dotenv') && file_exists(ROOT_PATH . '/.env')) {
-            $env = new Dotenv(ROOT_PATH, file_exists(ROOT_PATH . '/.env_dev') ? '.env_dev' : '.env');
+            $env = new Dotenv(ROOT_PATH);
             $env->load();
         }
 
@@ -137,7 +134,7 @@ class BotCore
         $this->loadDefaultConfig();
 
         // Merge default config with user config
-        $config_file = APP_PATH . '/config.php';
+        $config_file = ROOT_PATH . '/config.php';
         if (file_exists($config_file)) {
             /** @noinspection PhpIncludeInspection */
             $config = include $config_file;
@@ -187,12 +184,6 @@ class BotCore
             'validate_request' => true,
             'valid_ips'        => [
                 '149.154.167.197-149.154.167.233',
-            ],
-            'botan'            => [
-                'token'   => getenv('BOTAN_TOKEN'),
-                'options' => [
-                    'timeout' => 3,
-                ],
             ],
             'cron'             => [
                 'groups' => [
@@ -256,7 +247,7 @@ class BotCore
             return;
         }
 
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('DEBUG MODE');
+        Utilities::debugPrint('DEBUG MODE');
 
         $this->telegram = new Telegram($this->config['api_key'], $this->config['bot_username']);
 
@@ -281,7 +272,7 @@ class BotCore
             $handler->setFormatter(new TelegramFormatter());
 
             $handler = new DeduplicationHandler($handler, defined('DATA_PATH') ? DATA_PATH . '/monolog-dedup.log' : null);
-            $handler->setLevel(Logger::ERROR);
+            $handler->setLevel(Utilities::isDebugPrintEnabled() ? Logger::DEBUG : Logger::ERROR);
 
             $monolog->pushHandler($handler);
             TelegramLog::initialize($monolog);
@@ -310,14 +301,6 @@ class BotCore
         if (isset($this->config['commands']['configs'])) {
             foreach ($this->config['commands']['configs'] as $command => $config) {
                 $this->telegram->setCommandConfig($command, $config);
-            }
-        }
-
-        if (!empty($this->config['botan']['token'])) {
-            if (!empty($this->config['botan']['options'])) {
-                $this->telegram->enableBotan($this->config['botan']['token'], $this->config['botan']['options']);
-            } else {
-                $this->telegram->enableBotan($this->config['botan']['token']);
             }
         }
 
@@ -504,6 +487,7 @@ class BotCore
     {
         if (PHP_SAPI !== 'cli') {
             print 'Cannot run this from the webspace!' . PHP_EOL;
+
             return;
         }
 
@@ -548,6 +532,7 @@ class BotCore
     {
         if (PHP_SAPI !== 'cli') {
             print 'Cannot run this from the webspace!' . PHP_EOL;
+
             return;
         }
 
@@ -648,8 +633,8 @@ class BotCore
      */
     private function installDb()
     {
-        /** @var \jacklul\inlinegamesbot\Storage\File $storage_class */
-        $storage_class = Utilities::getStorageClass();
+        /** @var \jacklul\inlinegamesbot\Storage\Driver\File $storage_class */
+        $storage_class = Storage::getClass();
 
         print 'Installing storage structure (' . end(explode('\\', $storage_class)) . ')...' . PHP_EOL;
 
