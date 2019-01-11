@@ -104,7 +104,7 @@ class HelpCommand extends UserCommand
                 ),
                 new InlineKeyboardButton(
                     [
-                        'text' => 'Github ' . Emoji::bookmark(),
+                        'text' => 'Github ' . Emoji::pageWithCurl(),
                         'url'  => 'https://github.com/jacklul/inlinegamesbot/',
                     ]
                 ),
