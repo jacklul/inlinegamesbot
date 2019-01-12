@@ -62,14 +62,14 @@ class HelpCommand extends UserCommand
             'parse_mode'               => 'HTML',
             'disable_web_page_preview' => true,
             'reply_markup'             => new InlineKeyboard(
-                    [
-                        new InlineKeyboardButton(
-                            [
-                                'text'                => __('Play') . ' ' . Emoji::gameDie(),
-                                'switch_inline_query' => Emoji::gameDie(),
-                            ]
-                        ),
-                    ]
+                [
+                    new InlineKeyboardButton(
+                        [
+                            'text'                => __('Play') . ' ' . Emoji::gameDie(),
+                            'switch_inline_query' => Emoji::gameDie(),
+                        ]
+                    ),
+                ]
             ),
         ];
 
