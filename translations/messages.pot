@@ -8,7 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2019-01-11 23:18+0100\n"
+"POT-Creation-Date: 2019-01-12 13:45+0100\n"
 "PO-Revision-Date: 2017-07-13T17:47:54+00:00\n"
 "X-Poedit-Basepath: ../src\n"
 "X-Poedit-KeywordsList: __\n"
@@ -37,28 +37,16 @@ msgstr ""
 msgid "Hi!"
 msgstr ""
 
-#: Command/User/HelpCommand.php:57 Command/User/HelpCommand.php:93
+#: Command/User/HelpCommand.php:57 Command/User/HelpCommand.php:68
 #: Entity/Game.php:561 Entity/Game.php:790 Entity/Game.php:868
 msgid "Play"
 msgstr ""
 
 #: Command/User/HelpCommand.php:57
-msgid "To begin, start a message with {USAGE} in any of your chats or click the {BUTTON} button and then select a chat."
+msgid "To begin, start a message with {USAGE} in any of your chats or click the {BUTTON} button and then select a chat to play in."
 msgstr ""
 
-#: Command/User/HelpCommand.php:58
-msgid "This bot is open source - click the {BUTTON} button to go to the repository."
-msgstr ""
-
-#: Command/User/HelpCommand.php:58
-msgid "Please report all issues there!"
-msgstr ""
-
-#: Command/User/HelpCommand.php:101
-msgid "Rate"
-msgstr ""
-
-#: Entity/Game.php:231
+#: Entity/Game.php:228
 msgid "This game session has crashed."
 msgstr ""
 

@@ -54,15 +54,23 @@ class HelpCommand extends UserCommand
 
         $text = Emoji::wavingHandSign() . ' ';
         $text .= '<b>' . __('Hi!') . '</b>' . PHP_EOL;
-        $text .= __('To begin, start a message with {USAGE} in any of your chats or click the {BUTTON} button and then select a chat.', ['{USAGE}' => '<b>\'@' . $this->getTelegram()->getBotUsername() . ' ...\'</b>', '{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']) . PHP_EOL . PHP_EOL;
-        $text .= __('This bot is open source - click the {BUTTON} button to go to the repository.', ['{BUTTON}' => '<b>\'Github\'</b>']) . ' <b>' . __('Please report all issues there!') . '</b>';
+        $text .= __('To begin, start a message with {USAGE} in any of your chats or click the {BUTTON} button and then select a chat to play in.', ['{USAGE}' => '<b>\'@' . $this->getTelegram()->getBotUsername() . ' ...\'</b>', '{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']);
 
         $data = [
             'chat_id'                  => $chat_id,
             'text'                     => $text,
             'parse_mode'               => 'HTML',
             'disable_web_page_preview' => true,
-            'reply_markup'             => $this->createInlineKeyboard(),
+            'reply_markup'             => new InlineKeyboard(
+                    [
+                        new InlineKeyboardButton(
+                            [
+                                'text'                => __('Play') . ' ' . Emoji::gameDie(),
+                                'switch_inline_query' => Emoji::gameDie(),
+                            ]
+                        ),
+                    ]
+            ),
         ];
 
         if ($message) {
@@ -76,43 +84,5 @@ class HelpCommand extends UserCommand
         }
 
         return Request::emptyResponse();
-    }
-
-    /**
-     * Create inline keyboard
-     *
-     * @return InlineKeyboard
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     */
-    private function createInlineKeyboard()
-    {
-        $inline_keyboard = [
-            [
-                new InlineKeyboardButton(
-                    [
-                        'text'                => __('Play') . ' ' . Emoji::gameDie(),
-                        'switch_inline_query' => Emoji::gameDie(),
-                    ]
-                ),
-            ],
-            [
-                new InlineKeyboardButton(
-                    [
-                        'text' => __('Rate') . ' ' . Emoji::whiteMediumStar(),
-                        'url'  => 'https://telegram.me/storebot?start=' . $this->getTelegram()->getBotUsername(),
-                    ]
-                ),
-                new InlineKeyboardButton(
-                    [
-                        'text' => 'Github ' . Emoji::pageWithCurl(),
-                        'url'  => 'https://github.com/jacklul/inlinegamesbot/',
-                    ]
-                ),
-            ],
-        ];
-
-        $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
-
-        return $inline_keyboard_markup;
     }
 }

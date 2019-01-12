@@ -357,24 +357,29 @@
         },
         {
             "name": "jacklul/monolog-telegram",
-            "version": "1.2.0",
+            "version": "1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jacklul/monolog-telegram.git",
-                "reference": "78cd2da666b83a37e3defe174bc57a01d792f44a"
+                "reference": "92420530d8ff0654ffaf77b37b994bf235716e4a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jacklul/monolog-telegram/zipball/78cd2da666b83a37e3defe174bc57a01d792f44a",
-                "reference": "78cd2da666b83a37e3defe174bc57a01d792f44a",
+                "url": "https://api.github.com/repos/jacklul/monolog-telegram/zipball/92420530d8ff0654ffaf77b37b994bf235716e4a",
+                "reference": "92420530d8ff0654ffaf77b37b994bf235716e4a",
                 "shasum": ""
             },
             "require": {
+                "ext-json": "*",
+                "ext-mbstring": "*",
                 "monolog/monolog": "^1.0",
                 "php": "^5.5|^7.0"
             },
             "require-dev": {
                 "squizlabs/php_codesniffer": "^3.2"
+            },
+            "suggest": {
+                "ext-curl": "cURL generally works better and is recommended"
             },
             "type": "library",
             "autoload": {
@@ -394,7 +399,7 @@
                     "role": "Developer"
                 }
             ],
-            "description": "Monolog handler that sends logs through Telegram bot to any chat in HTML format.",
+            "description": "Monolog handler that sends logs through Telegram bot to any chat in HTML format",
             "keywords": [
                 "bot",
                 "log",
@@ -402,7 +407,7 @@
                 "monolog",
                 "telegram"
             ],
-            "time": "2018-05-15T17:04:39+00:00"
+            "time": "2019-01-12T08:23:09+00:00"
         },
         {
             "name": "longman/ip-tools",
