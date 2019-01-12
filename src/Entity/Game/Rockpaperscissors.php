@@ -158,7 +158,7 @@ class Rockpaperscissors extends Game
 
             $data['current_turn'] = 'E';
         } elseif (($data['guest_wins'] >= 3 && $data['guest_wins'] > $data['host_wins']) || $data['guest_wins'] >= $data['host_wins'] + 3 || ($data['round'] > 5 && $data['guest_wins'] > $data['host_wins'])) {
-            $gameOutput = Emoji::trophy() . '<b>' . __("{PLAYER} won the game!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>';
+            $gameOutput = Emoji::trophy() . ' <b>' . __("{PLAYER} won the game!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>';
 
             $data['current_turn'] = 'E';
         } else {
