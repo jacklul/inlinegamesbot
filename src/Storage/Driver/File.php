@@ -31,8 +31,8 @@ class File
 
             define('STORAGE_GAME_PATH', DATA_PATH . '/game');
 
-            if (!is_dir(STORAGE_GAME_PATH)) {
-                mkdir(STORAGE_GAME_PATH, 0755, true);
+            if (!is_dir(STORAGE_GAME_PATH) && !mkdir($concurrentDirectory = STORAGE_GAME_PATH, 0755, true) && !is_dir($concurrentDirectory)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
             }
         }
 
@@ -137,7 +137,7 @@ class File
             file_put_contents(STORAGE_GAME_PATH . '/' . $id . '.json', "[]");
         }
 
-        if (flock(fopen(STORAGE_GAME_PATH . '/' . $id . '.json', "a+"), LOCK_EX)) {
+        if (flock(fopen(STORAGE_GAME_PATH . '/' . $id . '.json', 'ab+'), LOCK_EX)) {
             return true;
         }
 
@@ -158,7 +158,7 @@ class File
             throw new StorageException('Id is empty!');
         }
 
-        if (flock(fopen(STORAGE_GAME_PATH . '/' . $id . '.json', "a+"), LOCK_UN)) {
+        if (flock(fopen(STORAGE_GAME_PATH . '/' . $id . '.json', 'ab+'), LOCK_UN)) {
             return true;
         }
 

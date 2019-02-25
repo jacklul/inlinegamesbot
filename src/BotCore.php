@@ -106,14 +106,14 @@ class BotCore
         }
 
         // Load environment variables from file if it exists
-        if (class_exists('Dotenv\Dotenv') && file_exists(ROOT_PATH . '/.env')) {
+        if (class_exists(Dotenv::class) && file_exists(ROOT_PATH . '/.env')) {
             $env = new Dotenv(ROOT_PATH);
             $env->load();
         }
 
         // Debug mode
         if (getenv('DEBUG')) {
-            Utilities::setDebugPrint(true);
+            Utilities::setDebugPrint();
         }
 
         // Do not display errors by default
@@ -148,7 +148,7 @@ class BotCore
     /**
      * Load default config values
      */
-    private function loadDefaultConfig()
+    private function loadDefaultConfig(): void
     {
         $this->config = [
             'api_key'          => getenv('BOT_TOKEN'),
@@ -202,7 +202,7 @@ class BotCore
      *
      * @throws \Throwable
      */
-    public function run(bool $webhook = false)
+    public function run(bool $webhook = false): void
     {
         if (is_bool($webhook) && $webhook === true) {
             $arg = 'handle';    // from webspace allow only handling webhook
@@ -316,7 +316,7 @@ class BotCore
     /**
      * Display usage help
      */
-    private function showHelp()
+    private function showHelp(): void
     {
         print 'Bot Console' . ($this->config['bot_username'] ? ' (@' . $this->config['bot_username'] . ')' : '') . PHP_EOL . PHP_EOL;
         print 'Available commands:' . PHP_EOL;
@@ -361,17 +361,17 @@ class BotCore
     {
         if (PHP_SAPI !== 'cli') {
             $secret = getenv('BOT_SECRET');
-            $secret_get = isset($_GET['s']) ? $_GET['s'] : '';
+            $secret_get = $_GET['s'] ?? '';
 
             if (!isset($secret, $secret_get) || $secret !== $secret_get) {
                 return false;
             }
 
             if (isset($this->config['valid_ip']) && !empty($this->config['valid_ip'] && is_array($this->config['valid_ip']))) {
-                if ($this->config['validate_request'] && PHP_SAPI !== 'cli') {
-                    $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '0.0.0.0';
+                if ($this->config['validate_request']) {
+                    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
                     foreach (['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR'] as $key) {
-                        if (filter_var(isset($_SERVER[$key]) ? $_SERVER[$key] : null, FILTER_VALIDATE_IP)) {
+                        if (filter_var($_SERVER[$key] ?? null, FILTER_VALIDATE_IP)) {
                             $ip = $_SERVER[$key];
                             break;
                         }
@@ -492,10 +492,10 @@ class BotCore
         }
 
         if (!isset($this->config['mysql']['host']) || empty($this->config['mysql']['host'])) {
-            $this->telegram->useGetUpdatesWithoutDatabase(true);
+            $this->telegram->useGetUpdatesWithoutDatabase();
         }
 
-        print '[' . date('Y-m-d H:i:s', time()) . '] Running with getUpdates method...' . PHP_EOL;
+        print '[' . date('Y-m-d H:i:s') . '] Running with getUpdates method...' . PHP_EOL;
         while (true) {
             set_time_limit(0);
 
@@ -505,10 +505,10 @@ class BotCore
                 $update_count = count($server_response->getResult());
 
                 if ($update_count > 0) {
-                    print '[' . date('Y-m-d H:i:s', time()) . '] Processed ' . $update_count . ' updates!' . ' (peak memory usage: ' . Utilities::formatBytes(memory_get_peak_usage()) . ')' . PHP_EOL;
+                    print '[' . date('Y-m-d H:i:s') . '] Processed ' . $update_count . ' updates!' . ' (peak memory usage: ' . Utilities::formatBytes(memory_get_peak_usage()) . ')' . PHP_EOL;
                 }
             } else {
-                print '[' . date('Y-m-d H:i:s', time()) . '] Failed to process updates!' . PHP_EOL;
+                print '[' . date('Y-m-d H:i:s') . '] Failed to process updates!' . PHP_EOL;
                 print 'Error: ' . $server_response->getDescription() . PHP_EOL;
             }
 
@@ -536,7 +536,7 @@ class BotCore
             return;
         }
 
-        print '[' . date('Y-m-d H:i:s', time()) . '] Initializing worker...' . PHP_EOL;
+        print '[' . date('Y-m-d H:i:s') . '] Initializing worker...' . PHP_EOL;
 
         $interval = 60;
         $sleep_time = 10;
@@ -557,7 +557,7 @@ class BotCore
                     $sleep_time_this = $next_run;
                 }
 
-                print '[' . date('Y-m-d H:i:s', time()) . '] Next run in ' . $next_run . ' seconds, sleeping for ' . $sleep_time_this . ' seconds...' . PHP_EOL;
+                print '[' . date('Y-m-d H:i:s') . '] Next run in ' . $next_run . ' seconds, sleeping for ' . $sleep_time_this . ' seconds...' . PHP_EOL;
 
                 if (function_exists('gc_collect_cycles')) {
                     gc_collect_cycles();
@@ -568,13 +568,13 @@ class BotCore
                 continue;
             }
 
-            print '[' . date('Y-m-d H:i:s', time()) . '] Running...' . PHP_EOL;
+            print '[' . date('Y-m-d H:i:s') . '] Running...' . PHP_EOL;
 
             $last_run = time();
 
             $this->handleCron();
 
-            print '[' . date('Y-m-d H:i:s', time()) . '] Finished!' . PHP_EOL;
+            print '[' . date('Y-m-d H:i:s') . '] Finished!' . PHP_EOL;
         }
     }
 
@@ -589,13 +589,13 @@ class BotCore
         $commands = [];
 
         $cronlock = new TempFile('cron');
-        $file = $cronlock->getFile()->getPathname();
-
-        if ($file === null) {
+        if ($cronlock->getFile() === null) {
             exit("Couldn't obtain lockfile!" . PHP_EOL);
         }
 
-        $fh = fopen($file, 'w');
+        $file = $cronlock->getFile()->getPathname();
+
+        $fh = fopen($file, 'wb');
         if (!$fh || !flock($fh, LOCK_EX | LOCK_NB)) {
             if (PHP_SAPI === 'cli') {
                 print "There is already another cron task running in the background!" . PHP_EOL;
@@ -607,7 +607,7 @@ class BotCore
         if (!empty($this->config['cron']['groups'])) {
             foreach ($this->config['cron']['groups'] as $command_group => $commands_in_group) {
                 foreach ($commands_in_group as $command) {
-                    array_push($commands, $command);
+                    $commands[] = $command;
                 }
             }
         }
@@ -631,12 +631,13 @@ class BotCore
      *
      * @throws StorageException
      */
-    private function installDb()
+    private function installDb(): void
     {
         /** @var \jacklul\inlinegamesbot\Storage\Driver\File $storage_class */
         $storage_class = Storage::getClass();
+        $storage_class = explode('\\', $storage_class);
 
-        print 'Installing storage structure (' . end(explode('\\', $storage_class)) . ')...' . PHP_EOL;
+        print 'Installing storage structure (' . end($storage_class) . ')...' . PHP_EOL;
 
         if ($storage_class::createStructure()) {
             print 'Ok!' . PHP_EOL;

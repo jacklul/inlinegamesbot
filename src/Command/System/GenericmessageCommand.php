@@ -16,6 +16,8 @@ use Longman\TelegramBot\Request;
 
 /**
  * Handle text messages
+ *
+ * @noinspection PhpUndefinedClassInspection
  */
 class GenericmessageCommand extends SystemCommand
 {

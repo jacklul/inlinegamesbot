@@ -98,8 +98,6 @@ class GameCore
         } else {
             Utilities::debugPrint('Game not found');
         }
-
-        return $this;
     }
 
     /**
@@ -109,7 +107,7 @@ class GameCore
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function notifyAboutStorageFailure()
+    protected function notifyAboutStorageFailure(): ServerResponse
     {
         Utilities::debugPrint('Database error');
 
@@ -176,7 +174,7 @@ class GameCore
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \Throwable
      */
-    public function run()
+    public function run(): ServerResponse
     {
         $callback_query = $this->getUpdate()->getCallbackQuery();
         $chosen_inline_result = $this->getUpdate()->getChosenInlineResult();
@@ -236,7 +234,7 @@ class GameCore
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function notifyAboutStorageLock()
+    protected function notifyAboutStorageLock(): ServerResponse
     {
         Utilities::debugPrint('Storage is locked');
 
@@ -260,7 +258,7 @@ class GameCore
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function notifyAboutTelegramApiFailure()
+    protected function notifyAboutTelegramApiFailure(): ServerResponse
     {
         Utilities::debugPrint('Telegram API error');
 
@@ -284,7 +282,7 @@ class GameCore
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function notifyAboutBotFailure()
+    protected function notifyAboutBotFailure(): ServerResponse
     {
         Utilities::debugPrint('Bot error');
 
@@ -308,7 +306,7 @@ class GameCore
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function notifyAboutUnknownFailure()
+    protected function notifyAboutUnknownFailure(): ServerResponse
     {
         Utilities::debugPrint('Unknown error');
 

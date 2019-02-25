@@ -13,6 +13,7 @@ namespace Longman\TelegramBot\Commands\UserCommands;
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
+use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Request;
 use Spatie\Emoji\Emoji;
 
@@ -22,11 +23,11 @@ use Spatie\Emoji\Emoji;
 class HelpCommand extends UserCommand
 {
     /**
-     * @return \Longman\TelegramBot\Entities\ServerResponse
+     * @return ServerResponse
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    public function execute()
+    public function execute(): ServerResponse
     {
         $message = $this->getUpdate()->getMessage();
         $edited_message = $this->getUpdate()->getEditedMessage();

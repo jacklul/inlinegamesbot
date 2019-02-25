@@ -122,8 +122,8 @@ class Language
         if (defined('DATA_PATH') && !file_exists(DATA_PATH . '/translations/messages.' . $language . '/.php')) {
             $translation = Translations::fromPoFile(APP_PATH . '/translations/messages.' . $language . '.po');
 
-            if (!is_dir(DATA_PATH . '/translations/')) {
-                mkdir(DATA_PATH . '/translations/', 0755, true);
+            if (!is_dir(DATA_PATH . '/translations/') && !mkdir($concurrentDirectory = DATA_PATH . '/translations/', 0755, true) && !is_dir($concurrentDirectory)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
             }
 
             $translation->toPhpArrayFile(DATA_PATH . '/translations/messages.' . $language . '.php');

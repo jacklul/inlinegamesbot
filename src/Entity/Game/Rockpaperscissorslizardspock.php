@@ -57,7 +57,7 @@ class Rockpaperscissorslizardspock extends Rockpaperscissors
     /**
      * Define game symbols (emojis)
      */
-    protected function defineSymbols()
+    protected function defineSymbols(): void
     {
         $this->symbols['R'] = 'ROCK';
         $this->symbols['R_short'] = Emoji::raisedFist();
@@ -80,7 +80,7 @@ class Rockpaperscissorslizardspock extends Rockpaperscissors
      *
      * @return string
      */
-    protected function isGameOver(string $x, string $y)
+    protected function isGameOver(string $x, string $y): ?string
     {
         if ($x == 'P' && $y == 'R') {
             return 'X';
@@ -178,7 +178,7 @@ class Rockpaperscissorslizardspock extends Rockpaperscissors
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      */
-    protected function customGameKeyboard(bool $isOver = false)
+    protected function customGameKeyboard(bool $isOver = false): InlineKeyboard
     {
         if (!$isOver) {
             $inline_keyboard[] = [
@@ -252,8 +252,6 @@ class Rockpaperscissorslizardspock extends Rockpaperscissors
             ),
         ];
 
-        $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
-
-        return $inline_keyboard_markup;
+        return new InlineKeyboard(...$inline_keyboard);
     }
 }

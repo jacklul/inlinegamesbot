@@ -17,6 +17,8 @@ use Longman\TelegramBot\Request;
 
 /**
  * Handle button presses
+ *
+ * @noinspection PhpUndefinedClassInspection
  */
 class CallbackqueryCommand extends SystemCommand
 {
@@ -75,8 +77,9 @@ class CallbackqueryCommand extends SystemCommand
      *
      * @return bool
      */
-    private function isDataValid(string $data)
+    private function isDataValid(string $data): bool
     {
+        /** @noinspection CallableParameterUseCaseInTypeContextInspection */
         $data = explode(';', $data);
 
         if (count($data) >= 2) {

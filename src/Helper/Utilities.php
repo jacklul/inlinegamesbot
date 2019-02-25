@@ -85,7 +85,7 @@ class Utilities
      *
      * @return string
      */
-    public static function debugDump(string $message = '', array $data = [])
+    public static function debugDump(string $message = '', array $data = []): string
     {
         if (!empty($message)) {
             $output = $message . PHP_EOL;
@@ -94,6 +94,7 @@ class Utilities
         }
 
         foreach ($data as $var => $val) {
+            /** @noinspection NestedTernaryOperatorInspection */
             $output .= $var . ': ' . (is_array($val) ? print_r($val, true) : (is_bool($val) ? ($val ? 'true' : 'false') : $val)) . PHP_EOL;
         }
 
@@ -131,7 +132,7 @@ class Utilities
      *
      * @return Update
      */
-    public static function updateToArray(Update $update)
+    public static function updateToArray(Update $update): Update
     {
         $update_array = json_decode(json_encode($update), true);
         unset($update_array['raw_data']);
@@ -149,14 +150,14 @@ class Utilities
      *
      * @return string
      */
-    public static function formatBytes(int $bytes, int $precision = 2)
+    public static function formatBytes(int $bytes, int $precision = 2): string
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
 
         $bytes = max($bytes, 0);
         $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
         $pow = min($pow, count($units) - 1);
-        $bytes /= pow(1024, $pow);
+        $bytes /= 1024 ** $pow;
 
         return round($bytes, $precision) . ' ' . $units[$pow];
     }

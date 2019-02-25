@@ -14,6 +14,8 @@ use Longman\TelegramBot\Commands\SystemCommand;
 
 /**
  * Start command...
+ *
+ * @noinspection PhpUndefinedClassInspection
  */
 class StartCommand extends SystemCommand
 {

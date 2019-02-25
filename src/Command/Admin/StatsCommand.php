@@ -15,6 +15,7 @@ use jacklul\inlinegamesbot\Storage\Storage;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
+use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Request;
 
 /**
@@ -25,16 +26,15 @@ class StatsCommand extends AdminCommand
     protected $name = 'stats';
     protected $description = 'Display stats';
     protected $usage = '/stats';
-    protected $private_only = true;
 
     /**
-     * @return \Longman\TelegramBot\Entities\ServerResponse
+     * @return ServerResponse
      *
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    public function execute()
+    public function execute(): ServerResponse
     {
         $message = $this->getMessage();
         $edited_message = $this->getUpdate()->getEditedMessage();
@@ -60,7 +60,7 @@ class StatsCommand extends AdminCommand
         $storage_class = Storage::getClass();
         $storage_class::initializeStorage();
 
-        $games = $storage_class::listFromGame(0);
+        $games = $storage_class::listFromGame();
         $stats = [
             'games'      => [],
             'games_5min' => [],
@@ -100,7 +100,7 @@ class StatsCommand extends AdminCommand
         arsort($stats['games_5min']);
 
         foreach ($stats['games_5min'] as $game => $value) {
-            $output .= ' ' . $game . ' – *' . (isset($stats['games_5min'][$game]) ? $stats['games_5min'][$game] : 0) . '* (*' . $stats['games'][$game] . '* total)' . PHP_EOL;
+            $output .= ' ' . $game . ' – *' . ($stats['games_5min'][$game] ?? 0) . '* (*' . $stats['games'][$game] . '* total)' . PHP_EOL;
         }
 
         $data = [];
@@ -127,7 +127,7 @@ class StatsCommand extends AdminCommand
      * @return InlineKeyboard
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    private function createInlineKeyboard()
+    private function createInlineKeyboard(): InlineKeyboard
     {
         $inline_keyboard = [
             [
@@ -140,8 +140,6 @@ class StatsCommand extends AdminCommand
             ],
         ];
 
-        $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
-
-        return $inline_keyboard_markup;
+        return new InlineKeyboard(...$inline_keyboard);
     }
 }

@@ -15,6 +15,7 @@ use jacklul\inlinegamesbot\Exception\StorageException;
 use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
+use Longman\TelegramBot\Entities\ServerResponse;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -60,13 +61,13 @@ class Russianroulette extends Game
     /**
      * Game handler
      *
-     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
-    protected function gameAction()
+    protected function gameAction(): ServerResponse
     {
         if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
@@ -81,10 +82,7 @@ class Russianroulette extends Game
 
         $command = $callbackquery_data[1];
 
-        $arg = null;
-        if (isset($callbackquery_data[2])) {
-            $arg = $callbackquery_data[2];
-        }
+        $arg = $callbackquery_data[2] ?? null;
 
         if ($command === 'start') {
             if (isset($data['settings']) && $data['settings']['X'] == 'host') {
@@ -97,6 +95,7 @@ class Russianroulette extends Game
 
             $data['current_turn'] = 'X';
             $data['cylinder'] = ['', '', '', '', '', ''];
+            /** @noinspection RandomApiMigrationInspection */
             $data['cylinder'][mt_rand(0, 5)] = 'X';
 
             Utilities::debugPrint('Game initialization');
@@ -163,21 +162,22 @@ class Russianroulette extends Game
 
                 if ($this->saveData($this->data)) {
                     return $this->editMessage($gameOutput . PHP_EOL . PHP_EOL . __('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->customGameKeyboard($hit));
-                } else {
-                    throw new StorageException();
-                }
-            } else {
-                $gameOutput = Emoji::smilingFaceWithSunglasses() . ' <b>' . __("{PLAYER} survived!", ['{PLAYER}' => '</b>' . $this->getCurrentUserMention() . '<b>']) . '</b>' . PHP_EOL;
-
-                if ($data['current_turn'] == 'X') {
-                    $data['current_turn'] = 'O';
-                } elseif ($data['current_turn'] == 'O') {
-                    $data['current_turn'] = 'X';
                 }
 
-                $data['cylinder'] = ['', '', '', '', '', ''];
-                $data['cylinder'][mt_rand(0, 5)] = 'X';
+                throw new StorageException();
             }
+
+            $gameOutput = Emoji::smilingFaceWithSunglasses() . ' <b>' . __("{PLAYER} survived!", ['{PLAYER}' => '</b>' . $this->getCurrentUserMention() . '<b>']) . '</b>' . PHP_EOL;
+
+            if ($data['current_turn'] == 'X') {
+                $data['current_turn'] = 'O';
+            } elseif ($data['current_turn'] == 'O') {
+                $data['current_turn'] = 'X';
+            }
+
+            $data['cylinder'] = ['', '', '', '', '', ''];
+            /** @noinspection RandomApiMigrationInspection */
+            $data['cylinder'][mt_rand(0, 5)] = 'X';
         }
 
         $gameOutput .= Emoji::blackRightwardsArrow() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]);
@@ -189,15 +189,15 @@ class Russianroulette extends Game
                 $this->getUserMention('host') . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->customGameKeyboard($hit)
             );
-        } else {
-            throw new StorageException();
         }
+
+        throw new StorageException();
     }
 
     /**
      * Define game symbols (emojis)
      */
-    protected function defineSymbols()
+    protected function defineSymbols(): void
     {
         $this->symbols['empty'] = '.';
 
@@ -214,7 +214,7 @@ class Russianroulette extends Game
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      */
-    protected function customGameKeyboard(string $hit = null)
+    protected function customGameKeyboard(string $hit = null): InlineKeyboard
     {
         $inline_keyboard[] = [
             new InlineKeyboardButton(
@@ -334,8 +334,6 @@ class Russianroulette extends Game
             ];
         }
 
-        $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
-
-        return $inline_keyboard_markup;
+        return new InlineKeyboard(...$inline_keyboard);
     }
 }

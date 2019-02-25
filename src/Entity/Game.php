@@ -260,7 +260,7 @@ class Game
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function answerCallbackQuery(string $text = null, bool $alert = false)
+    protected function answerCallbackQuery(string $text = null, bool $alert = false): ServerResponse
     {
         if (!$this->query_answered && $callback_query = $this->manager->getUpdate()->getCallbackQuery()) {
             $this->query_answered = true;
@@ -316,7 +316,7 @@ class Game
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function editMessage(string $text, InlineKeyboard $reply_markup, bool $ignore_mention_error = false)
+    protected function editMessage(string $text, InlineKeyboard $reply_markup, bool $ignore_mention_error = false): ServerResponse
     {
         $result = Request::editMessageText(
             [
@@ -335,7 +335,7 @@ class Game
             if ($this->saveData($this->data)) {
                 //if (preg_match_all("/<a\shref=\"tg:\/\/user\?id=(.*)\">.*<\/a>/Us", $text, $matches)) {
                 if (preg_match_all('/<a\\shref="tg:\\/\\/user\\?id=(.*)">.*<\\/a>/Us', $text, $matches)) {
-                    for ($i = 0; $i < count($matches[1]); $i++) {
+                    for ($i = 0, $iMax = count($matches[1]); $i < $iMax; $i++) {
                         if ($matches[1][$i] == $this->getUserId('host')) {
                             $text = str_replace($matches[0][$i], $this->getUser('host')->tryMention(), $text);
                         } elseif ($matches[1][$i] == $this->getUserId('guest')) {
@@ -423,7 +423,7 @@ class Game
      * @return InlineKeyboard
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function getReplyMarkup(string $inline_keyboard = null)
+    protected function getReplyMarkup(string $inline_keyboard = null): InlineKeyboard
     {
         if (empty($inline_keyboard)) {
             $inline_keyboard = 'empty';
@@ -440,9 +440,8 @@ class Game
         }
 
         $inline_keyboard = $this->$inline_keyboard();
-        $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
 
-        return $inline_keyboard_markup;
+        return new InlineKeyboard(...$inline_keyboard);
     }
 
     /**
@@ -454,7 +453,7 @@ class Game
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
-    protected function newAction()
+    protected function newAction(): ServerResponse
     {
         if ($this->getUser('host')) {
             return $this->answerCallbackQuery(__('This game is already created!'), true);
@@ -471,9 +470,9 @@ class Game
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
-        } else {
-            throw new StorageException();
         }
+
+        throw new StorageException();
     }
 
     /**
@@ -539,7 +538,7 @@ class Game
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
-    protected function joinAction()
+    protected function joinAction(): ServerResponse
     {
         if (!$this->getUser('host')) {
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Host:' . $this->getCurrentUserMention());
@@ -548,10 +547,12 @@ class Game
 
             if ($this->saveData($this->data)) {
                 return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
-            } else {
-                throw new StorageException();
             }
-        } elseif (!$this->getUser('guest')) {
+
+            throw new StorageException();
+        }
+
+        if (!$this->getUser('guest')) {
             if ($this->getCurrentUserId() != $this->getUserId('host') || (getenv('DEBUG') && $this->getCurrentUserId() == getenv('BOT_ADMIN'))) {
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Guest:' . $this->getCurrentUserMention());
 
@@ -559,15 +560,15 @@ class Game
 
                 if ($this->saveData($this->data)) {
                     return $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
-                } else {
-                    throw new StorageException();
                 }
-            } else {
-                return $this->answerCallbackQuery(__("You cannot play with yourself!"), true);
+
+                throw new StorageException();
             }
-        } else {
-            return $this->answerCallbackQuery(__("This game is full!"));
+
+            return $this->answerCallbackQuery(__("You cannot play with yourself!"), true);
         }
+
+        return $this->answerCallbackQuery(__("This game is full!"));
     }
 
     /**
@@ -607,7 +608,7 @@ class Game
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
-    protected function quitAction()
+    protected function quitAction(): ServerResponse
     {
         if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
@@ -624,21 +625,23 @@ class Game
 
                 if ($this->saveData($this->data)) {
                     return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $currentUserMention]) . PHP_EOL . __("{PLAYER_HOST} is now the host.", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
-                } else {
-                    throw new StorageException();
                 }
-            } else {
-                Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Quit (host): ' . $this->getCurrentUserMention());
 
-                $this->data['players']['host'] = null;
-
-                if ($this->saveData($this->data)) {
-                    return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
-                } else {
-                    throw new StorageException();
-                }
+                throw new StorageException();
             }
-        } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
+
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Quit (host): ' . $this->getCurrentUserMention());
+
+            $this->data['players']['host'] = null;
+
+            if ($this->saveData($this->data)) {
+                return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
+            }
+
+            throw new StorageException();
+        }
+
+        if ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Quit (guest): ' . $this->getCurrentUserMention());
 
             $currentUserMention = $this->getCurrentUserMention();
@@ -647,14 +650,14 @@ class Game
 
             if ($this->saveData($this->data)) {
                 return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $currentUserMention]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
-            } else {
-                throw new StorageException();
             }
-        } else {
-            Utilities::debugPrint('User quitting an empty game?');
 
-            return $this->answerCallbackQuery();
+            throw new StorageException();
         }
+
+        Utilities::debugPrint('User quitting an empty game?');
+
+        return $this->answerCallbackQuery();
     }
 
     /**
@@ -666,7 +669,7 @@ class Game
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
-    protected function kickAction()
+    protected function kickAction(): ServerResponse
     {
         if ($this->getCurrentUserId() !== $this->getUserId('host')) {
             return $this->answerCallbackQuery(__("You're not the host!"), true);
@@ -684,14 +687,14 @@ class Game
 
             if ($this->saveData($this->data)) {
                 return $this->editMessage(__('{PLAYER_GUEST} was kicked...', ['{PLAYER_GUEST}' => $user]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
-            } else {
-                throw new StorageException();
             }
-        } else {
-            Utilities::debugPrint('Kick executed on a game without a host');
 
-            return $this->answerCallbackQuery();
+            throw new StorageException();
         }
+
+        Utilities::debugPrint('Kick executed on a game without a host');
+
+        return $this->answerCallbackQuery();
     }
 
     /**
@@ -703,7 +706,7 @@ class Game
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
-    protected function startAction()
+    protected function startAction(): ServerResponse
     {
         if (!$this->getUser('host')) {
             return $this->editMessage('<i>' . __("This game session is empty.") . '</i>', $this->getReplyMarkup('empty'));
@@ -725,9 +728,7 @@ class Game
 
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention());
 
-        $result = $this->gameAction();
-
-        return $result;
+        return $this->gameAction();
     }
 
     /**
@@ -740,7 +741,7 @@ class Game
      * @throws BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function gameAction()
+    protected function gameAction(): ServerResponse
     {
         if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
@@ -758,7 +759,7 @@ class Game
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
-    protected function languageAction()
+    protected function languageAction(): ServerResponse
     {
         if ($this->getCurrentUserId() !== $this->getUserId('host')) {
             return $this->answerCallbackQuery(__("You're not the host!"), true);
@@ -788,9 +789,9 @@ class Game
 
         if ($this->getUser('host') && $this->getUser('guest')) {
             return $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
-        } else {
-            return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
         }
+
+        return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
     }
 
     /**
@@ -799,7 +800,7 @@ class Game
      * @return array
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function emptyKeyboard()
+    protected function emptyKeyboard(): array
     {
         return [
             [
@@ -819,7 +820,7 @@ class Game
      * @return array
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function lobbyKeyboard()
+    protected function lobbyKeyboard(): array
     {
         $inline_keyboard = [];
 
@@ -858,7 +859,7 @@ class Game
      * @return array
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    protected function pregameKeyboard()
+    protected function pregameKeyboard(): array
     {
         $inline_keyboard = [];
 
@@ -933,14 +934,11 @@ class Game
                         }
                     }
 
-                    array_push(
-                        $tmp_array,
-                        new InlineKeyboardButton(
-                            [
-                                'text'          => $field,
-                                'callback_data' => static::getCode() . ';game;' . $x . '-' . $y,
-                            ]
-                        )
+                    $tmp_array[] = new InlineKeyboardButton(
+                        [
+                            'text'          => $field,
+                            'callback_data' => static::getCode() . ';game;' . $x . '-' . $y,
+                        ]
                     );
                 }
             }
@@ -989,9 +987,7 @@ class Game
             ];
         }
 
-        $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
-
-        return $inline_keyboard_markup;
+        return new InlineKeyboard(...$inline_keyboard);
     }
 
     /**
@@ -999,7 +995,7 @@ class Game
      *
      * @param array $board
      */
-    protected function boardPrint(array $board)
+    protected function boardPrint(array $board): void
     {
         if (!empty($board) && is_array($board) && isset($this->max_y) && isset($this->max_x)) {
             $board_out = str_repeat(' ---', $this->max_x) . PHP_EOL;
@@ -1036,7 +1032,7 @@ class Game
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
-    protected function handleEmptyData()
+    protected function handleEmptyData(): ServerResponse
     {
         Utilities::debugPrint('Empty game data');
 

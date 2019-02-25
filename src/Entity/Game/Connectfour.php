@@ -13,6 +13,7 @@ namespace jacklul\inlinegamesbot\Entity\Game;
 use jacklul\inlinegamesbot\Entity\Game;
 use jacklul\inlinegamesbot\Exception\StorageException;
 use jacklul\inlinegamesbot\Helper\Utilities;
+use Longman\TelegramBot\Entities\ServerResponse;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -72,13 +73,13 @@ class Connectfour extends Game
     /**
      * Game handler
      *
-     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
-    protected function gameAction()
+    protected function gameAction(): ServerResponse
     {
         if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
@@ -140,7 +141,9 @@ class Connectfour extends Game
                         }
 
                         break;
-                    } elseif ($y === 0) {
+                    }
+
+                    if ($y === 0) {
                         return $this->answerCallbackQuery(__("Invalid move!"), true);
                     }
                 } else {
@@ -173,15 +176,15 @@ class Connectfour extends Game
                 $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($data['board'], $isOver)
             );
-        } else {
-            throw new StorageException();
         }
+
+        throw new StorageException();
     }
 
     /**
      * Define game symbols
      */
-    protected function defineSymbols()
+    protected function defineSymbols(): void
     {
         $this->symbols['empty'] = Emoji::mediumWhiteCircle();
 
@@ -202,7 +205,7 @@ class Connectfour extends Game
      *
      * @return string
      */
-    protected function isGameOver(array &$board)
+    protected function isGameOver(array &$board): ?string
     {
         $empty = 0;
         for ($x = 0; $x <= $this->max_x; $x++) {

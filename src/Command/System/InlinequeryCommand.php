@@ -15,19 +15,22 @@ use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\InlineQuery\InlineQueryResultArticle;
 use Longman\TelegramBot\Entities\InputMessageContent\InputTextMessageContent;
+use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Request;
 
 /**
  * Handle incoming inline queries, shows game list no matter what user enters
+ *
+ * @noinspection PhpUndefinedClassInspection
  */
 class InlinequeryCommand extends SystemCommand
 {
     /**
-     * @return \Longman\TelegramBot\Entities\ServerResponse
+     * @return ServerResponse
      *
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    public function execute()
+    public function execute(): ServerResponse
     {
         $articles = [];
 
@@ -74,7 +77,7 @@ class InlinequeryCommand extends SystemCommand
      *
      * @return array
      */
-    private function getGamesList()
+    private function getGamesList(): array
     {
         $games = [];
         if (is_dir(SRC_PATH . '/Entity/Game')) {
@@ -109,7 +112,7 @@ class InlinequeryCommand extends SystemCommand
      * @return InlineKeyboard
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    private function createInlineKeyboard(string $game_code)
+    private function createInlineKeyboard(string $game_code): InlineKeyboard
     {
         $inline_keyboard = [
             [
@@ -122,8 +125,6 @@ class InlinequeryCommand extends SystemCommand
             ],
         ];
 
-        $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
-
-        return $inline_keyboard_markup;
+        return new InlineKeyboard(...$inline_keyboard);
     }
 }

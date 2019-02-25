@@ -14,6 +14,8 @@ use AD7six\Dsn\Dsn;
 use jacklul\inlinegamesbot\Exception\StorageException;
 use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\DB;
+use jacklul\inlinegamesbot\Storage\Driver\File;
+use jacklul\inlinegamesbot\Storage\Driver\BotDB;
 
 /**
  * Picks the best storage driver available
@@ -42,7 +44,7 @@ class Storage
             $storage = str_replace('"', '', $debug_storage);
             Utilities::debugPrint('Forcing storage: \'' . $storage . '\'');
         } elseif (DB::isDbConnected()) {
-            $storage = 'jacklul\inlinegamesbot\Storage\Driver\BotDB';
+            $storage = BotDB::class;
         } elseif (getenv('DATABASE_URL')) {
             try {
                 $dsn = Dsn::parse(getenv('DATABASE_URL'));
@@ -55,9 +57,9 @@ class Storage
                 throw new StorageException('Unsupported database type!');
             }
 
-            $storage = 'jacklul\inlinegamesbot\Storage\Driver\\' . self::$storage_drivers[$dsn['engine']] ?: '';
+            $storage = 'jacklul\inlinegamesbot\Storage\Driver\\' . (self::$storage_drivers[$dsn['engine']] ?: '');
         } elseif (defined('DATA_PATH')) {
-            $storage = 'jacklul\inlinegamesbot\Storage\Driver\File';
+            $storage = File::class;
         }
 
         if (empty($storage) || !class_exists($storage)) {

@@ -16,6 +16,7 @@ use jacklul\inlinegamesbot\Storage\Storage;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
+use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Request;
 
 /**
@@ -27,16 +28,15 @@ class CleansessionsCommand extends AdminCommand
     protected $name = 'cleansessions';
     protected $description = 'Clean old game messages and set them as empty';
     protected $usage = '/cleansessions';
-    protected $private_only = true;
 
     /**
-     * @return \Longman\TelegramBot\Entities\ServerResponse
+     * @return ServerResponse
      *
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    public function execute()
+    public function execute(): ServerResponse
     {
         $message = $this->getMessage();
         $edited_message = $this->getUpdate()->getEditedMessage();
@@ -177,7 +177,7 @@ class CleansessionsCommand extends AdminCommand
      * @return InlineKeyboard
      * @throws \Longman\TelegramBot\Exception\TelegramException
      */
-    private function createInlineKeyboard(string $game_code)
+    private function createInlineKeyboard(string $game_code): InlineKeyboard
     {
         $inline_keyboard = [
             [
@@ -190,8 +190,6 @@ class CleansessionsCommand extends AdminCommand
             ],
         ];
 
-        $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
-
-        return $inline_keyboard_markup;
+        return new InlineKeyboard(...$inline_keyboard);
     }
 }

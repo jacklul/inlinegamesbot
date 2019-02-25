@@ -136,7 +136,7 @@ class PostgreSQL
             '
             );
 
-            $sth->bindParam(':id', $id, PDO::PARAM_STR);
+            $sth->bindParam(':id', $id);
 
             if ($result = $sth->execute()) {
                 $result = $sth->fetchAll(PDO::FETCH_ASSOC);
@@ -186,12 +186,13 @@ class PostgreSQL
             '
             );
 
+            /** @noinspection CallableParameterUseCaseInTypeContextInspection */
             $data = json_encode($data);
             $date = date('Y-m-d H:i:s');
 
-            $sth->bindParam(':id', $id, PDO::PARAM_STR);
-            $sth->bindParam(':data', $data, PDO::PARAM_STR);
-            $sth->bindParam(':date', $date, PDO::PARAM_STR);
+            $sth->bindParam(':id', $id);
+            $sth->bindParam(':data', $data);
+            $sth->bindParam(':date', $date);
 
             return $sth->execute();
         } catch (PDOException $e) {
@@ -225,7 +226,7 @@ class PostgreSQL
             '
             );
 
-            $sth->bindParam(':id', $id, PDO::PARAM_STR);
+            $sth->bindParam(':id', $id);
 
             return $sth->execute();
         } catch (PDOException $e) {
@@ -254,8 +255,11 @@ class PostgreSQL
         }
 
         self::$lock = new TempFile($id);
+        if (self::$lock->getFile() === null) {
+            return false;
+        }
 
-        return flock(fopen(self::$lock->getFile()->getPathname(), "a+"), LOCK_EX);
+        return flock(fopen(self::$lock->getFile()->getPathname(), 'ab+'), LOCK_EX);
     }
 
     /**
@@ -281,7 +285,11 @@ class PostgreSQL
             throw new StorageException('No lock file object!');
         }
 
-        return flock(fopen(self::$lock->getFile()->getPathname(), "a+"), LOCK_UN);
+        if (self::$lock->getFile() === null) {
+            return false;
+        }
+
+        return flock(fopen(self::$lock->getFile()->getPathname(), 'ab+'), LOCK_UN);
     }
 
     /**
@@ -318,7 +326,7 @@ class PostgreSQL
             );
 
             $date = date('Y-m-d H:i:s', strtotime('-' . abs($time) . ' seconds'));
-            $sth->bindParam(':date', $date, PDO::PARAM_STR);
+            $sth->bindParam(':date', $date);
 
             if ($result = $sth->execute()) {
                 return $sth->fetchAll(PDO::FETCH_ASSOC);

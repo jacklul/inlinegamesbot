@@ -15,6 +15,7 @@ use jacklul\inlinegamesbot\Exception\StorageException;
 use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
+use Longman\TelegramBot\Entities\ServerResponse;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -96,7 +97,7 @@ class Checkers extends Game
     /**
      * Handle user surrender
      *
-     * @return bool|\Longman\TelegramBot\Entities\ServerResponse|mixed
+     * @return bool|ServerResponse|mixed
      *
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -133,9 +134,9 @@ class Checkers extends Game
                         $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                         $this->gameKeyboard($data['board'], 'surrender')
                     );
-                } else {
-                    throw new StorageException();
                 }
+
+                throw new StorageException();
             }
 
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to surrender');
@@ -143,10 +144,12 @@ class Checkers extends Game
 
             if ($this->saveData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
-            } else {
-                throw new StorageException();
             }
-        } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
+
+            throw new StorageException();
+        }
+
+        if ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
             if ($data['vote']['guest']['surrender']) {
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' surrendered');
 
@@ -160,9 +163,9 @@ class Checkers extends Game
                         $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                         $this->gameKeyboard($data['board'], 'surrender')
                     );
-                } else {
-                    throw new StorageException();
                 }
+
+                throw new StorageException();
             }
 
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to surrender');
@@ -170,20 +173,20 @@ class Checkers extends Game
 
             if ($this->saveData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
-            } else {
-                throw new StorageException();
             }
-        } else {
-            Utilities::debugPrint('Someone else executed forfeit action');
 
-            return $this->answerCallbackQuery();
+            throw new StorageException();
         }
+
+        Utilities::debugPrint('Someone else executed forfeit action');
+
+        return $this->answerCallbackQuery();
     }
 
     /**
      * Define game symbols (emojis)
      */
-    protected function defineSymbols()
+    protected function defineSymbols(): void
     {
         $this->symbols['empty'] = '.';
 
@@ -204,7 +207,7 @@ class Checkers extends Game
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      */
-    protected function gameKeyboard(array $board, string $winner = null, int $moveCounter = 0)
+    protected function gameKeyboard(array $board, string $winner = null, int $moveCounter = 0): InlineKeyboard
     {
         $inline_keyboard = [];
 
@@ -227,14 +230,11 @@ class Checkers extends Game
                         $field = '[' . $field . ']';
                     }
 
-                    array_push(
-                        $tmp_array,
-                        new InlineKeyboardButton(
-                            [
-                                'text'          => $field,
-                                'callback_data' => self::getCode() . ';game;' . $x . '-' . $y,
-                            ]
-                        )
+                    $tmp_array[] = new InlineKeyboardButton(
+                        [
+                            'text'          => $field,
+                            'callback_data' => self::getCode() . ';game;' . $x . '-' . $y,
+                        ]
                     );
                 }
             }
@@ -319,9 +319,7 @@ class Checkers extends Game
             ];
         }
 
-        $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
-
-        return $inline_keyboard_markup;
+        return new InlineKeyboard(...$inline_keyboard);
     }
 
     /**
@@ -335,7 +333,7 @@ class Checkers extends Game
     {
         array_unshift($board, null);
 
-        return call_user_func_array('array_map', $board);
+        return array_map(...$board);
     }
 
     /**
@@ -345,7 +343,7 @@ class Checkers extends Game
      *
      * @return array
      */
-    protected function piecesLeft(array $board)
+    protected function piecesLeft(array $board): array
     {
         $xs = 0;
         $ys = 0;
@@ -369,7 +367,7 @@ class Checkers extends Game
     /**
      * Handle votes for draw
      *
-     * @return bool|\Longman\TelegramBot\Entities\ServerResponse|mixed
+     * @return bool|ServerResponse|mixed
      *
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
@@ -399,34 +397,36 @@ class Checkers extends Game
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
-            } else {
-                throw new StorageException();
             }
-        } elseif ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest') && !$data['vote']['guest']['draw']) {
+
+            throw new StorageException();
+        }
+
+        if ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest') && !$data['vote']['guest']['draw']) {
             $data['vote']['guest']['draw'] = true;
 
             if ($this->saveData($this->data)) {
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to draw');
 
                 return $this->gameAction();
-            } else {
-                throw new StorageException();
             }
-        } else {
-            return $this->answerCallbackQuery(__("You already voted!"), true);
+
+            throw new StorageException();
         }
+
+        return $this->answerCallbackQuery(__("You already voted!"), true);
     }
 
     /**
      * Game handler
      *
-     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
-    protected function gameAction()
+    protected function gameAction(): ServerResponse
     {
         if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
@@ -640,9 +640,9 @@ class Checkers extends Game
                 $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($data['board'], $isOver, $data['move_counter'])
             );
-        } else {
-            throw new StorageException();
         }
+
+        throw new StorageException();
     }
 
     /**
@@ -785,7 +785,7 @@ class Checkers extends Game
             foreach ($kill as $thismove => $thiskill) {
                 $thismove = (string)$thismove;
 
-                if (preg_match('/-/', $thismove) || $thismove[0] >= $this->max_x || $thismove[1] >= $this->max_y || $thismove[0] < 0 || $thismove[1] < 0) {
+                if (false !== strpos($thismove, "-") || $thismove[0] >= $this->max_x || $thismove[1] >= $this->max_y || $thismove[0] < 0 || $thismove[1] < 0) {
                     continue;
                 }
 
@@ -803,7 +803,7 @@ class Checkers extends Game
 
             if (strlen($value) > 2) {
                 unset($valid_moves[$key]);
-            } elseif ($x < 0 || $y < 0 || $x >= $this->max_x || $y >= $this->max_y || preg_match('/-/', $value)) {
+            } elseif ($x < 0 || $y < 0 || $x >= $this->max_x || $y >= $this->max_y || false !== strpos($value, "-")) {
                 unset($valid_moves[$key]);
                 unset($kill[$value]);
             } elseif ($board[$x][$y] != '') {
@@ -836,7 +836,7 @@ class Checkers extends Game
      *
      * @return string
      */
-    protected function isGameOver(array $board)
+    protected function isGameOver(array $board): ?string
     {
         $array = $this->piecesLeft($board);
 
@@ -852,9 +852,9 @@ class Checkers extends Game
         for ($x = 0; $x < $this->max_x; $x++) {
             for ($y = 0; $y < $this->max_y; $y++) {
                 if (strpos($board[$x][$y], 'X') !== false) {
-                    array_push($availableMoves_X, $this->possibleMoves($board, $x . $y, false, 'X"'));
+                    $availableMoves_X[] = $this->possibleMoves($board, $x . $y, false, 'X"');
                 } elseif (strpos($board[$x][$y], 'O') !== false) {
-                    array_push($availableMoves_O, $this->possibleMoves($board, $x . $y, false, 'O'));
+                    $availableMoves_O[] = $this->possibleMoves($board, $x . $y, false, 'O');
                 }
             }
         }

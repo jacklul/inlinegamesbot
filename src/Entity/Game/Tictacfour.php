@@ -71,7 +71,7 @@ class Tictacfour extends Tictactoe
      *
      * @return string
      */
-    protected function isGameOver(array &$board)
+    protected function isGameOver(array &$board): ?string
     {
         $empty = 0;
         for ($x = 0; $x <= $this->max_x; $x++) {

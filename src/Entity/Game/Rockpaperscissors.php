@@ -15,6 +15,7 @@ use jacklul\inlinegamesbot\Exception\StorageException;
 use jacklul\inlinegamesbot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
+use Longman\TelegramBot\Entities\ServerResponse;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -60,13 +61,13 @@ class Rockpaperscissors extends Game
     /**
      * Game handler
      *
-     * @return \Longman\TelegramBot\Entities\ServerResponse|mixed
+     * @return ServerResponse
      *
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\StorageException
      */
-    protected function gameAction()
+    protected function gameAction(): ServerResponse
     {
         if ($this->getCurrentUserId() !== $this->getUserId('host') && $this->getCurrentUserId() !== $this->getUserId('guest')) {
             return $this->answerCallbackQuery(__("You're not in this game!"), true);
@@ -81,10 +82,7 @@ class Rockpaperscissors extends Game
 
         $command = $callbackquery_data[1];
 
-        $arg = null;
-        if (isset($callbackquery_data[2])) {
-            $arg = $callbackquery_data[2];
-        }
+        $arg = $callbackquery_data[2] ?? null;
 
         if ($command === 'start') {
             $data['host_pick'] = '';
@@ -181,15 +179,15 @@ class Rockpaperscissors extends Game
                 $this->getUserMention('host') . (($data['host_wins'] > 0 || $data['guest_wins'] > 0) ? ' (' . $data['host_wins'] . ')' : '') . $hostPick . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . (($data['guest_wins'] > 0 || $data['host_wins'] > 0) ? ' (' . $data['guest_wins'] . ')' : '') . $guestPick . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->customGameKeyboard($isOver)
             );
-        } else {
-            throw new StorageException();
         }
+
+        throw new StorageException();
     }
 
     /**
      * Define game symbols (emojis)
      */
-    protected function defineSymbols()
+    protected function defineSymbols(): void
     {
         $this->symbols['R'] = 'ROCK';
         $this->symbols['R_short'] = Emoji::raisedFist();
@@ -208,7 +206,7 @@ class Rockpaperscissors extends Game
      *
      * @return string
      */
-    protected function isGameOver(string $x, string $y)
+    protected function isGameOver(string $x, string $y): ?string
     {
         if ($x == 'P' && $y == 'R') {
             return 'X';
@@ -250,7 +248,7 @@ class Rockpaperscissors extends Game
      * @throws \Longman\TelegramBot\Exception\TelegramException
      * @throws \jacklul\inlinegamesbot\Exception\BotException
      */
-    protected function customGameKeyboard(bool $isOver = false)
+    protected function customGameKeyboard(bool $isOver = false): InlineKeyboard
     {
         if (!$isOver) {
             $inline_keyboard[] = [
@@ -310,8 +308,6 @@ class Rockpaperscissors extends Game
             ),
         ];
 
-        $inline_keyboard_markup = new InlineKeyboard(...$inline_keyboard);
-
-        return $inline_keyboard_markup;
+        return new InlineKeyboard(...$inline_keyboard);
     }
 }

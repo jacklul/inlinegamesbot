@@ -24,14 +24,14 @@ class TempFile
      *
      * @var null|SplFileInfo
      */
-    private $file = null;
+    private $file;
 
     /**
      * Should the file be delete after script ends
      *
      * @var bool
      */
-    private $delete = true;
+    private $delete;
 
     /**
      * TempFile constructor
@@ -51,8 +51,8 @@ class TempFile
             $this->file = sys_get_temp_dir() . '/' . md5(__DIR__) . '/' . $name . '.tmp';
         }
 
-        if (!is_dir(dirname($this->file))) {
-            mkdir(dirname($this->file), 0755, true);
+        if (!is_dir(dirname($this->file)) && !mkdir($concurrentDirectory = dirname($this->file), 0755, true) && !is_dir($concurrentDirectory)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
 
         if (!is_writable(dirname($this->file))) {
@@ -70,7 +70,7 @@ class TempFile
      */
     public function __destruct()
     {
-        if ($this->delete && !is_null($this->file) && file_exists($this->file)) {
+        if ($this->delete && $this->file !== null && file_exists($this->file)) {
             @unlink($this->file);
         }
     }
@@ -80,7 +80,7 @@ class TempFile
      *
      * @return null|SplFileInfo
      */
-    public function getFile()
+    public function getFile(): ?SplFileInfo
     {
         return $this->file;
     }
