@@ -1,5 +1,6 @@
 # Composer
 /vendor/
+/composer.lock
 
 # Configuration files
 /config.php
