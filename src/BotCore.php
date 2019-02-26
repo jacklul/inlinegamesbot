@@ -263,21 +263,6 @@ class BotCore
             TelegramLog::initUpdateLog($this->config['logging']['update']);
         }
 
-        if (isset($this->config['admins']) && !empty($this->config['admins'][0])) {
-            $this->telegram->enableAdmins($this->config['admins']);
-
-            $monolog = new Logger($this->config['bot_username']);
-
-            $handler = new TelegramHandler($this->config['api_key'], (int)$this->config['admins'][0], Logger::ERROR);
-            $handler->setFormatter(new TelegramFormatter());
-
-            $handler = new DeduplicationHandler($handler, defined('DATA_PATH') ? DATA_PATH . '/monolog-dedup.log' : null);
-            $handler->setLevel(Utilities::isDebugPrintEnabled() ? Logger::DEBUG : Logger::ERROR);
-
-            $monolog->pushHandler($handler);
-            TelegramLog::initialize($monolog);
-        }
-
         if (isset($this->config['custom_http_client'])) {
             Request::setClient(new Client($this->config['custom_http_client']));
         }
