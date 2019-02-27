@@ -18,14 +18,10 @@ use jacklul\inlinegamesbot\Exception\BotException;
 use jacklul\inlinegamesbot\Exception\StorageException;
 use jacklul\inlinegamesbot\Helper\Utilities;
 use jacklul\inlinegamesbot\Storage\Storage;
-use jacklul\MonologTelegramHandler\TelegramFormatter;
-use jacklul\MonologTelegramHandler\TelegramHandler;
 use Longman\IPTools\Ip;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
-use Monolog\Handler\DeduplicationHandler;
-use Monolog\Logger;
 
 define("ROOT_PATH", realpath(dirname(__DIR__)));
 define("APP_PATH", ROOT_PATH . '/bot');
