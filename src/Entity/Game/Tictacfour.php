@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Entity\Game;
+namespace Bot\Entity\Game;
 
 /**
  * Tic-Tac-Four
@@ -55,7 +55,7 @@ class Tictacfour extends Tictactoe
      *
      * @var array
      */
-    protected $board = [
+    protected static $board = [
         ['', '', '', '', '', '', ''],
         ['', '', '', '', '', '', ''],
         ['', '', '', '', '', '', ''],

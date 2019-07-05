@@ -8,19 +8,23 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot;
+namespace Bot;
 
-use jacklul\inlinegamesbot\Entity\Game;
-use jacklul\inlinegamesbot\Exception\BotException;
-use jacklul\inlinegamesbot\Exception\StorageException;
-use jacklul\inlinegamesbot\Exception\TelegramApiException;
-use jacklul\inlinegamesbot\Helper\Language;
-use jacklul\inlinegamesbot\Helper\Utilities;
-use jacklul\inlinegamesbot\Storage\Storage;
+use Bot\Entity\Game;
+use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
+use Bot\Exception\TelegramApiException;
+use Bot\Helper\Language;
+use Bot\Helper\Utilities;
+use Bot\Storage\Driver\File;
+use Bot\Storage\Storage;
+use DirectoryIterator;
 use Longman\TelegramBot\Commands\Command;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Entities\Update;
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
+use Throwable;
 
 /**
  * This is the 'manager', it does everything what's required before running a game
@@ -44,7 +48,7 @@ class GameCore
     /**
      * Currently used storage class name
      *
-     * @var string|\jacklul\inlinegamesbot\Storage\Driver\File
+     * @var string|File
      */
     private $storage;
 
@@ -64,7 +68,7 @@ class GameCore
      *
      * @throws BotException
      * @throws StorageException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     public function __construct(string $id, string $game_code, Command $command)
     {
@@ -82,7 +86,7 @@ class GameCore
         $this->update = $command->getUpdate();
 
         try {
-            /** @var \jacklul\inlinegamesbot\Storage\Driver\File $storage_class */
+            /** @var File $storage_class */
             $this->storage = $storage_class = Storage::getClass();
             $storage_class::initializeStorage();
         } catch (StorageException $e) {
@@ -91,7 +95,7 @@ class GameCore
         }
 
         if ($game = $this->findGame($game_code)) {
-            /** @var \jacklul\inlinegamesbot\Entity\Game $game_class */
+            /** @var Game $game_class */
             $this->game = $game_class = $game;
 
             Utilities::debugPrint('Game: ' . $game_class::getTitle());
@@ -105,7 +109,7 @@ class GameCore
      *
      * @return ServerResponse
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function notifyAboutStorageFailure(): ServerResponse
     {
@@ -134,11 +138,11 @@ class GameCore
     private function findGame(string $game_code)
     {
         if (is_dir(SRC_PATH . '/Entity/Game')) {
-            foreach (new \DirectoryIterator(SRC_PATH . '/Entity/Game') as $file) {
+            foreach (new DirectoryIterator(SRC_PATH . '/Entity/Game') as $file) {
                 if (!$file->isDir() && !$file->isDot() && $file->getExtension() === 'php') {
-                    $game_class = '\jacklul\inlinegamesbot\Entity\Game\\' . basename($file->getFilename(), '.php');
+                    $game_class = '\Bot\Entity\Game\\' . basename($file->getFilename(), '.php');
 
-                    /** @var \jacklul\inlinegamesbot\Entity\Game $game_class */
+                    /** @var Game $game_class */
                     if ($game_class::getCode() == $game_code) {
                         return new $game_class($this);
                     }
@@ -171,8 +175,8 @@ class GameCore
      * @throws TelegramApiException
      * @throws BotException
      * @throws StorageException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \Throwable
+     * @throws TelegramException
+     * @throws Throwable
      */
     public function run(): ServerResponse
     {
@@ -205,7 +209,7 @@ class GameCore
         } catch (BotException $e) {
             $this->notifyAboutBotFailure();
             throw $e;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->notifyAboutUnknownFailure();
             throw $e;
         }
@@ -232,7 +236,7 @@ class GameCore
      *
      * @return ServerResponse
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function notifyAboutStorageLock(): ServerResponse
     {
@@ -256,7 +260,7 @@ class GameCore
      *
      * @return ServerResponse
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function notifyAboutTelegramApiFailure(): ServerResponse
     {
@@ -280,7 +284,7 @@ class GameCore
      *
      * @return ServerResponse
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function notifyAboutBotFailure(): ServerResponse
     {
@@ -304,7 +308,7 @@ class GameCore
      *
      * @return ServerResponse
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function notifyAboutUnknownFailure(): ServerResponse
     {

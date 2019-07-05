@@ -8,14 +8,13 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Storage;
+namespace Bot\Storage;
 
-use AD7six\Dsn\Dsn;
-use jacklul\inlinegamesbot\Exception\StorageException;
-use jacklul\inlinegamesbot\Helper\Utilities;
+use Bot\Exception\StorageException;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\DB;
-use jacklul\inlinegamesbot\Storage\Driver\File;
-use jacklul\inlinegamesbot\Storage\Driver\BotDB;
+use Bot\Storage\Driver\File;
+use Bot\Storage\Driver\BotDB;
 
 /**
  * Picks the best storage driver available
@@ -46,18 +45,13 @@ class Storage
         } elseif (DB::isDbConnected()) {
             $storage = BotDB::class;
         } elseif (getenv('DATABASE_URL')) {
-            try {
-                $dsn = Dsn::parse(getenv('DATABASE_URL'));
-                $dsn = $dsn->toArray();
-            } catch (\Exception $e) {
-                throw new StorageException('DSN parsing error', 0, $e);
-            }
+            $dsn = parse_url(getenv('DATABASE_URL'));
 
-            if (!isset(self::$storage_drivers[$dsn['engine']])) {
+            if (!isset(self::$storage_drivers[$dsn['scheme']])) {
                 throw new StorageException('Unsupported database type!');
             }
 
-            $storage = 'jacklul\inlinegamesbot\Storage\Driver\\' . (self::$storage_drivers[$dsn['engine']] ?: '');
+            $storage = 'Bot\Storage\Driver\\' . (self::$storage_drivers[$dsn['scheme']] ?: '');
         } elseif (defined('DATA_PATH')) {
             $storage = File::class;
         }

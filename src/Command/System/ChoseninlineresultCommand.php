@@ -10,9 +10,15 @@
 
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
-use jacklul\inlinegamesbot\GameCore;
-use jacklul\inlinegamesbot\Helper\Utilities;
+use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
+use Bot\Exception\TelegramApiException;
+use Bot\GameCore;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\Commands\SystemCommand;
+use Longman\TelegramBot\Entities\ServerResponse;
+use Longman\TelegramBot\Exception\TelegramException;
+use Throwable;
 
 /**
  * Handle event when inline message is pasted into chat, instantly put a player into game
@@ -22,13 +28,13 @@ use Longman\TelegramBot\Commands\SystemCommand;
 class ChoseninlineresultCommand extends SystemCommand
 {
     /**
-     * @return bool|\Longman\TelegramBot\Entities\ServerResponse
+     * @return bool|ServerResponse
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
-     * @throws \jacklul\inlinegamesbot\Exception\TelegramApiException
-     * @throws \Throwable
+     * @throws TelegramException
+     * @throws BotException
+     * @throws StorageException
+     * @throws TelegramApiException
+     * @throws Throwable
      */
     public function execute()
     {

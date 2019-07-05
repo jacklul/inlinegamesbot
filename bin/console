@@ -9,12 +9,12 @@
  * file that was distributed with this source code.
  */
 
-use jacklul\inlinegamesbot\BotCore;
+use Bot\BotCore;
 
 /**
  * Composer autoloader
  */
-require_once __DIR__ . ' /../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 /**
  * Run console interface

@@ -10,13 +10,17 @@
 
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
-use jacklul\inlinegamesbot\GameCore;
-use jacklul\inlinegamesbot\Helper\Utilities;
-use jacklul\inlinegamesbot\Storage\Storage;
+use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
+use Bot\GameCore;
+use Bot\Helper\Utilities;
+use Bot\Storage\Driver\File;
+use Bot\Storage\Storage;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 
 /**
@@ -32,9 +36,9 @@ class CleansessionsCommand extends AdminCommand
     /**
      * @return ServerResponse
      *
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws BotException
+     * @throws StorageException
+     * @throws TelegramException
      */
     public function execute(): ServerResponse
     {
@@ -67,7 +71,7 @@ class CleansessionsCommand extends AdminCommand
             set_time_limit(10);
         }
 
-        /** @var \jacklul\inlinegamesbot\Storage\Driver\File $storage_class */
+        /** @var File $storage_class */
         $storage_class = Storage::getClass();
 
         if (class_exists($storage_class)) {
@@ -175,7 +179,7 @@ class CleansessionsCommand extends AdminCommand
      * @param string $game_code
      *
      * @return InlineKeyboard
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     private function createInlineKeyboard(string $game_code): InlineKeyboard
     {

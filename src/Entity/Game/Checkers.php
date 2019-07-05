@@ -8,14 +8,16 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Entity\Game;
+namespace Bot\Entity\Game;
 
-use jacklul\inlinegamesbot\Entity\Game;
-use jacklul\inlinegamesbot\Exception\StorageException;
-use jacklul\inlinegamesbot\Helper\Utilities;
+use Bot\Entity\Game;
+use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;
+use Longman\TelegramBot\Exception\TelegramException;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -70,7 +72,7 @@ class Checkers extends Game
      *
      * @var array
      */
-    protected $board = [
+    protected static $board = [
         ['', 'X', '', '', '', 'O', '', 'O'],
         ['X', '', 'X', '', '', '', 'O', ''],
         ['', 'X', '', '', '', 'O', '', 'O'],
@@ -99,9 +101,9 @@ class Checkers extends Game
      *
      * @return bool|ServerResponse|mixed
      *
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @throws BotException
+     * @throws TelegramException
+     * @throws StorageException
      */
     protected function forfeitAction()
     {
@@ -204,8 +206,8 @@ class Checkers extends Game
      * @param int    $moveCounter
      *
      * @return InlineKeyboard
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
+     * @throws TelegramException
+     * @throws BotException
      */
     protected function gameKeyboard(array $board, string $winner = null, int $moveCounter = 0): InlineKeyboard
     {
@@ -276,7 +278,7 @@ class Checkers extends Game
                         ]
                     ),
                 ];
-            };
+            }
         }
 
         $inline_keyboard[] = [
@@ -369,9 +371,9 @@ class Checkers extends Game
      *
      * @return bool|ServerResponse|mixed
      *
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @throws BotException
+     * @throws TelegramException
+     * @throws StorageException
      */
     protected function drawAction()
     {
@@ -422,9 +424,9 @@ class Checkers extends Game
      *
      * @return ServerResponse
      *
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @throws BotException
+     * @throws TelegramException
+     * @throws StorageException
      */
     protected function gameAction(): ServerResponse
     {
@@ -464,7 +466,7 @@ class Checkers extends Game
             $data['vote']['guest']['draw'] = false;
             $data['vote']['guest']['surrender'] = false;
 
-            $data['board'] = $this->board;
+            $data['board'] = self::$board;
 
             Utilities::debugPrint('Game initialization');
         } elseif ($args === null && $command === 'game') {
@@ -812,7 +814,7 @@ class Checkers extends Game
             }
         }
 
-        $c = function ($v) {
+        $c = static function ($v) {
             if (is_array($v)) {
                 return array_filter($v) != [];
             }

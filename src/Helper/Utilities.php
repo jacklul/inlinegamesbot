@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Helper;
+namespace Bot\Helper;
 
 use Longman\TelegramBot\Entities\Update;
 use Longman\TelegramBot\TelegramLog;

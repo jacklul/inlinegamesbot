@@ -8,10 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Helper;
+namespace Bot\Helper;
 
+use DirectoryIterator;
 use Gettext\Translations;
 use Gettext\Translator;
+use RuntimeException;
 
 /**
  * Simple localization class
@@ -42,7 +44,7 @@ class Language
         $languages = [self::$default_language];
 
         if (is_dir(ROOT_PATH . '/language')) {
-            foreach (new \DirectoryIterator(ROOT_PATH . '/language') as $fileInfo) {
+            foreach (new DirectoryIterator(ROOT_PATH . '/language') as $fileInfo) {
                 if (!$fileInfo->isDir() && !$fileInfo->isDot()) {
                     $language = explode('.', $fileInfo->getFilename());
 
@@ -123,7 +125,7 @@ class Language
             $translation = Translations::fromPoFile(APP_PATH . '/translations/messages.' . $language . '.po');
 
             if (!is_dir(DATA_PATH . '/translations/') && !mkdir($concurrentDirectory = DATA_PATH . '/translations/', 0755, true) && !is_dir($concurrentDirectory)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+                throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
             }
 
             $translation->toPhpArrayFile(DATA_PATH . '/translations/messages.' . $language . '.php');

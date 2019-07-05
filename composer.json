@@ -17,26 +17,24 @@
     }
   ],
   "require": {
-    "php": "^7.1",
+    "php": "^7.2",
     "ext-curl": "*",
     "ext-gettext": "*",
     "ext-intl": "*",
     "ext-json": "*",
     "ext-mbstring": "*",
     "ext-pdo": "*",
-    "ad7six/dsn": "^0.4",
     "gettext/gettext": "^4.3",
-    "longman/ip-tools": "^1.2",
     "longman/telegram-bot": "^0.53",
     "spatie/emoji": "^1.0"
   },
   "require-dev": {
-    "squizlabs/php_codesniffer": "^3.2",
-    "vlucas/phpdotenv": "^2.4"
+    "vlucas/phpdotenv": "^2.4",
+    "squizlabs/php_codesniffer": "^3.2"
   },
   "autoload": {
     "psr-4": {
-      "jacklul\\inlinegamesbot\\": "src/"
+      "Bot\\": "src/"
     }
   },
   "config": {

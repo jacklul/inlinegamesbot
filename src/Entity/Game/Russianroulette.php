@@ -8,14 +8,16 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Entity\Game;
+namespace Bot\Entity\Game;
 
-use jacklul\inlinegamesbot\Entity\Game;
-use jacklul\inlinegamesbot\Exception\StorageException;
-use jacklul\inlinegamesbot\Helper\Utilities;
+use Bot\Entity\Game;
+use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;
+use Longman\TelegramBot\Exception\TelegramException;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -63,9 +65,9 @@ class Russianroulette extends Game
      *
      * @return ServerResponse
      *
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @throws BotException
+     * @throws TelegramException
+     * @throws StorageException
      */
     protected function gameAction(): ServerResponse
     {
@@ -211,8 +213,8 @@ class Russianroulette extends Game
      * @param string $hit
      *
      * @return InlineKeyboard
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
+     * @throws TelegramException
+     * @throws BotException
      */
     protected function customGameKeyboard(string $hit = null): InlineKeyboard
     {

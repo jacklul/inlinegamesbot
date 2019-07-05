@@ -8,11 +8,11 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Storage\Driver;
+namespace Bot\Storage\Driver;
 
-use AD7six\Dsn\Dsn;
-use jacklul\inlinegamesbot\Entity\TempFile;
-use jacklul\inlinegamesbot\Exception\StorageException;
+use Bot\Entity\TempFile;
+use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
 use PDO;
 use PDOException;
 
@@ -94,14 +94,9 @@ class PostgreSQL
         }
 
         try {
-            $dsn = Dsn::parse(getenv('DATABASE_URL'));
-            $dsn = $dsn->toArray();
-        } catch (\Exception $e) {
-            throw new StorageException($e);
-        }
-
-        try {
-            self::$pdo = new PDO('pgsql:' . 'host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['database'], $dsn['user'], $dsn['pass']);
+            $dsn = parse_url(getenv('DATABASE_URL'));
+            
+            self::$pdo = new PDO('pgsql:' . 'host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . $dsn['path'], $dsn['user'], $dsn['pass']);
             self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
         } catch (PDOException $e) {
             throw new StorageException('Connection to the database failed: ' . $e->getMessage());
@@ -242,7 +237,7 @@ class PostgreSQL
      * @return bool
      *
      * @throws StorageException
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
+     * @throws BotException
      */
     public static function lockGame(string $id): bool
     {

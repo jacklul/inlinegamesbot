@@ -8,20 +8,25 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot;
+namespace Bot;
 
+use Bot\Storage\Driver\File;
 use Dotenv\Dotenv;
+use Exception;
 use Gettext\Translator;
 use GuzzleHttp\Client;
-use jacklul\inlinegamesbot\Entity\TempFile;
-use jacklul\inlinegamesbot\Exception\BotException;
-use jacklul\inlinegamesbot\Exception\StorageException;
-use jacklul\inlinegamesbot\Helper\Utilities;
-use jacklul\inlinegamesbot\Storage\Storage;
-use Longman\IPTools\Ip;
+use Bot\Entity\TempFile;
+use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
+use Bot\Helper\Utilities;
+use Bot\Storage\Storage;
+use InvalidArgumentException;
+use Longman\TelegramBot\Exception\TelegramException;
+use Longman\TelegramBot\Exception\TelegramLogException;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
+use Throwable;
 
 define("ROOT_PATH", realpath(dirname(__DIR__)));
 define("APP_PATH", ROOT_PATH . '/bot');
@@ -44,7 +49,7 @@ class BotCore
      *
      * @var array
      */
-    private $commands = [
+    private static $commands = [
         'help'    => [
             'function'    => 'showHelp',
             'description' => 'Shows this help message',
@@ -177,10 +182,6 @@ class BotCore
                 'password' => getenv('DB_PASS'),
                 'database' => getenv('DB_NAME'),
             ],
-            'validate_request' => true,
-            'valid_ips'        => [
-                '149.154.167.197-149.154.167.233',
-            ],
             'cron'             => [
                 'groups' => [
                     'default' => [
@@ -196,7 +197,7 @@ class BotCore
      *
      * @param bool $webhook
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function run(bool $webhook = false): void
     {
@@ -211,8 +212,8 @@ class BotCore
                 $this->initialize();
             }
 
-            if (!empty($arg) && isset($this->commands[$arg]['function'])) {
-                $function = $this->commands[$arg]['function'];
+            if (!empty($arg) && isset(self::$commands[$arg]['function'])) {
+                $function = self::$commands[$arg]['function'];
                 $this->$function();
             } else {
                 $this->showHelp();
@@ -223,7 +224,7 @@ class BotCore
                     print PHP_EOL . 'No parameter specified!' . PHP_EOL;
                 }
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             TelegramLog::error($e);
             throw $e;
         }
@@ -232,10 +233,10 @@ class BotCore
     /**
      * Initialize Telegram object
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \Longman\TelegramBot\Exception\TelegramLogException
-     * @throws \InvalidArgumentException
-     * @throws \Exception
+     * @throws TelegramException
+     * @throws TelegramLogException
+     * @throws InvalidArgumentException
+     * @throws Exception
      */
     private function initialize(): void
     {
@@ -307,7 +308,7 @@ class BotCore
         print 'Available commands:' . PHP_EOL;
 
         $commands = '';
-        foreach ($this->commands as $command => $data) {
+        foreach (self::$commands as $command => $data) {
             if (!empty($commands)) {
                 $commands .= PHP_EOL;
             }
@@ -327,7 +328,7 @@ class BotCore
      *
      * @noinspection PhpUnusedPrivateMethodInspection
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     private function handleWebhook(): void
     {
@@ -351,20 +352,6 @@ class BotCore
             if (!isset($secret, $secret_get) || $secret !== $secret_get) {
                 return false;
             }
-
-            if (isset($this->config['valid_ip']) && !empty($this->config['valid_ip'] && is_array($this->config['valid_ip']))) {
-                if ($this->config['validate_request']) {
-                    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-                    foreach (['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR'] as $key) {
-                        if (filter_var($_SERVER[$key] ?? null, FILTER_VALIDATE_IP)) {
-                            $ip = $_SERVER[$key];
-                            break;
-                        }
-                    }
-
-                    return Ip::match($ip, $this->config['valid_ips']);
-                }
-            }
         }
 
         return true;
@@ -376,7 +363,7 @@ class BotCore
      * @noinspection PhpUnusedPrivateMethodInspection
      *
      * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     private function setWebhook(): void
     {
@@ -428,7 +415,7 @@ class BotCore
      *
      * @noinspection PhpUnusedPrivateMethodInspection
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     private function deleteWebhook(): void
     {
@@ -466,7 +453,7 @@ class BotCore
      *
      * @noinspection PhpUnusedPrivateMethodInspection
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     private function handleLongPolling(): void
     {
@@ -511,7 +498,7 @@ class BotCore
      * @noinspection PhpUnusedPrivateMethodInspection
      *
      * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     private function handleWorker(): void
     {
@@ -567,7 +554,7 @@ class BotCore
      * Run scheduled commands
      *
      * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     private function handleCron(): void
     {
@@ -618,7 +605,7 @@ class BotCore
      */
     private function installDb(): void
     {
-        /** @var \jacklul\inlinegamesbot\Storage\Driver\File $storage_class */
+        /** @var File $storage_class */
         $storage_class = Storage::getClass();
         $storage_class = explode('\\', $storage_class);
 

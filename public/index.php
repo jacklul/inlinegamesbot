@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-use jacklul\inlinegamesbot\BotCore;
+use Bot\BotCore;
 
 /**
  * Handle webhook request only when it's a POST request

@@ -8,9 +8,11 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Exception;
+namespace Bot\Exception;
 
-use jacklul\inlinegamesbot\Storage\Storage;
+use Bot\Storage\Storage;
+use Exception;
+use Throwable;
 
 /**
  * Exception class used for bot storage related exception handling
@@ -20,13 +22,13 @@ class StorageException extends BotException
     /**
      * @param string          $message
      * @param int             $code
-     * @param \Throwable|null $previous
+     * @param Throwable|null $previous
      */
-    public function __construct($message = "", $code = 0, \Throwable $previous = null)
+    public function __construct($message = "", $code = 0, Throwable $previous = null)
     {
         try {
             parent::__construct($message . ' [' . Storage::getClass() . ']', $code, $previous);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             parent::__construct($message, $code, $previous);
         }
     }

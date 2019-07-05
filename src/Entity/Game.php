@@ -8,18 +8,20 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Entity;
+namespace Bot\Entity;
 
-use jacklul\inlinegamesbot\Exception\BotException;
-use jacklul\inlinegamesbot\Exception\StorageException;
-use jacklul\inlinegamesbot\Exception\TelegramApiException;
-use jacklul\inlinegamesbot\GameCore;
-use jacklul\inlinegamesbot\Helper\Language;
-use jacklul\inlinegamesbot\Helper\Utilities;
+use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
+use Bot\Exception\TelegramApiException;
+use Bot\GameCore;
+use Bot\Helper\Language;
+use Bot\Helper\Utilities;
+use Bot\Storage\Driver\File;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Entities\User;
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 
 /**
@@ -148,7 +150,7 @@ class Game
      * @throws TelegramApiException
      * @throws StorageException
      * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     public function handleAction(string $action)
     {
@@ -156,7 +158,7 @@ class Game
         if (class_exists($storage_class = $this->manager->getStorage()) && $this->data === null) {
             Utilities::debugPrint('Reading game data from the database');
 
-            /** @var \jacklul\inlinegamesbot\Storage\Driver\File $storage_class */
+            /** @var File $storage_class */
             $this->data = $storage_class::selectFromGame($game_id);
         }
 
@@ -258,7 +260,7 @@ class Game
      *
      * @return ServerResponse
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function answerCallbackQuery(string $text = null, bool $alert = false): ServerResponse
     {
@@ -284,7 +286,7 @@ class Game
      *
      * @return bool
      *
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @throws StorageException
      */
     protected function saveData(array $data = null): bool
     {
@@ -297,7 +299,7 @@ class Game
 
         Utilities::debugPrint('Saving game data to database');
 
-        /** @var \jacklul\inlinegamesbot\Storage\Driver\File $storage_class */
+        /** @var File $storage_class */
         $storage_class = $this->manager->getStorage();
 
         return $storage_class::insertToGame($this->manager->getId(), $data);
@@ -313,8 +315,8 @@ class Game
      * @return ServerResponse
      *
      * @throws BotException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws StorageException
+     * @throws TelegramException
      */
     protected function editMessage(string $text, InlineKeyboard $reply_markup, bool $ignore_mention_error = false): ServerResponse
     {
@@ -375,7 +377,7 @@ class Game
      *
      * @return int|bool
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function getUserId(string $user = null)
     {
@@ -390,7 +392,7 @@ class Game
      *
      * @return User|bool
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function getUser(string $user = null, bool $as_json = false)
     {
@@ -421,7 +423,7 @@ class Game
      * @param string $inline_keyboard
      *
      * @return InlineKeyboard
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function getReplyMarkup(string $inline_keyboard = null): InlineKeyboard
     {
@@ -450,8 +452,8 @@ class Game
      * @return ServerResponse
      *
      * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @throws TelegramException
+     * @throws StorageException
      */
     protected function newAction(): ServerResponse
     {
@@ -518,7 +520,7 @@ class Game
      *
      * @return string|bool
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function getUserMention(string $user = null)
     {
@@ -535,8 +537,8 @@ class Game
      * @return ServerResponse
      *
      * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @throws TelegramException
+     * @throws StorageException
      */
     protected function joinAction(): ServerResponse
     {
@@ -605,8 +607,8 @@ class Game
      * @return ServerResponse
      *
      * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @throws TelegramException
+     * @throws StorageException
      */
     protected function quitAction(): ServerResponse
     {
@@ -666,8 +668,8 @@ class Game
      * @return ServerResponse
      *
      * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @throws TelegramException
+     * @throws StorageException
      */
     protected function kickAction(): ServerResponse
     {
@@ -703,8 +705,8 @@ class Game
      * @return ServerResponse
      *
      * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @throws TelegramException
+     * @throws StorageException
      */
     protected function startAction(): ServerResponse
     {
@@ -739,7 +741,7 @@ class Game
      * @return ServerResponse
      *
      * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function gameAction(): ServerResponse
     {
@@ -756,8 +758,8 @@ class Game
      * @return ServerResponse
      *
      * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @throws TelegramException
+     * @throws StorageException
      */
     protected function languageAction(): ServerResponse
     {
@@ -798,7 +800,7 @@ class Game
      * Game empty keyboard
      *
      * @return array
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function emptyKeyboard(): array
     {
@@ -818,7 +820,7 @@ class Game
      * Game in lobby without guest keyboard
      *
      * @return array
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function lobbyKeyboard(): array
     {
@@ -857,7 +859,7 @@ class Game
      * Game in lobby with guest keyboard
      *
      * @return array
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     protected function pregameKeyboard(): array
     {
@@ -908,7 +910,7 @@ class Game
      * @param string $winner
      *
      * @return InlineKeyboard|bool
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      * @throws BotException
      */
     protected function gameKeyboard(array $board, string $winner = null)
@@ -1029,8 +1031,8 @@ class Game
      * @return ServerResponse
      *
      * @throws BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @throws TelegramException
+     * @throws StorageException
      */
     protected function handleEmptyData(): ServerResponse
     {

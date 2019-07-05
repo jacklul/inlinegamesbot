@@ -8,9 +8,11 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Storage\Driver;
+namespace Bot\Storage\Driver;
 
-use jacklul\inlinegamesbot\Exception\StorageException;
+use Bot\Exception\StorageException;
+use DirectoryIterator;
+use RuntimeException;
 
 /**
  * Stores data in json formatted text files
@@ -32,7 +34,7 @@ class File
             define('STORAGE_GAME_PATH', DATA_PATH . '/game');
 
             if (!is_dir(STORAGE_GAME_PATH) && !mkdir($concurrentDirectory = STORAGE_GAME_PATH, 0755, true) && !is_dir($concurrentDirectory)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+                throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
             }
         }
 
@@ -180,7 +182,7 @@ class File
         }
 
         $ids = [];
-        foreach (new \DirectoryIterator(STORAGE_GAME_PATH) as $file) {
+        foreach (new DirectoryIterator(STORAGE_GAME_PATH) as $file) {
             if (!$file->isDir() && !$file->isDot() && $file->getMTime() + $time < time()) {
                 $ids[] = ['id' => trim(basename($file->getFilename(), '.json')), 'data' => file_get_contents($file->getPathname())];
             }

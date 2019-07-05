@@ -8,10 +8,11 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Entity;
+namespace Bot\Entity;
 
-use jacklul\inlinegamesbot\Exception\BotException;
-use jacklul\inlinegamesbot\Helper\Utilities;
+use Bot\Exception\BotException;
+use Bot\Helper\Utilities;
+use RuntimeException;
 use SplFileInfo;
 
 /**
@@ -39,7 +40,7 @@ class TempFile
      * @param string $name
      * @param bool   $delete
      *
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
+     * @throws BotException
      */
     public function __construct($name, $delete = true)
     {
@@ -52,7 +53,7 @@ class TempFile
         }
 
         if (!is_dir(dirname($this->file)) && !mkdir($concurrentDirectory = dirname($this->file), 0755, true) && !is_dir($concurrentDirectory)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
+            throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
 
         if (!is_writable(dirname($this->file))) {

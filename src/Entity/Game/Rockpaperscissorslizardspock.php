@@ -8,10 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Entity\Game;
+namespace Bot\Entity\Game;
 
+use Bot\Exception\BotException;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
+use Longman\TelegramBot\Exception\TelegramException;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -175,8 +177,8 @@ class Rockpaperscissorslizardspock extends Rockpaperscissors
      * @param bool $isOver
      *
      * @return InlineKeyboard
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
+     * @throws TelegramException
+     * @throws BotException
      */
     protected function customGameKeyboard(bool $isOver = false): InlineKeyboard
     {

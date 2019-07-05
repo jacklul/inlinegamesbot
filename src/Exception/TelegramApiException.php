@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Exception;
+namespace Bot\Exception;
 
 use Longman\TelegramBot\Entities\ServerResponse;
 

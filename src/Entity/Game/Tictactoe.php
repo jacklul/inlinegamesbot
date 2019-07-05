@@ -8,12 +8,14 @@
  * file that was distributed with this source code.
  */
 
-namespace jacklul\inlinegamesbot\Entity\Game;
+namespace Bot\Entity\Game;
 
-use jacklul\inlinegamesbot\Entity\Game;
-use jacklul\inlinegamesbot\Exception\StorageException;
-use jacklul\inlinegamesbot\Helper\Utilities;
+use Bot\Entity\Game;
+use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\Entities\ServerResponse;
+use Longman\TelegramBot\Exception\TelegramException;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -61,7 +63,7 @@ class Tictactoe extends Game
      *
      * @var array
      */
-    protected $board = [
+    protected static $board = [
         ['', '', ''],
         ['', '', ''],
         ['', '', ''],
@@ -72,9 +74,9 @@ class Tictactoe extends Game
      *
      * @return ServerResponse
      *
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
+     * @throws BotException
+     * @throws TelegramException
+     * @throws StorageException
      */
     protected function gameAction(): ServerResponse
     {
@@ -106,7 +108,7 @@ class Tictactoe extends Game
             }
 
             $data['current_turn'] = 'X';
-            $data['board'] = $this->board;
+            $data['board'] = self::$board;
 
             Utilities::debugPrint('Game initialization');
         } elseif ($args === null) {

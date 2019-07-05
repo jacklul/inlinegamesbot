@@ -10,12 +10,16 @@
 
 namespace Longman\TelegramBot\Commands\AdminCommands;
 
-use jacklul\inlinegamesbot\GameCore;
-use jacklul\inlinegamesbot\Storage\Storage;
+use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
+use Bot\GameCore;
+use Bot\Storage\Driver\File;
+use Bot\Storage\Storage;
 use Longman\TelegramBot\Commands\AdminCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\ServerResponse;
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 
 /**
@@ -30,9 +34,9 @@ class StatsCommand extends AdminCommand
     /**
      * @return ServerResponse
      *
-     * @throws \jacklul\inlinegamesbot\Exception\BotException
-     * @throws \jacklul\inlinegamesbot\Exception\StorageException
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws BotException
+     * @throws StorageException
+     * @throws TelegramException
      */
     public function execute(): ServerResponse
     {
@@ -56,7 +60,7 @@ class StatsCommand extends AdminCommand
             $data_query['callback_query_id'] = $callback_query->getId();
         }
 
-        /** @var \jacklul\inlinegamesbot\Storage\Driver\File $storage_class */
+        /** @var File $storage_class */
         $storage_class = Storage::getClass();
         $storage_class::initializeStorage();
 
@@ -125,7 +129,7 @@ class StatsCommand extends AdminCommand
      * Create inline keyboard that will refresh this message
      *
      * @return InlineKeyboard
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     private function createInlineKeyboard(): InlineKeyboard
     {

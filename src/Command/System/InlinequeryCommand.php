@@ -10,12 +10,15 @@
 
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
+use Bot\Entity\Game;
+use DirectoryIterator;
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
 use Longman\TelegramBot\Entities\InlineQuery\InlineQueryResultArticle;
 use Longman\TelegramBot\Entities\InputMessageContent\InputTextMessageContent;
 use Longman\TelegramBot\Entities\ServerResponse;
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 
 /**
@@ -28,14 +31,14 @@ class InlinequeryCommand extends SystemCommand
     /**
      * @return ServerResponse
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     public function execute(): ServerResponse
     {
         $articles = [];
 
         foreach ($this->getGamesList() as $game) {
-            /** @var \jacklul\inlinegamesbot\Entity\Game $game_class */
+            /** @var Game $game_class */
             if (class_exists($game_class = $game['class'])) {
                 $articles[] = [
                     'id'                    => $game_class::getCode(),
@@ -81,10 +84,10 @@ class InlinequeryCommand extends SystemCommand
     {
         $games = [];
         if (is_dir(SRC_PATH . '/Entity/Game')) {
-            foreach (new \DirectoryIterator(SRC_PATH . '/Entity/Game') as $file) {
+            foreach (new DirectoryIterator(SRC_PATH . '/Entity/Game') as $file) {
                 if (!$file->isDir() && !$file->isDot() && $file->getExtension() === 'php') {
-                    /** @var \jacklul\inlinegamesbot\Entity\Game $game_class */
-                    $game_class = '\jacklul\inlinegamesbot\Entity\Game\\' . basename($file->getFilename(), '.php');
+                    /** @var Game $game_class */
+                    $game_class = '\Bot\Entity\Game\\' . basename($file->getFilename(), '.php');
 
                     $games[] = [
                         'class' => $game_class,
@@ -96,7 +99,7 @@ class InlinequeryCommand extends SystemCommand
 
         usort(
             $games,
-            function ($item1, $item2) {
+            static function ($item1, $item2) {
                 return $item1['order'] <=> $item2['order'];
             }
         );
@@ -110,7 +113,7 @@ class InlinequeryCommand extends SystemCommand
      * @param string $game_code
      *
      * @return InlineKeyboard
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     private function createInlineKeyboard(string $game_code): InlineKeyboard
     {

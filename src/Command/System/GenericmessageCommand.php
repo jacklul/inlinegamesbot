@@ -12,6 +12,8 @@ namespace Longman\TelegramBot\Commands\SystemCommands;
 
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Conversation;
+use Longman\TelegramBot\Entities\ServerResponse;
+use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 
 /**
@@ -24,7 +26,7 @@ class GenericmessageCommand extends SystemCommand
     /**
      * @return mixed
      *
-     * @throws \Longman\TelegramBot\Exception\TelegramException
+     * @throws TelegramException
      */
     public function execute()
     {
@@ -47,9 +49,18 @@ class GenericmessageCommand extends SystemCommand
     }
 
     /**
+     * @return ServerResponse|void
+     * @throws TelegramException
+     */
+    public function executeNoDb()
+    {
+        $this->execute();
+    }
+
+    /**
      * Leave group chats
      *
-     * @return bool|\Longman\TelegramBot\Entities\ServerResponse
+     * @return bool|ServerResponse
      */
     private function leaveGroupChat()
     {
