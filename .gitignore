@@ -5,7 +5,7 @@
 # Configuration files
 /config.php
 /.env*
-/!.env.example
+!/.env.example
 
 # Data directory
 /data/
