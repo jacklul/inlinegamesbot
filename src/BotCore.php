@@ -21,11 +21,15 @@ use Bot\Exception\StorageException;
 use Bot\Helper\Utilities;
 use Bot\Storage\Storage;
 use InvalidArgumentException;
+use jacklul\MonologTelegramHandler\TelegramFormatter;
+use jacklul\MonologTelegramHandler\TelegramHandler;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Exception\TelegramLogException;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
+use Monolog\Handler\DeduplicationHandler;
+use Monolog\Logger;
 use Throwable;
 
 define("ROOT_PATH", realpath(dirname(__DIR__)));
@@ -262,6 +266,17 @@ class BotCore
 
         if (isset($this->config['admins']) && !empty($this->config['admins'][0])) {
             $this->telegram->enableAdmins($this->config['admins']);
+
+            $monolog = new Logger($this->config['bot_username']);
+
+            $handler = new TelegramHandler($this->config['api_key'], (int)$this->config['admins'][0], Logger::ERROR);
+            $handler->setFormatter(new TelegramFormatter());
+
+            $handler = new DeduplicationHandler($handler, defined('DATA_PATH') ? DATA_PATH . '/monolog-dedup.log' : null);
+            $handler->setLevel(Utilities::isDebugPrintEnabled() ? Logger::DEBUG : Logger::ERROR);
+
+            $monolog->pushHandler($handler);
+            TelegramLog::initialize($monolog);
         }
 
         if (isset($this->config['custom_http_client'])) {

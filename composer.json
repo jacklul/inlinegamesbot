@@ -25,6 +25,7 @@
     "ext-mbstring": "*",
     "ext-pdo": "*",
     "gettext/gettext": "^4.3",
+    "jacklul/monolog-telegram": "^1.0",
     "longman/telegram-bot": "^0.53",
     "spatie/emoji": "^1.0"
   },
