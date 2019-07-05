@@ -12,6 +12,7 @@ namespace Longman\TelegramBot\Commands\SystemCommands;
 
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Conversation;
+use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
@@ -54,7 +55,7 @@ class GenericmessageCommand extends SystemCommand
      */
     public function executeNoDb()
     {
-        $this->execute();
+        return Request::emptyResponse();
     }
 
     /**
