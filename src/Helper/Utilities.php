@@ -130,9 +130,9 @@ class Utilities
      *
      * @param Update $update
      *
-     * @return Update
+     * @return array
      */
-    public static function updateToArray(Update $update): Update
+    public static function updateToArray(Update $update): array
     {
         $update_array = json_decode(json_encode($update), true);
         unset($update_array['raw_data']);
