@@ -29,6 +29,9 @@ use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
 use Monolog\Handler\DeduplicationHandler;
+use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
+use Monolog\Handler\FingersCrossedHandler;
+use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Throwable;
 
@@ -264,10 +267,19 @@ class BotCore
             TelegramLog::initUpdateLog($this->config['logging']['update']);
         }
 
+        $monolog = new Logger($this->config['bot_username']);
+
+        if (file_exists(ROOT_PATH . '/vendor/bin/heroku-php-nginx')) {
+            $monolog->pushHandler(
+                new FingersCrossedHandler(
+                    new StreamHandler('php://stderr'),
+                    new ErrorLevelActivationStrategy(Logger::WARNING)
+                )
+            );
+        }
+
         if (isset($this->config['admins']) && !empty($this->config['admins'][0])) {
             $this->telegram->enableAdmins($this->config['admins']);
-
-            $monolog = new Logger($this->config['bot_username']);
 
             $handler = new TelegramHandler($this->config['api_key'], (int)$this->config['admins'][0], Logger::ERROR);
             $handler->setFormatter(new TelegramFormatter());
@@ -276,6 +288,9 @@ class BotCore
             $handler->setLevel(Utilities::isDebugPrintEnabled() ? Logger::DEBUG : Logger::ERROR);
 
             $monolog->pushHandler($handler);
+        }
+
+        if (!empty($monolog->getHandlers())) {
             TelegramLog::initialize($monolog);
         }
 
