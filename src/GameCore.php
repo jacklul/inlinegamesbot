@@ -91,6 +91,11 @@ class GameCore
             $storage_class::initializeStorage();
         } catch (StorageException $e) {
             $this->notifyAboutStorageFailure();
+
+            if (strpos($e->getMessage(), 'too many connections') !== false) {
+                return;
+            }
+
             throw $e;
         }
 
