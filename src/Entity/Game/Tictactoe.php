@@ -108,7 +108,7 @@ class Tictactoe extends Game
             }
 
             $data['current_turn'] = 'X';
-            $data['board'] = self::$board;
+            $data['board'] = static::$board;
 
             Utilities::debugPrint('Game initialization');
         } elseif ($args === null) {

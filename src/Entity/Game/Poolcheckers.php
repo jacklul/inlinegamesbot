@@ -333,7 +333,7 @@ class Poolcheckers extends Checkers
             $data['vote']['guest']['draw'] = false;
             $data['vote']['guest']['surrender'] = false;
 
-            $data['board'] = self::$board;
+            $data['board'] = static::$board;
 
             Utilities::debugPrint('Game initialization');
         } elseif ($args === null && $command === 'game') {
