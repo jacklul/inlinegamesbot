@@ -75,7 +75,20 @@ class CleansessionsCommand extends AdminCommand
         $storage_class = Storage::getClass();
 
         if (class_exists($storage_class)) {
-            $storage_class::initializeStorage();
+            $timeout = 10;
+            do {
+                try {
+                    $storage_init = $storage_class::initializeStorage();
+                } catch (StorageException $e) {
+                    if ($timeout < 0 || strpos($e, 'too many connections') === false) {
+                        throw $e;
+                    }
+                }
+
+                $timeout--;
+                sleep(1);
+            } while (!isset($storage_init));
+
             $inactive = $storage_class::listFromGame($cleanInterval);
 
             if (is_array($inactive) && count($inactive) > 0) {
