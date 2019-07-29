@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "23c3ee33dfd657a782ffc163ddb6eea7",
+    "content-hash": "b3c30661b30146db32842005a09d3956",
     "packages": [
         {
             "name": "gettext/gettext",
-            "version": "v4.6.2",
+            "version": "v4.6.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/oscarotero/Gettext.git",
-                "reference": "93176b272d61fb58a9767be71c50d19149cb1e48"
+                "reference": "70c6ff2fecd275e6ef9cdd542f55939a3d1904d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/oscarotero/Gettext/zipball/93176b272d61fb58a9767be71c50d19149cb1e48",
-                "reference": "93176b272d61fb58a9767be71c50d19149cb1e48",
+                "url": "https://api.github.com/repos/oscarotero/Gettext/zipball/70c6ff2fecd275e6ef9cdd542f55939a3d1904d6",
+                "reference": "70c6ff2fecd275e6ef9cdd542f55939a3d1904d6",
                 "shasum": ""
             },
             "require": {
@@ -66,7 +66,7 @@
                 "po",
                 "translation"
             ],
-            "time": "2019-01-12T18:40:56+00:00"
+            "time": "2019-07-15T12:56:31+00:00"
         },
         {
             "name": "gettext/languages",
@@ -375,29 +375,31 @@
         },
         {
             "name": "longman/telegram-bot",
-            "version": "0.53.0",
+            "version": "0.59.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-telegram-bot/core.git",
-                "reference": "ed50346851088a13f2af27e067d3f595b900b55f"
+                "reference": "f55fd1c2eb75b4f8e9ab468066ce96acba9e6b68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-telegram-bot/core/zipball/ed50346851088a13f2af27e067d3f595b900b55f",
-                "reference": "ed50346851088a13f2af27e067d3f595b900b55f",
+                "url": "https://api.github.com/repos/php-telegram-bot/core/zipball/f55fd1c2eb75b4f8e9ab468066ce96acba9e6b68",
+                "reference": "f55fd1c2eb75b4f8e9ab468066ce96acba9e6b68",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
+                "ext-json": "*",
                 "ext-mbstring": "*",
                 "ext-pdo": "*",
                 "guzzlehttp/guzzle": "^6.3",
-                "monolog/monolog": "^1.23",
-                "php": "^5.5|^7.0"
+                "monolog/monolog": "^1.24",
+                "php": "^5.5|^7.0",
+                "psr/log": "^1.1"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8|^5.7|^6.5|^7.0",
-                "squizlabs/php_codesniffer": "^3.2"
+                "phpunit/phpunit": "^4.8|^5.7|^6.5|^7.5|^8.1",
+                "squizlabs/php_codesniffer": "^3.4"
             },
             "type": "library",
             "autoload": {
@@ -415,6 +417,11 @@
                     "email": "akalongman@gmail.com",
                     "homepage": "http://longman.me",
                     "role": "Developer"
+                },
+                {
+                    "name": "PHP Telegram Bot Team",
+                    "homepage": "https://github.com/php-telegram-bot/core/graphs/contributors",
+                    "role": "Developer"
                 }
             ],
             "description": "PHP Telegram bot",
@@ -424,7 +431,7 @@
                 "bot",
                 "telegram"
             ],
-            "time": "2018-03-31T22:35:18+00:00"
+            "time": "2019-07-18T15:02:31+00:00"
         },
         {
             "name": "monolog/monolog",

@@ -8,9 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Longman\TelegramBot\Commands\SystemCommands;
+namespace Longman\TelegramBot\Commands\UserCommands;
 
-use Longman\TelegramBot\Commands\SystemCommand;
+use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Exception\TelegramException;
 
 /**
@@ -18,7 +18,7 @@ use Longman\TelegramBot\Exception\TelegramException;
  *
  * @noinspection PhpUndefinedClassInspection
  */
-class StartCommand extends SystemCommand
+class StartCommand extends UserCommand
 {
     /**
      * @return mixed

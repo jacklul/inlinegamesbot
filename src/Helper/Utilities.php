@@ -37,9 +37,7 @@ class Utilities
                 return;
             }
 
-            if (TelegramLog::isDebugLogActive()) {
-                TelegramLog::debug($text);
-            }
+            TelegramLog::debug($text);
 
             $prefix = '';
             $backtrace = debug_backtrace();
