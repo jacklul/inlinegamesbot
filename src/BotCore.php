@@ -28,6 +28,7 @@ use Longman\TelegramBot\Exception\TelegramLogException;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
+use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 use Monolog\Handler\FingersCrossedHandler;
@@ -254,20 +255,21 @@ class BotCore
         Utilities::debugPrint('DEBUG MODE');
 
         $this->telegram = new Telegram($this->config['api_key'], $this->config['bot_username']);
+        $monolog = new Logger($this->config['bot_username']);
 
         if (isset($this->config['logging']['error'])) {
-            TelegramLog::initErrorLog($this->config['logging']['error']);
+            $monolog->pushHandler((new StreamHandler($this->config['logging']['error'], Logger::ERROR))->setFormatter(new LineFormatter(null, null, true)));
         }
 
         if (isset($this->config['logging']['debug'])) {
-            TelegramLog::initDebugLog($this->config['logging']['debug']);
+            $monolog->pushHandler((new StreamHandler($this->config['logging']['debug'], Logger::ERROR))->setFormatter(new LineFormatter(null, null, true)));
         }
 
         if (isset($this->config['logging']['update'])) {
-            TelegramLog::initUpdateLog($this->config['logging']['update']);
+            $update_logger = new Logger($this->config['bot_username'] . '_update', [
+                (new StreamHandler($this->config['logging']['update'], Logger::INFO))->setFormatter(new LineFormatter('%message%' . PHP_EOL))
+            ]);
         }
-
-        $monolog = new Logger($this->config['bot_username']);
 
         if (file_exists(ROOT_PATH . '/vendor/bin/heroku-php-nginx')) {
             $monolog->pushHandler(
@@ -291,7 +293,7 @@ class BotCore
         }
 
         if (!empty($monolog->getHandlers())) {
-            TelegramLog::initialize($monolog);
+            TelegramLog::initialize($monolog, $update_logger ?? null);
         }
 
         if (isset($this->config['custom_http_client'])) {
