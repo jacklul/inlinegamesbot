@@ -10,6 +10,8 @@
 
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
+use Bot\GameCore;
+use Bot\Helper\Utilities;
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\DB;
@@ -28,9 +30,25 @@ class GenericmessageCommand extends SystemCommand
      * @return mixed
      *
      * @throws TelegramException
+     * @throws \Bot\Exception\BotException
+     * @throws \Bot\Exception\StorageException
+     * @throws \Bot\Exception\TelegramApiException
+     * @throws \Throwable
      */
     public function execute()
     {
+        if ($chosen_inline_result = $this->getUpdate()->getChosenInlineResult()) {
+            Utilities::debugPrint('Data: ' . $chosen_inline_result->getResultId());
+
+            $game = new GameCore($chosen_inline_result->getInlineMessageId(), $chosen_inline_result->getResultId(), $this);
+
+            if ($game->canRun()) {
+                return $game->run();
+            }
+
+            return Request::emptyResponse();
+        }
+
         $this->leaveGroupChat();
 
         if (strpos($this->getMessage()->getText(true), 'This game session is empty.') !== false) {
