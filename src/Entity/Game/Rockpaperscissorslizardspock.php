@@ -13,7 +13,6 @@ namespace Bot\Entity\Game;
 use Bot\Exception\BotException;
 use Longman\TelegramBot\Entities\InlineKeyboard;
 use Longman\TelegramBot\Entities\InlineKeyboardButton;
-use Longman\TelegramBot\Exception\TelegramException;
 use Spatie\Emoji\Emoji;
 
 /**
@@ -177,7 +176,6 @@ class Rockpaperscissorslizardspock extends Rockpaperscissors
      * @param bool $isOver
      *
      * @return InlineKeyboard
-     * @throws TelegramException
      * @throws BotException
      */
     protected function customGameKeyboard(bool $isOver = false): InlineKeyboard

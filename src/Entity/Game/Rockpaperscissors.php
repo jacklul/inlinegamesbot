@@ -115,8 +115,6 @@ class Rockpaperscissors extends Game
 
                 if ($this->saveData($this->data)) {
                     Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' picked ' . $arg);
-                } else {
-                    throw new StorageException();
                 }
             } else {
                 Utilities::debugPrint('Invalid move data: ' . $arg);
@@ -183,7 +181,7 @@ class Rockpaperscissors extends Game
             );
         }
 
-        throw new StorageException();
+        return parent::gameAction();
     }
 
     /**
@@ -247,7 +245,6 @@ class Rockpaperscissors extends Game
      * @param bool $isOver
      *
      * @return InlineKeyboard
-     * @throws TelegramException
      * @throws BotException
      */
     protected function customGameKeyboard(bool $isOver = false): InlineKeyboard

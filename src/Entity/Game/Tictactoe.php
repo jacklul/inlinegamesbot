@@ -168,7 +168,7 @@ class Tictactoe extends Game
             );
         }
 
-        throw new StorageException();
+        return parent::gameAction();
     }
 
     /**

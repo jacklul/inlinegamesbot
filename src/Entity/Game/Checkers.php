@@ -137,8 +137,6 @@ class Checkers extends Game
                         $this->gameKeyboard($data['board'], 'surrender')
                     );
                 }
-
-                throw new StorageException();
             }
 
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to surrender');
@@ -147,8 +145,6 @@ class Checkers extends Game
             if ($this->saveData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
             }
-
-            throw new StorageException();
         }
 
         if ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest')) {
@@ -166,8 +162,6 @@ class Checkers extends Game
                         $this->gameKeyboard($data['board'], 'surrender')
                     );
                 }
-
-                throw new StorageException();
             }
 
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' voted to surrender');
@@ -176,8 +170,6 @@ class Checkers extends Game
             if ($this->saveData($this->data)) {
                 return $this->answerCallbackQuery(__("Press the button again to surrender!"), true);
             }
-
-            throw new StorageException();
         }
 
         Utilities::debugPrint('Someone else executed forfeit action');
@@ -206,7 +198,6 @@ class Checkers extends Game
      * @param int    $moveCounter
      *
      * @return InlineKeyboard
-     * @throws TelegramException
      * @throws BotException
      */
     protected function gameKeyboard(array $board, string $winner = null, int $moveCounter = 0): InlineKeyboard
@@ -400,8 +391,6 @@ class Checkers extends Game
 
                 return $this->gameAction();
             }
-
-            throw new StorageException();
         }
 
         if ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest') && !$data['vote']['guest']['draw']) {
@@ -412,8 +401,6 @@ class Checkers extends Game
 
                 return $this->gameAction();
             }
-
-            throw new StorageException();
         }
 
         return $this->answerCallbackQuery(__("You already voted!"), true);
@@ -644,7 +631,7 @@ class Checkers extends Game
             );
         }
 
-        throw new StorageException();
+        return parent::gameAction();
     }
 
     /**

@@ -180,7 +180,7 @@ class Connectfour extends Game
             );
         }
 
-        throw new StorageException();
+        return parent::gameAction();
     }
 
     /**

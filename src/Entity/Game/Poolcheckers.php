@@ -73,7 +73,6 @@ class Poolcheckers extends Checkers
      * @param int    $moveCounter
      *
      * @return InlineKeyboard
-     * @throws TelegramException
      * @throws BotException
      */
     protected function gameKeyboard(array $board, string $winner = null, int $moveCounter = 0): InlineKeyboard
@@ -263,8 +262,6 @@ class Poolcheckers extends Checkers
 
                 return $this->gameAction();
             }
-
-            throw new StorageException();
         }
 
         if ($this->getUser('guest') && $this->getCurrentUserId() === $this->getUserId('guest') && !$data['vote']['guest']['draw']) {
@@ -275,8 +272,6 @@ class Poolcheckers extends Checkers
 
                 return $this->gameAction();
             }
-
-            throw new StorageException();
         }
 
         if ((!$this->getUser('host') || $this->getCurrentUserId() !== $this->getUserId('host')) && (!$this->getUser('guest') || $this->getCurrentUserId() !== $this->getUserId('guest'))) {
@@ -513,7 +508,7 @@ class Poolcheckers extends Checkers
             );
         }
 
-        throw new StorageException();
+        return parent::gameAction();
     }
 
     /**

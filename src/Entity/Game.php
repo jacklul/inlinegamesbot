@@ -302,8 +302,13 @@ class Game
 
         /** @var File $storage_class */
         $storage_class = $this->manager->getStorage();
+        $result = $storage_class::insertToGame($this->manager->getId(), $data);
 
-        return $storage_class::insertToGame($this->manager->getId(), $data);
+        if (!$result) {
+            throw new StorageException('Data save failed');
+        }
+
+        return true;
     }
 
     /**

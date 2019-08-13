@@ -165,8 +165,6 @@ class Russianroulette extends Game
                 if ($this->saveData($this->data)) {
                     return $this->editMessage($gameOutput . PHP_EOL . PHP_EOL . __('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->customGameKeyboard($hit));
                 }
-
-                throw new StorageException();
             }
 
             $gameOutput = Emoji::smilingFaceWithSunglasses() . ' <b>' . __("{PLAYER} survived!", ['{PLAYER}' => '</b>' . $this->getCurrentUserMention() . '<b>']) . '</b>' . PHP_EOL;
@@ -193,7 +191,7 @@ class Russianroulette extends Game
             );
         }
 
-        throw new StorageException();
+        return parent::gameAction();
     }
 
     /**
@@ -213,7 +211,6 @@ class Russianroulette extends Game
      * @param string $hit
      *
      * @return InlineKeyboard
-     * @throws TelegramException
      * @throws BotException
      */
     protected function customGameKeyboard(string $hit = null): InlineKeyboard
