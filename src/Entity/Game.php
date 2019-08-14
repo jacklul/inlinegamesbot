@@ -203,6 +203,7 @@ class Game
                 'query is too old and response timeout expired or query ID is invalid',
                 'MESSAGE_ID_INVALID',               // Callback query from deleted message, or chooses inline result on message that is no yet delivered to Telegram servers
                 'ENTITY_MENTION_USER_INVALID',      // User mention ended up somehow invalid
+                'MESSAGE_AUTHOR_REQUIRED',          // No message author in the object?
                 'Too Many Requests',                // Telegram API limit reached
             ];
 
