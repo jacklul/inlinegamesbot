@@ -26,7 +26,7 @@
     "ext-pdo": "*",
     "gettext/gettext": "^4.3",
     "jacklul/monolog-telegram": "^1.0",
-    "longman/telegram-bot": "^0.59",
+    "longman/telegram-bot": "^0.60",
     "spatie/emoji": "^1.0"
   },
   "require-dev": {

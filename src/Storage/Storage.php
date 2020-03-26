@@ -12,9 +12,9 @@ namespace Bot\Storage;
 
 use Bot\Exception\StorageException;
 use Bot\Helper\Utilities;
-use Longman\TelegramBot\DB;
-use Bot\Storage\Driver\File;
 use Bot\Storage\Driver\BotDB;
+use Bot\Storage\Driver\File;
+use Longman\TelegramBot\DB;
 
 /**
  * Picks the best storage driver available

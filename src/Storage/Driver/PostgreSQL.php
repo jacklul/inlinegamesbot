@@ -95,7 +95,7 @@ class PostgreSQL
 
         try {
             $dsn = parse_url(getenv('DATABASE_URL'));
-            
+
             self::$pdo = new PDO('pgsql:' . 'host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . ltrim($dsn['path'], '/'), $dsn['user'], $dsn['pass']);
             self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
         } catch (PDOException $e) {

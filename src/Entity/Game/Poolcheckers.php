@@ -66,169 +66,6 @@ class Poolcheckers extends Checkers
     }
 
     /**
-     * Keyboard for game in progress
-     *
-     * @param array  $board
-     * @param string $winner
-     * @param int    $moveCounter
-     *
-     * @return InlineKeyboard
-     * @throws BotException
-     */
-    protected function gameKeyboard(array $board, string $winner = null, int $moveCounter = 0): InlineKeyboard
-    {
-        $inline_keyboard = [];
-
-        for ($x = 0; $x <= $this->max_x; $x++) {
-            $tmp_array = [];
-
-            for ($y = 0; $y <= $this->max_y; $y++) {
-                if (isset($board[$x][$y])) {
-                    if ($board[$x][$y] == 'X' || $board[$x][$y] == 'O' || $board[$x][$y] == 'XK' || $board[$x][$y] == 'OK') {
-                        $field = $this->symbols[$board[$x][$y]];
-                    } else {
-                        $field = '';
-                    }
-
-                    if (!isset($field) || $field === '') {
-                        $field = ($this->symbols['empty']) ?: ' ';
-                    }
-
-                    if (isset($this->selection) && $this->selection == $x . $y) {
-                        $field = '[' . $field . ']';
-                    }
-
-                    $tmp_array[] = new InlineKeyboardButton(
-                        [
-                            'text'          => $field,
-                            'callback_data' => self::getCode() . ';game;' . $x . '-' . $y,
-                        ]
-                    );
-                }
-            }
-
-            if (!empty($tmp_array)) {
-                $inline_keyboard[] = $tmp_array;
-            }
-        }
-
-        $inline_keyboard = $this->invertBoard($inline_keyboard);
-
-        $piecesLeft = $this->piecesLeft($board);
-
-        if (!empty($winner)) {
-            $inline_keyboard[] = [
-                new InlineKeyboardButton(
-                    [
-                        'text'          => __('Play again!'),
-                        'callback_data' => self::getCode() . ';start',
-                    ]
-                ),
-            ];
-        } else {
-            if ($moveCounter == 0 || ($moveCounter > 0 && $piecesLeft['X'] != $piecesLeft['O'])) {
-                $inline_keyboard[] = [
-                    new InlineKeyboardButton(
-                        [
-                            'text'          => __('Surrender'),
-                            'callback_data' => self::getCode() . ';forfeit',
-                        ]
-                    ),
-                ];
-            } else {
-                $inline_keyboard[] = [
-                    new InlineKeyboardButton(
-                        [
-                            'text'          => __('Vote to draw'),
-                            'callback_data' => self::getCode() . ';draw',
-                        ]
-                    ),
-                ];
-            }
-        }
-
-        $inline_keyboard[] = [
-            new InlineKeyboardButton(
-                [
-                    'text'          => __('Quit'),
-                    'callback_data' => self::getCode() . ';quit',
-                ]
-            ),
-            new InlineKeyboardButton(
-                [
-                    'text'          => __('Kick'),
-                    'callback_data' => self::getCode() . ';kick',
-                ]
-            ),
-        ];
-
-        if (getenv('DEBUG') && $this->getCurrentUserId() == getenv('BOT_ADMIN')) {
-            $this->boardPrint($board);
-
-            $inline_keyboard[] = [
-                new InlineKeyboardButton(
-                    [
-                        'text'          => 'DEBUG: ' . 'Restart',
-                        'callback_data' => self::getCode() . ';start',
-                    ]
-                ),
-                new InlineKeyboardButton(
-                    [
-                        'text'          => 'DEBUG: ' . 'Surrender',
-                        'callback_data' => self::getCode() . ';forfeit',
-                    ]
-                ),
-                new InlineKeyboardButton(
-                    [
-                        'text'          => 'DEBUG: ' . 'Draw',
-                        'callback_data' => self::getCode() . ';draw',
-                    ]
-                ),
-            ];
-        }
-
-        return new InlineKeyboard(...$inline_keyboard);
-    }
-
-    /**
-     * Check how many pieces is left
-     *
-     * @param array $board
-     *
-     * @return array
-     */
-    protected function piecesLeft(array $board): array
-    {
-        $xs = 0;
-        $ys = 0;
-        $xks = 0;
-        $yks = 0;
-
-        for ($x = 0; $x < $this->max_x; $x++) {
-            for ($y = 0; $y < $this->max_y; $y++) {
-                if (strpos($board[$x][$y], 'X') !== false) {
-                    $xs++;
-                } elseif (strpos($board[$x][$y], 'O') !== false) {
-                    $ys++;
-                }
-
-                if (strpos($board[$x][$y], 'XK') !== false) {
-                    $xks++;
-                } elseif (strpos($board[$x][$y], 'OK') !== false) {
-                    $yks++;
-                }
-            }
-        }
-
-        return [
-            'X'  => $xs,
-            'O'  => $ys,
-            'XK' => $xks,
-            'OK' => $yks,
-        ];
-    }
-
-    /**
      * Handle votes for draw
      *
      * @return bool|ServerResponse|mixed
@@ -885,5 +722,168 @@ class Poolcheckers extends Checkers
         }
 
         return null;
+    }
+
+    /**
+     * Keyboard for game in progress
+     *
+     * @param array  $board
+     * @param string $winner
+     * @param int    $moveCounter
+     *
+     * @return InlineKeyboard
+     * @throws BotException
+     */
+    protected function gameKeyboard(array $board, string $winner = null, int $moveCounter = 0): InlineKeyboard
+    {
+        $inline_keyboard = [];
+
+        for ($x = 0; $x <= $this->max_x; $x++) {
+            $tmp_array = [];
+
+            for ($y = 0; $y <= $this->max_y; $y++) {
+                if (isset($board[$x][$y])) {
+                    if ($board[$x][$y] == 'X' || $board[$x][$y] == 'O' || $board[$x][$y] == 'XK' || $board[$x][$y] == 'OK') {
+                        $field = $this->symbols[$board[$x][$y]];
+                    } else {
+                        $field = '';
+                    }
+
+                    if (!isset($field) || $field === '') {
+                        $field = ($this->symbols['empty']) ?: ' ';
+                    }
+
+                    if (isset($this->selection) && $this->selection == $x . $y) {
+                        $field = '[' . $field . ']';
+                    }
+
+                    $tmp_array[] = new InlineKeyboardButton(
+                        [
+                            'text'          => $field,
+                            'callback_data' => self::getCode() . ';game;' . $x . '-' . $y,
+                        ]
+                    );
+                }
+            }
+
+            if (!empty($tmp_array)) {
+                $inline_keyboard[] = $tmp_array;
+            }
+        }
+
+        $inline_keyboard = $this->invertBoard($inline_keyboard);
+
+        $piecesLeft = $this->piecesLeft($board);
+
+        if (!empty($winner)) {
+            $inline_keyboard[] = [
+                new InlineKeyboardButton(
+                    [
+                        'text'          => __('Play again!'),
+                        'callback_data' => self::getCode() . ';start',
+                    ]
+                ),
+            ];
+        } else {
+            if ($moveCounter == 0 || ($moveCounter > 0 && $piecesLeft['X'] != $piecesLeft['O'])) {
+                $inline_keyboard[] = [
+                    new InlineKeyboardButton(
+                        [
+                            'text'          => __('Surrender'),
+                            'callback_data' => self::getCode() . ';forfeit',
+                        ]
+                    ),
+                ];
+            } else {
+                $inline_keyboard[] = [
+                    new InlineKeyboardButton(
+                        [
+                            'text'          => __('Vote to draw'),
+                            'callback_data' => self::getCode() . ';draw',
+                        ]
+                    ),
+                ];
+            }
+        }
+
+        $inline_keyboard[] = [
+            new InlineKeyboardButton(
+                [
+                    'text'          => __('Quit'),
+                    'callback_data' => self::getCode() . ';quit',
+                ]
+            ),
+            new InlineKeyboardButton(
+                [
+                    'text'          => __('Kick'),
+                    'callback_data' => self::getCode() . ';kick',
+                ]
+            ),
+        ];
+
+        if (getenv('DEBUG') && $this->getCurrentUserId() == getenv('BOT_ADMIN')) {
+            $this->boardPrint($board);
+
+            $inline_keyboard[] = [
+                new InlineKeyboardButton(
+                    [
+                        'text'          => 'DEBUG: ' . 'Restart',
+                        'callback_data' => self::getCode() . ';start',
+                    ]
+                ),
+                new InlineKeyboardButton(
+                    [
+                        'text'          => 'DEBUG: ' . 'Surrender',
+                        'callback_data' => self::getCode() . ';forfeit',
+                    ]
+                ),
+                new InlineKeyboardButton(
+                    [
+                        'text'          => 'DEBUG: ' . 'Draw',
+                        'callback_data' => self::getCode() . ';draw',
+                    ]
+                ),
+            ];
+        }
+
+        return new InlineKeyboard(...$inline_keyboard);
+    }
+
+    /**
+     * Check how many pieces is left
+     *
+     * @param array $board
+     *
+     * @return array
+     */
+    protected function piecesLeft(array $board): array
+    {
+        $xs = 0;
+        $ys = 0;
+        $xks = 0;
+        $yks = 0;
+
+        for ($x = 0; $x < $this->max_x; $x++) {
+            for ($y = 0; $y < $this->max_y; $y++) {
+                if (strpos($board[$x][$y], 'X') !== false) {
+                    $xs++;
+                } elseif (strpos($board[$x][$y], 'O') !== false) {
+                    $ys++;
+                }
+
+                if (strpos($board[$x][$y], 'XK') !== false) {
+                    $xks++;
+                } elseif (strpos($board[$x][$y], 'OK') !== false) {
+                    $yks++;
+                }
+            }
+        }
+
+        return [
+            'X'  => $xs,
+            'O'  => $ys,
+            'XK' => $xks,
+            'OK' => $yks,
+        ];
     }
 }

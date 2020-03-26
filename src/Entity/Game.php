@@ -247,14 +247,6 @@ class Game
     }
 
     /**
-     * @return string
-     */
-    public static function getCode(): string
-    {
-        return static::$code;
-    }
-
-    /**
      * Answer to callback query helper
      *
      * @param string $text
@@ -310,6 +302,14 @@ class Game
         }
 
         return true;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getCode(): string
+    {
+        return static::$code;
     }
 
     /**

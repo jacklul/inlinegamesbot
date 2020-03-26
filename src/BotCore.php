@@ -10,16 +10,16 @@
 
 namespace Bot;
 
-use Bot\Storage\Driver\File;
-use Dotenv\Dotenv;
-use Exception;
-use Gettext\Translator;
-use GuzzleHttp\Client;
 use Bot\Entity\TempFile;
 use Bot\Exception\BotException;
 use Bot\Exception\StorageException;
 use Bot\Helper\Utilities;
+use Bot\Storage\Driver\File;
 use Bot\Storage\Storage;
+use Dotenv\Dotenv;
+use Exception;
+use Gettext\Translator;
+use GuzzleHttp\Client;
 use InvalidArgumentException;
 use jacklul\MonologTelegramHandler\TelegramFormatter;
 use jacklul\MonologTelegramHandler\TelegramHandler;
@@ -45,13 +45,6 @@ define("SRC_PATH", ROOT_PATH . '/src');
  */
 class BotCore
 {
-    /**
-     * Config array
-     *
-     * @var array
-     */
-    private $config = [];
-
     /**
      * Commands
      *
@@ -95,7 +88,12 @@ class BotCore
             'description' => 'Run scheduled commands every minute',
         ],
     ];
-
+    /**
+     * Config array
+     *
+     * @var array
+     */
+    private $config = [];
     /**
      * Telegram object
      *
@@ -160,11 +158,11 @@ class BotCore
     private function loadDefaultConfig(): void
     {
         $this->config = [
-            'api_key'          => getenv('BOT_TOKEN'),
-            'bot_username'     => getenv('BOT_USERNAME'),
-            'secret'           => getenv('BOT_SECRET'),
-            'admins'           => [(int)getenv('BOT_ADMIN') ?: 0],
-            'commands'         => [
+            'api_key'      => getenv('BOT_TOKEN'),
+            'bot_username' => getenv('BOT_USERNAME'),
+            'secret'       => getenv('BOT_SECRET'),
+            'admins'       => [(int)getenv('BOT_ADMIN') ?: 0],
+            'commands'     => [
                 'paths'   => [
                     SRC_PATH . '/Command',
                 ],
@@ -174,7 +172,7 @@ class BotCore
                     ],
                 ],
             ],
-            'webhook'          => [
+            'webhook'      => [
                 'url'             => getenv('BOT_WEBHOOK'),
                 'max_connections' => 100,
                 'allowed_updates' => [
@@ -184,13 +182,13 @@ class BotCore
                     'callback_query',
                 ],
             ],
-            'mysql'            => [
+            'mysql'        => [
                 'host'     => getenv('DB_HOST'),
                 'user'     => getenv('DB_USER'),
                 'password' => getenv('DB_PASS'),
                 'database' => getenv('DB_NAME'),
             ],
-            'cron'             => [
+            'cron'         => [
                 'groups' => [
                     'default' => [
                         '/cleansessions',
@@ -266,9 +264,11 @@ class BotCore
         }
 
         if (isset($this->config['logging']['update'])) {
-            $update_logger = new Logger($this->config['bot_username'] . '_update', [
-                (new StreamHandler($this->config['logging']['update'], Logger::INFO))->setFormatter(new LineFormatter('%message%' . PHP_EOL))
-            ]);
+            $update_logger = new Logger(
+                $this->config['bot_username'] . '_update', [
+                (new StreamHandler($this->config['logging']['update'], Logger::INFO))->setFormatter(new LineFormatter('%message%' . PHP_EOL)),
+            ]
+            );
         }
 
         if (file_exists(ROOT_PATH . '/vendor/bin/heroku-php-nginx')) {

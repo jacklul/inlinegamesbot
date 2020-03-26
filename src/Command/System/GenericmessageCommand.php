@@ -10,14 +10,17 @@
 
 namespace Longman\TelegramBot\Commands\SystemCommands;
 
+use Bot\Exception\BotException;
+use Bot\Exception\StorageException;
+use Bot\Exception\TelegramApiException;
 use Bot\GameCore;
 use Bot\Helper\Utilities;
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Conversation;
-use Longman\TelegramBot\DB;
 use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
+use Throwable;
 
 /**
  * Handle text messages
@@ -30,10 +33,10 @@ class GenericmessageCommand extends SystemCommand
      * @return mixed
      *
      * @throws TelegramException
-     * @throws \Bot\Exception\BotException
-     * @throws \Bot\Exception\StorageException
-     * @throws \Bot\Exception\TelegramApiException
-     * @throws \Throwable
+     * @throws BotException
+     * @throws StorageException
+     * @throws TelegramApiException
+     * @throws Throwable
      */
     public function execute()
     {
@@ -68,15 +71,6 @@ class GenericmessageCommand extends SystemCommand
     }
 
     /**
-     * @return ServerResponse|void
-     * @throws TelegramException
-     */
-    public function executeNoDb()
-    {
-        return Request::emptyResponse();
-    }
-
-    /**
      * Leave group chats
      *
      * @return bool|ServerResponse
@@ -96,5 +90,14 @@ class GenericmessageCommand extends SystemCommand
         }
 
         return false;
+    }
+
+    /**
+     * @return ServerResponse|void
+     * @throws TelegramException
+     */
+    public function executeNoDb()
+    {
+        return Request::emptyResponse();
     }
 }
