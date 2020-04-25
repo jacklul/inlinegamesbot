@@ -82,7 +82,7 @@ class Poolcheckers extends Checkers
 
         $data = &$this->data['game_data'];
 
-        if (isset($data['current_turn']) && $data['current_turn'] == 'E') {
+        if ((isset($data['current_turn']) && $data['current_turn'] == 'E') || $data['board'] === null) {
             return $this->answerCallbackQuery(__("This game has ended!", true));
         }
 
