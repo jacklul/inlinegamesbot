@@ -265,9 +265,10 @@ class BotCore
 
         if (isset($this->config['logging']['update'])) {
             $update_logger = new Logger(
-                $this->config['bot_username'] . '_update', [
-                (new StreamHandler($this->config['logging']['update'], Logger::INFO))->setFormatter(new LineFormatter('%message%' . PHP_EOL)),
-            ]
+                $this->config['bot_username'] . '_update',
+                [
+                    (new StreamHandler($this->config['logging']['update'], Logger::INFO))->setFormatter(new LineFormatter('%message%' . PHP_EOL)),
+                ]
             );
         }
 
