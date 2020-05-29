@@ -38,12 +38,14 @@ class ChoseninlineresultCommand extends SystemCommand
     {
         $chosen_inline_result = $this->getUpdate()->getChosenInlineResult();
 
-        Utilities::debugPrint('Data: ' . $chosen_inline_result->getResultId());
+        if ($inline_message_id = $chosen_inline_result->getInlineMessageId()) {
+            Utilities::debugPrint('Data: ' . $chosen_inline_result->getResultId());
 
-        $game = new GameCore($chosen_inline_result->getInlineMessageId(), $chosen_inline_result->getResultId(), $this);
+            $game = new GameCore($inline_message_id, $chosen_inline_result->getResultId(), $this);
 
-        if ($game->canRun()) {
-            return $game->run();
+            if ($game->canRun()) {
+                return $game->run();
+            }
         }
 
         return parent::execute();
