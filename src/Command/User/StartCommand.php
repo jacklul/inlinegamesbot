@@ -8,15 +8,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Longman\TelegramBot\Commands\UserCommands;
+namespace Bot\Command\User;
 
 use Longman\TelegramBot\Commands\UserCommand;
 use Longman\TelegramBot\Exception\TelegramException;
 
 /**
  * Start command...
- *
- * @noinspection PhpUndefinedClassInspection
  */
 class StartCommand extends UserCommand
 {
