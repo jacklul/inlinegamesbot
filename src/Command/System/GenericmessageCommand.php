@@ -34,7 +34,7 @@ class GenericmessageCommand extends SystemCommand
     {
         $this->leaveGroupChat();
 
-        if (strpos($this->getMessage()->getText(true), 'This game session is empty.') !== false) {
+        if ($this->getMessage()->getViaBot()->getId() === $this->getTelegram()->getBotId()) {
             return Request::emptyResponse();
         }
 
