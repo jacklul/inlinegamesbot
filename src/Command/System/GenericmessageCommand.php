@@ -32,7 +32,7 @@ class GenericmessageCommand extends SystemCommand
     {
         $this->leaveGroupChat();
 
-        if ($this->getMessage()->getViaBot()->getId() === $this->getTelegram()->getBotId()) {
+        if ($this->getMessage()->getViaBot() && $this->getMessage()->getViaBot()->getId() === $this->getTelegram()->getBotId()) {
             return Request::emptyResponse();
         }
 
