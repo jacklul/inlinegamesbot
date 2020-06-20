@@ -57,8 +57,8 @@ class CallbackqueryCommand extends SystemCommand
             return $this->getTelegram()->executeCommand($this->aliases[$command]);
         }
 
-        if ($this->isDataValid($data)) {
-            $game = new GameCore($callback_query->getInlineMessageId(), explode(';', $data)[0], $this);
+        if (($inline_message_id = $callback_query->getInlineMessageId()) && $this->isDataValid($data)) {
+            $game = new GameCore($inline_message_id, explode(';', $data)[0], $this);
 
             if ($game->canRun()) {
                 return $game->run();
