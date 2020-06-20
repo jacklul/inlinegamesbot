@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Bot\Command\Admin;
+namespace Longman\TelegramBot\Commands\AdminCommands;
 
 use Bot\Exception\BotException;
 use Bot\Exception\StorageException;

@@ -8,17 +8,20 @@
  * file that was distributed with this source code.
  */
 
-namespace Bot\Command\System;
+namespace Longman\TelegramBot\Commands\SystemCommands;
 
 use Longman\TelegramBot\Commands\SystemCommand;
 use Longman\TelegramBot\Conversation;
 use Longman\TelegramBot\Entities\ServerResponse;
+use Longman\TelegramBot\Entities\User;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Request;
 use Throwable;
 
 /**
  * Handle text messages
+ *
+ * @noinspection PhpUndefinedClassInspection
  */
 class GenericmessageCommand extends SystemCommand
 {
@@ -32,7 +35,7 @@ class GenericmessageCommand extends SystemCommand
     {
         $this->leaveGroupChat();
 
-        if ($this->getMessage()->getViaBot() && $this->getMessage()->getViaBot()->getId() === $this->getTelegram()->getBotId()) {
+        if ($this->getMessage()->getViaBot() instanceof User && $this->getMessage()->getViaBot()->getId() === $this->getTelegram()->getBotId()) {
             return Request::emptyResponse();
         }
 

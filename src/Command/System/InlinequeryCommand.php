@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Bot\Command\System;
+namespace Longman\TelegramBot\Commands\SystemCommands;
 
 use Bot\Entity\Game;
 use DirectoryIterator;
@@ -23,6 +23,8 @@ use Longman\TelegramBot\Request;
 
 /**
  * Handle incoming inline queries, shows game list no matter what user enters
+ *
+ * @noinspection PhpUndefinedClassInspection
  */
 class InlinequeryCommand extends SystemCommand
 {
