@@ -184,7 +184,7 @@ class File
         $ids = [];
         foreach (new DirectoryIterator(STORAGE_GAME_PATH) as $file) {
             if (!$file->isDir() && !$file->isDot() && $file->getMTime() + $time < time()) {
-                $ids[] = ['id' => trim(basename($file->getFilename(), '.json')), 'data' => file_get_contents($file->getPathname())];
+                $ids[] = ['id' => trim(basename($file->getFilename(), '.json')), 'data' => file_get_contents($file->getPathname()), 'updated_at' => date('H:i:s d-m-Y', filemtime($file->getPathname()))];
             }
         }
 
