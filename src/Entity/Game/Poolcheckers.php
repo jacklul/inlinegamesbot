@@ -715,10 +715,18 @@ class Poolcheckers extends Checkers
             }
         }
 
-        if ($noMovesO) {
-            return 'X';
-        } elseif ($noMovesX) {
-            return 'O';
+        if ($noMovesO || $noMovesX) {
+            if ($array['X'] > $array['O']) {
+                return 'X';
+            } elseif ($array['O'] > $array['X']) {
+                return 'O';
+            }
+
+            if ($array['XK'] > $array['OK']) {
+                return 'X';
+            } elseif ($array['OK'] > $array['XK']) {
+                return 'O';
+            }
         }
 
         return null;

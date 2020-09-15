@@ -864,10 +864,12 @@ class Checkers extends Game
             }
         }
 
-        if ($noMovesO) {
-            return 'X';
-        } elseif ($noMovesX) {
-            return 'O';
+        if ($noMovesO || $noMovesX) {
+            if ($array['X'] > $array['O']) {
+                return 'X';
+            } elseif ($array['O'] > $array['X']) {
+                return 'O';
+            }
         }
 
         return null;
