@@ -198,8 +198,8 @@ class CleansessionsCommand extends AdminCommand
     /**
      * Create inline keyboard with button that creates the game session
      *
-     * @param string $game_code
-     * @param string $text
+     * @param string      $game_code
+     * @param string|null $text
      *
      * @return InlineKeyboard
      * @throws TelegramException
