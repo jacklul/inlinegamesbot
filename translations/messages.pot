@@ -8,14 +8,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-11-09 19:15+0100\n"
+"POT-Creation-Date: 2020-11-12 14:09+0100\n"
 "PO-Revision-Date: 2017-07-13T17:47:54+00:00\n"
 "X-Poedit-Basepath: ../src\n"
 "X-Poedit-KeywordsList: __\n"
 "X-Generator: Poedit 2.2.4\n"
 "X-Poedit-SearchPath-0: .\n"
 
-#: Command/Admin/CleansessionsCommand.php:148 Entity/Game.php:1048
+#: Command/Admin/CleansessionsCommand.php:148
 msgid "This game session has expired."
 msgstr ""
 
@@ -141,6 +141,10 @@ msgstr ""
 #: Entity/Game/Poolcheckers.php:790 Entity/Game/Rockpaperscissors.php:277
 #: Entity/Game/Rockpaperscissorslizardspock.php:222
 msgid "Play again!"
+msgstr ""
+
+#: Entity/Game.php:1048
+msgid "Game session not found or expired."
 msgstr ""
 
 #: Entity/Game/Checkers.php:117 Entity/Game/Checkers.php:378

@@ -1045,7 +1045,7 @@ class Game
     {
         Utilities::debugPrint('Empty game data');
 
-        $result = $this->editMessage('<i>' . __("This game session has expired.") . '</i>', $this->getReplyMarkup('empty'));
+        $result = $this->editMessage('<i>' . __("Game session not found or expired.") . '</i>', $this->getReplyMarkup('empty'));
 
         if (!$result->isOk()) {
             return $result;
