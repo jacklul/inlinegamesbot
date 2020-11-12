@@ -41,7 +41,7 @@ class Tictacfour extends Tictactoe
      *
      * @var string
      */
-    protected static $image = 'https://i.imgur.com/t4FQuSz.png';
+    protected static $image = 'https://i.imgur.com/DSB90oa.png';
 
     /**
      * Order on the games list
