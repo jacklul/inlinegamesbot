@@ -142,15 +142,24 @@ class CleansessionsCommand extends AdminCommand
 
                             $game_class = $game->getGame();
 
-                            $result = Request::editMessageText(
-                                [
-                                    'inline_message_id'        => $inactive_game['id'],
-                                    'text'                     => '<b>' . $game_class::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __("This game session has expired.") . '</i>',
-                                    'reply_markup'             => $this->createInlineKeyboard($game_data['game_code']),
-                                    'parse_mode'               => 'HTML',
-                                    'disable_web_page_preview' => true,
-                                ]
-                            );
+                            if (isset($game_data['game_data']['current_turn']) && $game_data['game_data']['current_turn'] === 'E') {
+                                $result = Request::editMessageReplyMarkup(
+                                    [
+                                        'inline_message_id'        => $inactive_game['id'],
+                                        'reply_markup'             => $this->createInlineKeyboard($game_data['game_code'], __('Create New Session')),
+                                    ]
+                                );
+                            } else {
+                                $result = Request::editMessageText(
+                                    [
+                                        'inline_message_id'        => $inactive_game['id'],
+                                        'text'                     => '<b>' . $game_class::getTitle() . '</b>' . PHP_EOL . PHP_EOL . '<i>' . __("This game session has expired.") . '</i>',
+                                        'reply_markup'             => $this->createInlineKeyboard($game_data['game_code']),
+                                        'parse_mode'               => 'HTML',
+                                        'disable_web_page_preview' => true,
+                                    ]
+                                );
+                            }
 
                             $last_request_time = time();
 
@@ -190,17 +199,18 @@ class CleansessionsCommand extends AdminCommand
      * Create inline keyboard with button that creates the game session
      *
      * @param string $game_code
+     * @param string $text
      *
      * @return InlineKeyboard
      * @throws TelegramException
      */
-    private function createInlineKeyboard(string $game_code): InlineKeyboard
+    private function createInlineKeyboard(string $game_code, $text = null): InlineKeyboard
     {
         $inline_keyboard = [
             [
                 new InlineKeyboardButton(
                     [
-                        'text'          => __('Create'),
+                        'text'          => $text ?: __('Create'),
                         'callback_data' => $game_code . ';new',
                     ]
                 ),
