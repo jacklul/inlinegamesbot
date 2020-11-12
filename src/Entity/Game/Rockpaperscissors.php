@@ -176,7 +176,7 @@ class Rockpaperscissors extends Game
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(
-                $this->getUserMention('host') . (($data['host_wins'] > 0 || $data['guest_wins'] > 0) ? ' (' . $data['host_wins'] . ')' : '') . $hostPick . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . (($data['guest_wins'] > 0 || $data['host_wins'] > 0) ? ' (' . $data['guest_wins'] . ')' : '') . $guestPick . PHP_EOL . PHP_EOL . $gameOutput,
+                $this->getUserMention('host') . (($data['host_wins'] > 0 || $data['guest_wins'] > 0) ? ' (' . $data['host_wins'] . ')' : '') . $hostPick . ' vs. ' . $this->getUserMention('guest') . (($data['guest_wins'] > 0 || $data['host_wins'] > 0) ? ' (' . $data['guest_wins'] . ')' : '') . $guestPick . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->customGameKeyboard($isOver)
             );
         }

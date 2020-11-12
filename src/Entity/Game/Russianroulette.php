@@ -180,13 +180,13 @@ class Russianroulette extends Game
             $data['cylinder'][mt_rand(0, 5)] = 'X';
         }
 
-        $gameOutput .= Emoji::blackRightwardsArrow() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]);
+        $gameOutput .= Emoji::playButton() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]);
 
         Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Cylinder: |' . implode('|', $data['cylinder']) . '|');
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(
-                $this->getUserMention('host') . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . PHP_EOL . PHP_EOL . $gameOutput,
+                $this->getUserMention('host') . ' vs. ' . $this->getUserMention('guest') . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->customGameKeyboard($hit)
             );
         }
@@ -202,7 +202,7 @@ class Russianroulette extends Game
         $this->symbols['empty'] = '.';
 
         $this->symbols['chamber'] = Emoji::radioButton();
-        $this->symbols['chamber_hit'] = Emoji::largeRedCircle();
+        $this->symbols['chamber_hit'] = Emoji::redCircle();
     }
 
     /**

@@ -27,7 +27,7 @@
     "gettext/gettext": "^4.3",
     "jacklul/monolog-telegram": "^1.0",
     "longman/telegram-bot": "^0.63.1",
-    "spatie/emoji": "^1.0"
+    "spatie/emoji": "^2.0"
   },
   "require-dev": {
     "vlucas/phpdotenv": "^2.4",

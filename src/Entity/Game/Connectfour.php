@@ -170,12 +170,12 @@ class Connectfour extends Game
         if (!empty($isOver) && in_array($isOver, ['X', 'O', 'T'])) {
             $data['current_turn'] = 'E';
         } else {
-            $gameOutput = Emoji::blackRightwardsArrow() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
+            $gameOutput = Emoji::playButton() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
         }
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(
-                $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
+                $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' vs. ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($data['board'], $isOver)
             );
         }
@@ -188,16 +188,16 @@ class Connectfour extends Game
      */
     protected function defineSymbols(): void
     {
-        $this->symbols['empty'] = Emoji::mediumWhiteCircle();
+        $this->symbols['empty'] = Emoji::whiteCircle();
 
-        $this->symbols['X'] = Emoji::largeBlueCircle();
-        $this->symbols['O'] = Emoji::largeRedCircle();
+        $this->symbols['X'] = Emoji::blueCircle();
+        $this->symbols['O'] = Emoji::redCircle();
 
         $this->symbols['X_won'] = Emoji::largeBlueDiamond();
         $this->symbols['O_won'] = Emoji::largeOrangeDiamond();
 
-        $this->symbols['X_lost'] = Emoji::mediumBlackCircle();
-        $this->symbols['O_lost'] = Emoji::mediumBlackCircle();
+        $this->symbols['X_lost'] = Emoji::blackCircle();
+        $this->symbols['O_lost'] = Emoji::blackCircle();
     }
 
     /**

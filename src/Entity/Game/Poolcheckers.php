@@ -321,7 +321,7 @@ class Poolcheckers extends Checkers
                 $gameOutput .= '<b>' . __("{PLAYER} voted to draw!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL . PHP_EOL;
             }
 
-            $gameOutput .= Emoji::blackRightwardsArrow() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
+            $gameOutput .= Emoji::playButton() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
 
             if ($data['current_selection'] == '') {
                 $gameOutput .= "\n" . __("(Select the piece you want to move)");
@@ -340,7 +340,7 @@ class Poolcheckers extends Checkers
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(
-                $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
+                $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' vs. ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($data['board'], $isOver, $data['move_counter'])
             );
         }

@@ -67,9 +67,9 @@ class Rockpaperscissorslizardspock extends Rockpaperscissors
         $this->symbols['S'] = 'SCISSORS';
         $this->symbols['S_short'] = Emoji::victoryHand();
         $this->symbols['L'] = 'LIZARD';
-        $this->symbols['L_short'] = Emoji::okHandSign();
+        $this->symbols['L_short'] = Emoji::okHand();
         $this->symbols['A'] = 'SPOCK';
-        $this->symbols['A_short'] = Emoji::raisedHandWithPartBetweenMiddleAndRingFingers();
+        $this->symbols['A_short'] = Emoji::vulcanSalute();
         $this->symbols['valid'] = ['R', 'P', 'S', 'L', 'A'];
     }
 

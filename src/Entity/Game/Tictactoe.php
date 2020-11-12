@@ -158,12 +158,12 @@ class Tictactoe extends Game
         if (!empty($isOver) && in_array($isOver, ['X', 'O', 'T'])) {
             $data['current_turn'] = 'E';
         } else {
-            $gameOutput = Emoji::blackRightwardsArrow() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
+            $gameOutput = Emoji::playButton() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
         }
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(
-                $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
+                $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' vs. ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($data['board'], $isOver)
             );
         }
@@ -179,12 +179,12 @@ class Tictactoe extends Game
         $this->symbols['empty'] = '.';
 
         $this->symbols['X'] = Emoji::crossMark();
-        $this->symbols['O'] = Emoji::heavyLargeCircle();
+        $this->symbols['O'] = Emoji::hollowRedCircle();
 
         $this->symbols['X_won'] = $this->symbols['X'];
         $this->symbols['O_won'] = $this->symbols['O'];
 
-        $this->symbols['X_lost'] = Emoji::heavyMultiplicationX();
+        $this->symbols['X_lost'] = Emoji::multiply();
         $this->symbols['O_lost'] = Emoji::radioButton();
     }
 

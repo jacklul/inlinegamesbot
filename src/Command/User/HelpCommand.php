@@ -54,7 +54,7 @@ class HelpCommand extends UserCommand
             $data_query['callback_query_id'] = $callback_query->getId();
         }
 
-        $text = Emoji::wavingHandSign() . ' ';
+        $text = Emoji::wavingHand() . ' ';
         $text .= '<b>' . __('Hi!') . '</b>' . PHP_EOL;
         $text .= __('To begin, start a message with {USAGE} in any of your chats or click the {BUTTON} button and then select a chat to play in.', ['{USAGE}' => '<b>\'@' . $this->getTelegram()->getBotUsername() . ' ...\'</b>', '{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']);
 

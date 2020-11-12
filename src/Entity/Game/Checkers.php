@@ -127,13 +127,13 @@ class Checkers extends Game
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint($this->getCurrentUserMention() . ' surrendered');
 
                 $gameOutput = Emoji::trophy() . ' <b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL;
-                $gameOutput .= Emoji::wavingWhiteFlag() . ' <b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
+                $gameOutput .= Emoji::whiteFlag() . ' <b>' . __("{PLAYER} surrendered!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>' . PHP_EOL;
 
                 $data['current_turn'] = 'E';
 
                 if ($this->saveData($this->data)) {
                     return $this->editMessage(
-                        $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
+                        $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' vs. ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                         $this->gameKeyboard($data['board'], 'surrender')
                     );
                 }
@@ -158,7 +158,7 @@ class Checkers extends Game
 
                 if ($this->saveData($this->data)) {
                     return $this->editMessage(
-                        $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
+                        $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' vs. ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                         $this->gameKeyboard($data['board'], 'surrender')
                     );
                 }
@@ -184,9 +184,9 @@ class Checkers extends Game
     {
         $this->symbols['empty'] = '.';
 
-        $this->symbols['X'] = Emoji::mediumBlackCircle();
+        $this->symbols['X'] = Emoji::blackCircle();
         $this->symbols['XK'] = Emoji::blackMediumSquare();
-        $this->symbols['O'] = Emoji::mediumWhiteCircle();
+        $this->symbols['O'] = Emoji::whiteCircle();
         $this->symbols['OK'] = Emoji::whiteMediumSquare();
     }
 
@@ -607,7 +607,7 @@ class Checkers extends Game
                 $gameOutput .= '<b>' . __("{PLAYER} voted to draw!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>' . PHP_EOL . PHP_EOL;
             }
 
-            $gameOutput .= Emoji::blackRightwardsArrow() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
+            $gameOutput .= Emoji::playButton() . ' ' . $this->getUserMention($data['settings'][$data['current_turn']]) . ' (' . $this->symbols[$data['current_turn']] . ')';
 
             if ($data['current_selection'] == '') {
                 $gameOutput .= "\n" . __("(Select the piece you want to move)");
@@ -626,7 +626,7 @@ class Checkers extends Game
 
         if ($this->saveData($this->data)) {
             return $this->editMessage(
-                $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' ' . Emoji::squaredVs() . ' ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
+                $this->getUserMention('host') . ' (' . (($data['settings']['X'] == 'host') ? $this->symbols['X'] : $this->symbols['O']) . ')' . ' vs. ' . $this->getUserMention('guest') . ' (' . (($data['settings']['O'] == 'guest') ? $this->symbols['O'] : $this->symbols['X']) . ')' . PHP_EOL . PHP_EOL . $gameOutput,
                 $this->gameKeyboard($data['board'], $isOver, $data['move_counter'])
             );
         }
