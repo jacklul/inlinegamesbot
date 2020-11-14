@@ -41,14 +41,14 @@ class Elephantxo extends Tictactoe
      *
      * @var string
      */
-    protected static $image = 'https://i.imgur.com/t4FQuSz.png';
+    protected static $image = 'https://i.imgur.com/tv2dmtq.png';
 
     /**
      * Order on the games list
      *
      * @var int
      */
-    protected static $order = 2;
+    protected static $order = 3;
 
     /**
      * Base starting board
@@ -56,6 +56,7 @@ class Elephantxo extends Tictactoe
      * @var array
      */
     protected static $board = [
+        ['', '', '', '', '', '', '', ''],
         ['', '', '', '', '', '', '', ''],
         ['', '', '', '', '', '', '', ''],
         ['', '', '', '', '', '', '', ''],
