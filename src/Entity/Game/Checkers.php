@@ -515,12 +515,12 @@ class Checkers extends Game
                             $data['vote'][$data['settings'][$data['current_turn']]]['surrender'] = false;
                             $data['vote'][$data['settings'][$data['current_turn']]]['draw'] = false;
 
-                            if (strpos($data['board'][$args[0]][$args[1]], 'K') === false && (($data['current_turn'] == 'X' && $args[1] == 7) || ($data['current_turn'] == 'O' && $args[1] == 0))) {
+                            if (isset($data['board'][$args[0]][$args[1]]) && strpos($data['board'][$args[0]][$args[1]], 'K') === false && (($data['current_turn'] == 'X' && $args[1] == 7) || ($data['current_turn'] == 'O' && $args[1] == 0))) {
                                 $data['board'][$args[0]][$args[1]] .= 'K';
                                 $canChain = false;
                             }
 
-                            if ($possibleMoves['kills'][$args[0] . $args[1]] != '') {
+                            if (isset($possibleMoves['kills'][$args[0] . $args[1]]) && $possibleMoves['kills'][$args[0] . $args[1]] != '') {
                                 $data['board'][$possibleMoves['kills'][$args[0] . $args[1]][0]][$possibleMoves['kills'][$args[0] . $args[1]][1]] = '';
                                 $killed = true;
                             }
