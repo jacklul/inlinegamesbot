@@ -658,112 +658,112 @@ class Checkers extends Game
 
         if (strpos($char, 'X') !== false) {
             if ($board[$sel_x][$sel_y] == 'X') {
-                if ($board[($sel_x - 1)][($sel_y + 1)] == '') {
+                if (isset($board[($sel_x - 1)][($sel_y + 1)]) && $board[($sel_x - 1)][($sel_y + 1)] == '') {
                     $valid_moves[] = ($sel_x - 1) . ($sel_y + 1); //right up
                 }
 
-                if ($board[($sel_x + 1)][($sel_y + 1)] == '') {
+                if (isset($board[($sel_x + 1)][($sel_y + 1)]) && $board[($sel_x + 1)][($sel_y + 1)] == '') {
                     $valid_moves[] = ($sel_x + 1) . ($sel_y + 1); //right down
                 }
 
-                if (strpos($board[($sel_x - 1)][($sel_y + 1)], 'O') !== false) {
+                if (isset($board[($sel_x - 1)][($sel_y + 1)]) && strpos($board[($sel_x - 1)][($sel_y + 1)], 'O') !== false) {
                     $valid_moves[] = ($sel_x - 2) . ($sel_y + 2); //right up
                     $kill[($sel_x - 2) . ($sel_y + 2)] = ($sel_x - 1) . ($sel_y + 1);
                 }
 
-                if (strpos($board[($sel_x + 1)][($sel_y + 1)], 'O') !== false) {
+                if (isset($board[($sel_x + 1)][($sel_y + 1)]) && strpos($board[($sel_x + 1)][($sel_y + 1)], 'O') !== false) {
                     $valid_moves[] = ($sel_x + 2) . ($sel_y + 2); //right down
                     $kill[($sel_x + 2) . ($sel_y + 2)] = ($sel_x + 1) . ($sel_y + 1);
                 }
             } elseif ($board[$sel_x][$sel_y] == 'XK') {
-                if ($board[($sel_x - 1)][($sel_y + 1)] == '') {
+                if (isset($board[($sel_x - 1)][($sel_y + 1)]) && $board[($sel_x - 1)][($sel_y + 1)] == '') {
                     $valid_moves[] = ($sel_x - 1) . ($sel_y + 1); //right up
                 }
 
-                if ($board[($sel_x + 1)][($sel_y + 1)] == '') {
+                if (isset($board[($sel_x + 1)][($sel_y + 1)]) && $board[($sel_x + 1)][($sel_y + 1)] == '') {
                     $valid_moves[] = ($sel_x + 1) . ($sel_y + 1); //right down
                 }
 
-                if ($board[($sel_x + 1)][($sel_y - 1)] == '') {
+                if (isset($board[($sel_x + 1)][($sel_y - 1)]) && $board[($sel_x + 1)][($sel_y - 1)] == '') {
                     $valid_moves[] = ($sel_x + 1) . ($sel_y - 1); //left up
                 }
 
-                if ($board[($sel_x - 1)][($sel_y - 1)] == '') {
+                if (isset($board[($sel_x - 1)][($sel_y - 1)]) && $board[($sel_x - 1)][($sel_y - 1)] == '') {
                     $valid_moves[] = ($sel_x - 1) . ($sel_y - 1); //left down
                 }
 
-                if (strpos($board[($sel_x - 1)][($sel_y + 1)], 'O') !== false) {
+                if (isset($board[($sel_x - 1)][($sel_y + 1)]) && strpos($board[($sel_x - 1)][($sel_y + 1)], 'O') !== false) {
                     $valid_moves[] = ($sel_x - 2) . ($sel_y + 2); //right up
                     $kill[($sel_x - 2) . ($sel_y + 2)] = ($sel_x - 1) . ($sel_y + 1);
                 }
 
-                if (strpos($board[($sel_x + 1)][($sel_y + 1)], 'O') !== false) {
+                if (isset($board[($sel_x + 1)][($sel_y + 1)]) && strpos($board[($sel_x + 1)][($sel_y + 1)], 'O') !== false) {
                     $valid_moves[] = ($sel_x + 2) . ($sel_y + 2); //right down
                     $kill[($sel_x + 2) . ($sel_y + 2)] = ($sel_x + 1) . ($sel_y + 1);
                 }
 
-                if (strpos($board[($sel_x + 1)][($sel_y - 1)], 'O') !== false) {
+                if (isset($board[($sel_x + 1)][($sel_y - 1)]) && strpos($board[($sel_x + 1)][($sel_y - 1)], 'O') !== false) {
                     $valid_moves[] = ($sel_x + 2) . ($sel_y - 2); //left up
                     $kill[($sel_x + 2) . ($sel_y - 2)] = ($sel_x + 1) . ($sel_y - 1);
                 }
 
-                if (strpos($board[($sel_x - 1)][($sel_y - 1)], 'O') !== false) {
+                if (isset($board[($sel_x - 1)][($sel_y - 1)]) && strpos($board[($sel_x - 1)][($sel_y - 1)], 'O') !== false) {
                     $valid_moves[] = ($sel_x - 2) . ($sel_y - 2); //left down
                     $kill[($sel_x - 2) . ($sel_y - 2)] = ($sel_x - 1) . ($sel_y - 1);
                 }
             }
         } elseif (strpos($char, 'O') !== false) {
             if ($board[$sel_x][$sel_y] == 'O') {
-                if ($board[($sel_x + 1)][($sel_y - 1)] == '') {
+                if (isset($board[($sel_x + 1)][($sel_y - 1)]) && $board[($sel_x + 1)][($sel_y - 1)] == '') {
                     $valid_moves[] = ($sel_x + 1) . ($sel_y - 1); //left up
                 }
 
-                if ($board[($sel_x - 1)][($sel_y - 1)] == '') {
+                if (isset($board[($sel_x - 1)][($sel_y - 1)]) && $board[($sel_x - 1)][($sel_y - 1)] == '') {
                     $valid_moves[] = ($sel_x - 1) . ($sel_y - 1); //left down
                 }
 
-                if (strpos($board[($sel_x + 1)][($sel_y - 1)], 'X') !== false) {
+                if (isset($board[($sel_x + 1)][($sel_y - 1)]) && strpos($board[($sel_x + 1)][($sel_y - 1)], 'X') !== false) {
                     $valid_moves[] = ($sel_x + 2) . ($sel_y - 2); //left up
                     $kill[($sel_x + 2) . ($sel_y - 2)] = ($sel_x + 1) . ($sel_y - 1);
                 }
 
-                if (strpos($board[($sel_x - 1)][($sel_y - 1)], 'X') !== false) {
+                if (isset($board[($sel_x - 1)][($sel_y - 1)]) && strpos($board[($sel_x - 1)][($sel_y - 1)], 'X') !== false) {
                     $valid_moves[] = ($sel_x - 2) . ($sel_y - 2); //left down
                     $kill[($sel_x - 2) . ($sel_y - 2)] = ($sel_x - 1) . ($sel_y - 1);
                 }
             } elseif ($board[$sel_x][$sel_y] == 'OK') {
-                if ($board[($sel_x - 1)][($sel_y + 1)] == '') {
+                if (isset($board[($sel_x - 1)][($sel_y + 1)]) && $board[($sel_x - 1)][($sel_y + 1)] == '') {
                     $valid_moves[] = ($sel_x - 1) . ($sel_y + 1); //right up
                 }
 
-                if ($board[($sel_x + 1)][($sel_y + 1)] == '') {
+                if (isset($board[($sel_x + 1)][($sel_y + 1)]) && $board[($sel_x + 1)][($sel_y + 1)] == '') {
                     $valid_moves[] = ($sel_x + 1) . ($sel_y + 1); //right down
                 }
 
-                if ($board[($sel_x + 1)][($sel_y - 1)] == '') {
+                if (isset($board[($sel_x + 1)][($sel_y - 1)]) && $board[($sel_x + 1)][($sel_y - 1)] == '') {
                     $valid_moves[] = ($sel_x + 1) . ($sel_y - 1); //left up
                 }
 
-                if ($board[($sel_x - 1)][($sel_y - 1)] == '') {
+                if (isset($board[($sel_x - 1)][($sel_y - 1)]) && $board[($sel_x - 1)][($sel_y - 1)] == '') {
                     $valid_moves[] = ($sel_x - 1) . ($sel_y - 1); //left down
                 }
 
-                if (strpos($board[($sel_x - 1)][($sel_y + 1)], 'X') !== false) {
+                if (isset($board[($sel_x - 1)][($sel_y + 1)]) && strpos($board[($sel_x - 1)][($sel_y + 1)], 'X') !== false) {
                     $valid_moves[] = ($sel_x - 2) . ($sel_y + 2); //right up
                     $kill[($sel_x - 2) . ($sel_y + 2)] = ($sel_x - 1) . ($sel_y + 1);
                 }
 
-                if (strpos($board[($sel_x + 1)][($sel_y + 1)], 'X') !== false) {
+                if (isset($board[($sel_x + 1)][($sel_y + 1)]) && strpos($board[($sel_x + 1)][($sel_y + 1)], 'X') !== false) {
                     $valid_moves[] = ($sel_x + 2) . ($sel_y + 2); //right down
                     $kill[($sel_x + 2) . ($sel_y + 2)] = ($sel_x + 1) . ($sel_y + 1);
                 }
 
-                if (strpos($board[($sel_x + 1)][($sel_y - 1)], 'X') !== false) {
+                if (isset($board[($sel_x + 1)][($sel_y - 1)]) && strpos($board[($sel_x + 1)][($sel_y - 1)], 'X') !== false) {
                     $valid_moves[] = ($sel_x + 2) . ($sel_y - 2); //left up
                     $kill[($sel_x + 2) . ($sel_y - 2)] = ($sel_x + 1) . ($sel_y - 1);
                 }
 
-                if (strpos($board[($sel_x - 1)][($sel_y - 1)], 'X') !== false) {
+                if (isset($board[($sel_x - 1)][($sel_y - 1)]) && strpos($board[($sel_x - 1)][($sel_y - 1)], 'X') !== false) {
                     $valid_moves[] = ($sel_x - 2) . ($sel_y - 2); //left down
                     $kill[($sel_x - 2) . ($sel_y - 2)] = ($sel_x - 1) . ($sel_y - 1);
                 }

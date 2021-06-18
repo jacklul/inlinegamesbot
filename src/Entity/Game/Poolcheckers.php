@@ -377,36 +377,36 @@ class Poolcheckers extends Checkers
 
         if (strpos($char, 'X') !== false) {
             if ($board[$sel_x][$sel_y] == 'X') {
-                if ($board[($sel_x - 1)][($sel_y + 1)] == '') {
+                if (isset($board[($sel_x - 1)][($sel_y + 1)]) && $board[($sel_x - 1)][($sel_y + 1)] == '') {
                     $valid_moves[] = ($sel_x - 1) . ($sel_y + 1); //right up
                 }
 
-                if ($board[($sel_x + 1)][($sel_y + 1)] == '') {
+                if (isset($board[($sel_x + 1)][($sel_y + 1)]) && $board[($sel_x + 1)][($sel_y + 1)] == '') {
                     $valid_moves[] = ($sel_x + 1) . ($sel_y + 1); //right down
                 }
 
-                if (strpos($board[($sel_x - 1)][($sel_y + 1)], 'O') !== false) {
+                if (isset($board[($sel_x - 1)][($sel_y + 1)]) && strpos($board[($sel_x - 1)][($sel_y + 1)], 'O') !== false) {
                     $valid_moves[] = ($sel_x - 2) . ($sel_y + 2); //right up
                     $kill[($sel_x - 2) . ($sel_y + 2)] = ($sel_x - 1) . ($sel_y + 1);
                 }
 
-                if (strpos($board[($sel_x + 1)][($sel_y + 1)], 'O') !== false) {
+                if (isset($board[($sel_x + 1)][($sel_y + 1)]) && strpos($board[($sel_x + 1)][($sel_y + 1)], 'O') !== false) {
                     $valid_moves[] = ($sel_x + 2) . ($sel_y + 2); //right down
                     $kill[($sel_x + 2) . ($sel_y + 2)] = ($sel_x + 1) . ($sel_y + 1);
                 }
 
-                if (strpos($board[($sel_x + 1)][($sel_y - 1)], 'O') !== false) {
+                if (isset($board[($sel_x + 1)][($sel_y - 1)]) && strpos($board[($sel_x + 1)][($sel_y - 1)], 'O') !== false) {
                     $valid_moves[] = ($sel_x + 2) . ($sel_y - 2); //left up
                     $kill[($sel_x + 2) . ($sel_y - 2)] = ($sel_x + 1) . ($sel_y - 1);
                 }
 
-                if (strpos($board[($sel_x - 1)][($sel_y - 1)], 'O') !== false) {
+                if (isset($board[($sel_x - 1)][($sel_y - 1)]) && strpos($board[($sel_x - 1)][($sel_y - 1)], 'O') !== false) {
                     $valid_moves[] = ($sel_x - 2) . ($sel_y - 2); //left down
                     $kill[($sel_x - 2) . ($sel_y - 2)] = ($sel_x - 1) . ($sel_y - 1);
                 }
             } elseif ($board[$sel_x][$sel_y] == 'XK') {
                 for ($move = 1; $move <= 8; $move++) {
-                    if ($board[($sel_x - $move)][($sel_y + $move)] == '') {
+                    if (isset($board[($sel_x - $move)][($sel_y + $move)]) && $board[($sel_x - $move)][($sel_y + $move)] == '') {
                         $valid_moves[] = ($sel_x - $move) . ($sel_y + $move); //right up
                     } else {
                         break;
@@ -414,7 +414,7 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if ($board[($sel_x + $move)][($sel_y + $move)] == '') {
+                    if (isset($board[($sel_x + $move)][($sel_y + $move)]) && $board[($sel_x + $move)][($sel_y + $move)] == '') {
                         $valid_moves[] = ($sel_x + $move) . ($sel_y + $move); //right down
                     } else {
                         break;
@@ -422,7 +422,7 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if ($board[($sel_x + $move)][($sel_y - $move)] == '') {
+                    if (isset($board[($sel_x + $move)][($sel_y - $move)]) && $board[($sel_x + $move)][($sel_y - $move)] == '') {
                         $valid_moves[] = ($sel_x + $move) . ($sel_y - $move); //left up
                     } else {
                         break;
@@ -430,7 +430,7 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if ($board[($sel_x - $move)][($sel_y - $move)] == '') {
+                    if (isset($board[($sel_x - $move)][($sel_y - $move)]) && $board[($sel_x - $move)][($sel_y - $move)] == '') {
                         $valid_moves[] = ($sel_x - $move) . ($sel_y - $move); //left down
                     } else {
                         break;
@@ -438,9 +438,9 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if (strpos($board[($sel_x - $move)][($sel_y + $move)], 'O') !== false) {
+                    if (isset($board[($sel_x - $move)][($sel_y + $move)]) && strpos($board[($sel_x - $move)][($sel_y + $move)], 'O') !== false) {
                         for ($move2 = 1; $move2 < $move; $move2++) {
-                            if ($board[($sel_x - $move2)][($sel_y + $move2)] != '') {
+                            if (isset($board[($sel_x - $move2)][($sel_y + $move2)]) && $board[($sel_x - $move2)][($sel_y + $move2)] != '') {
                                 break 2;
                             }
                         }
@@ -453,9 +453,9 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if (strpos($board[($sel_x + $move)][($sel_y + $move)], 'O') !== false) {
+                    if (isset($board[($sel_x + $move)][($sel_y + $move)]) && strpos($board[($sel_x + $move)][($sel_y + $move)], 'O') !== false) {
                         for ($move2 = 1; $move2 < $move; $move2++) {
-                            if ($board[($sel_x + $move2)][($sel_y + $move2)] != '') {
+                            if (isset($board[($sel_x + $move2)][($sel_y + $move2)]) && $board[($sel_x + $move2)][($sel_y + $move2)] != '') {
                                 break 2;
                             }
                         }
@@ -467,9 +467,9 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if (strpos($board[($sel_x + $move)][($sel_y - $move)], 'O') !== false) {
+                    if (isset($board[($sel_x + $move)][($sel_y - $move)]) && strpos($board[($sel_x + $move)][($sel_y - $move)], 'O') !== false) {
                         for ($move2 = 1; $move2 < $move; $move2++) {
-                            if ($board[($sel_x + $move2)][($sel_y - $move2)] != '') {
+                            if (isset($board[($sel_x + $move2)][($sel_y - $move2)]) && $board[($sel_x + $move2)][($sel_y - $move2)] != '') {
                                 break 2;
                             }
                         }
@@ -481,9 +481,9 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if (strpos($board[($sel_x - $move)][($sel_y - $move)], 'O') !== false) {
+                    if (isset($board[($sel_x - $move)][($sel_y - $move)]) && strpos($board[($sel_x - $move)][($sel_y - $move)], 'O') !== false) {
                         for ($move2 = 1; $move2 < $move; $move2++) {
-                            if ($board[($sel_x - $move2)][($sel_y - $move2)] != '') {
+                            if (isset($board[($sel_x - $move2)][($sel_y - $move2)]) && $board[($sel_x - $move2)][($sel_y - $move2)] != '') {
                                 break 2;
                             }
                         }
@@ -495,37 +495,37 @@ class Poolcheckers extends Checkers
                 }
             }
         } elseif (strpos($char, 'O') !== false) {
-            if ($board[$sel_x][$sel_y] == 'O') {
-                if ($board[($sel_x + 1)][($sel_y - 1)] == '') {
+            if (isset($board[$sel_x][$sel_y]) && $board[$sel_x][$sel_y] == 'O') {
+                if (isset($board[($sel_x + 1)][($sel_y - 1)]) && $board[($sel_x + 1)][($sel_y - 1)] == '') {
                     $valid_moves[] = ($sel_x + 1) . ($sel_y - 1); //left up
                 }
 
-                if ($board[($sel_x - 1)][($sel_y - 1)] == '') {
+                if (isset($board[($sel_x - 1)][($sel_y - 1)]) && $board[($sel_x - 1)][($sel_y - 1)] == '') {
                     $valid_moves[] = ($sel_x - 1) . ($sel_y - 1); //left down
                 }
 
-                if (strpos($board[($sel_x - 1)][($sel_y + 1)], 'X') !== false) {
+                if (isset($board[($sel_x - 1)][($sel_y + 1)]) && strpos($board[($sel_x - 1)][($sel_y + 1)], 'X') !== false) {
                     $valid_moves[] = ($sel_x - 2) . ($sel_y + 2); //right up
                     $kill[($sel_x - 2) . ($sel_y + 2)] = ($sel_x - 1) . ($sel_y + 1);
                 }
 
-                if (strpos($board[($sel_x + 1)][($sel_y + 1)], 'X') !== false) {
+                if (isset($board[($sel_x + 1)][($sel_y + 1)]) && strpos($board[($sel_x + 1)][($sel_y + 1)], 'X') !== false) {
                     $valid_moves[] = ($sel_x + 2) . ($sel_y + 2); //right down
                     $kill[($sel_x + 2) . ($sel_y + 2)] = ($sel_x + 1) . ($sel_y + 1);
                 }
 
-                if (strpos($board[($sel_x + 1)][($sel_y - 1)], 'X') !== false) {
+                if (isset($board[($sel_x + 1)][($sel_y - 1)]) && strpos($board[($sel_x + 1)][($sel_y - 1)], 'X') !== false) {
                     $valid_moves[] = ($sel_x + 2) . ($sel_y - 2); //left up
                     $kill[($sel_x + 2) . ($sel_y - 2)] = ($sel_x + 1) . ($sel_y - 1);
                 }
 
-                if (strpos($board[($sel_x - 1)][($sel_y - 1)], 'X') !== false) {
+                if (isset($board[($sel_x - 1)][($sel_y - 1)]) && strpos($board[($sel_x - 1)][($sel_y - 1)], 'X') !== false) {
                     $valid_moves[] = ($sel_x - 2) . ($sel_y - 2); //left down
                     $kill[($sel_x - 2) . ($sel_y - 2)] = ($sel_x - 1) . ($sel_y - 1);
                 }
-            } elseif ($board[$sel_x][$sel_y] == 'OK') {
+            } elseif (isset($board[$sel_x][$sel_y]) && $board[$sel_x][$sel_y] == 'OK') {
                 for ($move = 1; $move <= 8; $move++) {
-                    if ($board[($sel_x - $move)][($sel_y + $move)] == '') {
+                    if (isset($board[($sel_x - $move)][($sel_y + $move)]) && $board[($sel_x - $move)][($sel_y + $move)] == '') {
                         $valid_moves[] = ($sel_x - $move) . ($sel_y + $move); //right up
                     } else {
                         break;
@@ -533,7 +533,7 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if ($board[($sel_x + $move)][($sel_y + $move)] == '') {
+                    if (isset($board[($sel_x + $move)][($sel_y + $move)]) && $board[($sel_x + $move)][($sel_y + $move)] == '') {
                         $valid_moves[] = ($sel_x + $move) . ($sel_y + $move); //right down
                     } else {
                         break;
@@ -541,7 +541,7 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if ($board[($sel_x + $move)][($sel_y - $move)] == '') {
+                    if (isset($board[($sel_x + $move)][($sel_y - $move)]) && $board[($sel_x + $move)][($sel_y - $move)] == '') {
                         $valid_moves[] = ($sel_x + $move) . ($sel_y - $move); //left up
                     } else {
                         break;
@@ -549,7 +549,7 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if ($board[($sel_x - $move)][($sel_y - $move)] == '') {
+                    if (isset($board[($sel_x - $move)][($sel_y - $move)]) && $board[($sel_x - $move)][($sel_y - $move)] == '') {
                         $valid_moves[] = ($sel_x - $move) . ($sel_y - $move); //left down
                     } else {
                         break;
@@ -557,9 +557,9 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if (strpos($board[($sel_x - $move)][($sel_y + $move)], 'X') !== false) {
+                    if (isset($board[($sel_x - $move)][($sel_y + $move)]) && strpos($board[($sel_x - $move)][($sel_y + $move)], 'X') !== false) {
                         for ($move2 = 1; $move2 < $move; $move2++) {
-                            if ($board[($sel_x - $move2)][($sel_y + $move2)] != '') {
+                            if (isset($board[($sel_x - $move2)][($sel_y + $move2)]) && $board[($sel_x - $move2)][($sel_y + $move2)] != '') {
                                 break 2;
                             }
                         }
@@ -572,9 +572,9 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if (strpos($board[($sel_x + $move)][($sel_y + $move)], 'X') !== false) {
+                    if (isset($board[($sel_x + $move)][($sel_y + $move)]) && strpos($board[($sel_x + $move)][($sel_y + $move)], 'X') !== false) {
                         for ($move2 = 1; $move2 < $move; $move2++) {
-                            if ($board[($sel_x + $move2)][($sel_y + $move2)] != '') {
+                            if (isset($board[($sel_x + $move2)][($sel_y + $move2)]) && $board[($sel_x + $move2)][($sel_y + $move2)] != '') {
                                 break 2;
                             }
                         }
@@ -586,9 +586,9 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if (strpos($board[($sel_x + $move)][($sel_y - $move)], 'X') !== false) {
+                    if (isset($board[($sel_x + $move)][($sel_y - $move)]) && strpos($board[($sel_x + $move)][($sel_y - $move)], 'X') !== false) {
                         for ($move2 = 1; $move2 < $move; $move2++) {
-                            if ($board[($sel_x + $move2)][($sel_y - $move2)] != '') {
+                            if (isset($board[($sel_x + $move2)][($sel_y - $move2)]) && $board[($sel_x + $move2)][($sel_y - $move2)] != '') {
                                 break 2;
                             }
                         }
@@ -600,9 +600,9 @@ class Poolcheckers extends Checkers
                 }
 
                 for ($move = 1; $move <= 8; $move++) {
-                    if (strpos($board[($sel_x - $move)][($sel_y - $move)], 'X') !== false) {
+                    if (isset($board[($sel_x - $move)][($sel_y - $move)]) && strpos($board[($sel_x - $move)][($sel_y - $move)], 'X') !== false) {
                         for ($move2 = 1; $move2 < $move; $move2++) {
-                            if ($board[($sel_x - $move2)][($sel_y - $move2)] != '') {
+                            if (isset($board[($sel_x - $move2)][($sel_y - $move2)]) && $board[($sel_x - $move2)][($sel_y - $move2)] != '') {
                                 break 2;
                             }
                         }
