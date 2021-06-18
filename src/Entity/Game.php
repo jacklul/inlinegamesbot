@@ -562,7 +562,7 @@ class Game
         }
 
         if (!$this->getUser('guest')) {
-            if ($this->getCurrentUserId() != $this->getUserId('host') || (getenv('DEBUG') && $this->getCurrentUserId() == getenv('BOT_ADMIN'))) {
+            if ($this->getCurrentUserId() != $this->getUserId('host') || getenv('DEBUG') || $this->getCurrentUserId() == getenv('BOT_ADMIN')) {
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Guest:' . $this->getCurrentUserMention());
 
                 $this->data['players']['guest'] = $this->getCurrentUser(true);
