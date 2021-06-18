@@ -21,7 +21,7 @@
       "value": ""
     },
     "BOT_WEBHOOK": {
-      "description": "Webhook URL",
+      "description": "Webhook URL (YOURAPPNAME must match app name entered earlier)",
       "value": "https://YOURAPPNAME.herokuapp.com"
     },
     "BOT_SECRET": {
