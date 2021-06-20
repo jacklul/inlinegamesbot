@@ -205,8 +205,13 @@ class GameCore
             } else {
                 throw new BotException('Unknown update received!');
             }
-        } catch (TelegramApiException $e) {
+        } catch (TelegramApiException | TelegramException $e) {
             $this->notifyAboutTelegramApiFailure();
+
+            if (strpos($e->getMessage(), 'Telegram returned an invalid response') !== false) {
+                return new ServerResponse(['ok' => false, 'description' => 'Telegram returned an invalid response'], null);
+            }
+
             throw $e;
         } catch (StorageException $e) {
             $this->notifyAboutStorageFailure();

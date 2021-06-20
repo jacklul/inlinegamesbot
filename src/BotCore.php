@@ -25,6 +25,7 @@ use jacklul\MonologTelegramHandler\TelegramFormatter;
 use jacklul\MonologTelegramHandler\TelegramHandler;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Exception\TelegramLogException;
+use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
@@ -366,7 +367,13 @@ class BotCore
     private function handleWebhook(): void
     {
         if ($this->validateRequest()) {
-            $this->telegram->handle();
+            try {
+                $this->telegram->handle();
+            } catch (TelegramException $e) {
+                if (strpos($e->getMessage(), 'Telegram returned an invalid response') === false) {
+                    throw $e;
+                }
+            }
         }
     }
 
@@ -504,7 +511,15 @@ class BotCore
         while (true) {
             set_time_limit(0);
 
-            $server_response = $this->telegram->handleGetUpdates();
+            try {
+                $server_response = $this->telegram->handleGetUpdates();
+            } catch (TelegramException $e) {
+                if (strpos($e->getMessage(), 'Telegram returned an invalid response') !== false) {
+                    $server_response = new ServerResponse(['ok' => false, 'description' => 'Telegram returned an invalid response'], null);
+                } else {
+                    throw $e;
+                }
+            }
 
             if ($server_response->isOk()) {
                 $update_count = count($server_response->getResult());
