@@ -215,7 +215,7 @@ class Poolcheckers extends Checkers
                             }
                         }
 
-                        if (in_array($args[0] . $args[1], $possibleMoves['valid_moves']) && $data['board'][$args[0]][$args[1]] == '') {
+                        if (in_array($args[0] . $args[1], $possibleMoves['valid_moves']) && isset($data['board'][$args[0]][$args[1]]) && $data['board'][$args[0]][$args[1]] == '') {
                             if ($forcedJump) {
                                 return $this->answerCallbackQuery(__("You must make a jump when possible!"), true);
                             }
