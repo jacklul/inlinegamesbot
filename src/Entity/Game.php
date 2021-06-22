@@ -395,31 +395,27 @@ class Game
      * Get player's user object
      *
      * @param string $user
-     * @param bool   $as_json
      *
      * @return User|bool
      *
      * @throws TelegramException
      */
-    protected function getUser(string $user = null, bool $as_json = false)
+    protected function getUser(string $user = null)
     {
         if ($user === null) {
             return false;
         }
 
-        Utilities::debugPrint($user . ' (as_json: ' . ($as_json ? 'true' : 'false') . ')');
-
-        if ($as_json) {
-            $result = isset($this->data['players'][$user]['id']) ? $this->data['players'][$user] : false;
-
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('JSON: ' . json_encode($result));
-
-            return $result;
-        }
-
         $result = isset($this->data['players'][$user]['id']) ? new User($this->data['players'][$user]) : false;
 
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint((($result instanceof User) ? 'OBJ->JSON: ' . $result->toJson() : 'false'));
+        if ($result !== false) {
+            $object_as_array = (array) $result;
+            unset($object_as_array['raw_data'], $object_as_array['bot_username']);
+
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint($user, $object_as_array);
+        } else {
+            Utilities::isDebugPrintEnabled() && Utilities::debugPrint($user . ' = false');
+        }
 
         return $result;
     }
@@ -468,7 +464,7 @@ class Game
             return $this->answerCallbackQuery(__('This game is already created!'), true);
         }
 
-        $this->data['players']['host'] = $this->getCurrentUser(true);
+        $this->data['players']['host'] = (array) $this->getCurrentUser(true);
         $this->data['players']['guest'] = null;
 
         if (isset($this->data['settings']['use_old_mentions']) && $this->data['settings']['use_old_mentions'] === true) {
@@ -487,16 +483,12 @@ class Game
     /**
      * Get current player's user object
      *
-     * @param bool $as_json
-     *
-     * @return User|string|null
+     * @return User
      *
      * @throws BotException
      */
-    protected function getCurrentUser(bool $as_json = false)
+    protected function getCurrentUser()
     {
-        Utilities::debugPrint('(as_json: ' . ($as_json ? 'true' : 'false') . ')');
-
         if ($callback_query = $this->manager->getUpdate()->getCallbackQuery()) {
             $update_object = $callback_query;
         } elseif ($chosen_inline_result = $this->manager->getUpdate()->getChosenInlineResult()) {
@@ -505,19 +497,14 @@ class Game
             throw new BotException('No current user found!?');
         }
 
-        if ($as_json) {
-            $json = $update_object->getFrom();
+        $user = $update_object->getFrom();
 
-            Utilities::isDebugPrintEnabled() && Utilities::debugPrint('JSON: ' . $json);
+        $object_as_array = (array) $user;
+        unset($object_as_array['raw_data'], $object_as_array['bot_username']);
 
-            return json_decode($json, true);
-        }
+        Utilities::isDebugPrintEnabled() && Utilities::debugPrint('current', (array) $object_as_array);
 
-        $result = $update_object->getFrom();
-
-        Utilities::isDebugPrintEnabled() && Utilities::debugPrint((($result instanceof User) ? 'OBJ->JSON: ' . $result->toJson() : 'false'));
-
-        return $result;
+        return $user;
     }
 
     /**
@@ -552,7 +539,7 @@ class Game
         if (!$this->getUser('host')) {
             Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Host:' . $this->getCurrentUserMention());
 
-            $this->data['players']['host'] = $this->getCurrentUser(true);
+            $this->data['players']['host'] = (array) $this->getCurrentUser(true);
 
             if ($this->saveData($this->data)) {
                 return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
@@ -565,7 +552,7 @@ class Game
             if ($this->getCurrentUserId() != $this->getUserId('host') || getenv('DEBUG') || $this->getCurrentUserId() == getenv('BOT_ADMIN')) {
                 Utilities::isDebugPrintEnabled() && Utilities::debugPrint('Guest:' . $this->getCurrentUserMention());
 
-                $this->data['players']['guest'] = $this->getCurrentUser(true);
+                $this->data['players']['guest'] = (array) $this->getCurrentUser(true);
 
                 if ($this->saveData($this->data)) {
                     return $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
@@ -1024,6 +1011,8 @@ class Game
                     $line .= '|' . (!empty($board[$x][$y]) ? ' ' . $board[$x][$y] . ' ' : '   ');
                 }
 
+                $line = str_replace('_won', '*', $line);
+                
                 $board_out .= $line . '|' . PHP_EOL;
                 $board_out .= str_repeat(' ---', $this->max_x) . PHP_EOL;
             }

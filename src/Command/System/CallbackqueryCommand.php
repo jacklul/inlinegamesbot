@@ -46,7 +46,7 @@ class CallbackqueryCommand extends SystemCommand
      * @throws TelegramApiException
      * @throws Throwable
      */
-    public function execute()
+    public function execute(): ServerResponse
     {
         $callback_query = $this->getUpdate()->getCallbackQuery();
         $data = $callback_query->getData();

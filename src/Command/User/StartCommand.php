@@ -11,6 +11,7 @@
 namespace Bot\Command\User;
 
 use Longman\TelegramBot\Commands\UserCommand;
+use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Exception\TelegramException;
 
 /**
@@ -25,7 +26,7 @@ class StartCommand extends UserCommand
      *
      * @throws TelegramException
      */
-    public function execute()
+    public function execute(): ServerResponse
     {
         return $this->getTelegram()->executeCommand("help");
     }

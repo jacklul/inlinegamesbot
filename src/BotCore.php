@@ -34,6 +34,7 @@ use Monolog\Handler\DeduplicationHandler;
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\StreamHandler;
+use Monolog\Handler\ErrorLogHandler;
 use Monolog\Logger;
 use Throwable;
 
@@ -115,17 +116,22 @@ class BotCore
 
         // Load environment variables from file if it exists
         if (class_exists(Dotenv::class) && file_exists(ROOT_PATH . '/.env')) {
-            $env = new Dotenv(ROOT_PATH);
-            $env->load();
+            $dotenv = Dotenv::createUnsafeImmutable(ROOT_PATH);
+            $dotenv->load();
         }
 
         // Debug mode
         if (getenv('DEBUG')) {
             Utilities::setDebugPrint();
+
+            /*$logger = new Logger('console');
+            $logger->pushHandler((new ErrorLogHandler())->setFormatter(new LineFormatter('[%datetime%] %message% %context% %extra%', 'Y-m-d H:i:s', false, true)));
+            
+            Utilities::setDebugPrintLogger($logger);*/
         }
 
         // Do not display errors by default
-        ini_set('display_errors', (getenv("DEBUG") ? 1 : 0));
+        ini_set('display_errors', (getenv('DEBUG') ? 1 : 0));
 
         // Set timezone
         date_default_timezone_set(getenv('TIMEZONE') ?: 'UTC');
@@ -251,7 +257,7 @@ class BotCore
             return;
         }
 
-        Utilities::debugPrint('DEBUG MODE');
+        Utilities::debugPrint('DEBUG MODE ACTIVE');
 
         $this->telegram = new Telegram($this->config['api_key'], $this->config['bot_username']);
         $monolog = new Logger($this->config['bot_username']);

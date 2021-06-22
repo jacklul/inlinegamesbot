@@ -34,7 +34,7 @@ class ChoseninlineresultCommand extends SystemCommand
      * @throws TelegramApiException
      * @throws Throwable
      */
-    public function execute()
+    public function execute(): ServerResponse
     {
         $chosen_inline_result = $this->getUpdate()->getChosenInlineResult();
 

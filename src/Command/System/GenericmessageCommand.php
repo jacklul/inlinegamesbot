@@ -31,7 +31,7 @@ class GenericmessageCommand extends SystemCommand
      * @throws TelegramException
      * @throws Throwable
      */
-    public function execute()
+    public function execute(): ServerResponse
     {
         $this->leaveGroupChat();
 
@@ -54,12 +54,12 @@ class GenericmessageCommand extends SystemCommand
     /**
      * Leave group chats
      *
-     * @return bool|ServerResponse
+     * @return ServerResponse|null
      */
-    private function leaveGroupChat()
+    private function leaveGroupChat(): ?ServerResponse
     {
         if (getenv('DEBUG')) {
-            return false;
+            return null;
         }
 
         if (!$this->getMessage()->getChat()->isPrivateChat()) {
@@ -70,14 +70,14 @@ class GenericmessageCommand extends SystemCommand
             );
         }
 
-        return false;
+        return null;
     }
 
     /**
      * @return ServerResponse|void
      * @throws TelegramException
      */
-    public function executeNoDb()
+    public function executeNoDb(): ServerResponse
     {
         return Request::emptyResponse();
     }
