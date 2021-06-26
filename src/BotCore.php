@@ -77,13 +77,13 @@ class BotCore
             'function'    => 'handleWebhook',
             'description' => 'Handle incoming webhook update',
         ],
+        'run'    => [
+            'function'    => 'handleLongPolling',
+            'description' => 'Run the bot using getUpdates in a loop',
+        ],
         'cron'    => [
             'function'    => 'handleCron',
             'description' => 'Run scheduled commands once',
-        ],
-        'loop'    => [
-            'function'    => 'handleLongPolling',
-            'description' => 'Run the bot using getUpdates in a loop',
         ],
         'worker'  => [
             'function'    => 'handleWorker',
