@@ -33,11 +33,5 @@
       "value": "",
       "required": false
     }
-  },
-  "scripts": {
-    "postdeploy": [
-      "bin/console install",
-      "bin/console set"
-    ]
   }
 }
