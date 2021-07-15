@@ -21,22 +21,22 @@ use Exception;
 use Gettext\Translator;
 use GuzzleHttp\Client;
 use InvalidArgumentException;
-use jacklul\MonologTelegramHandler\TelegramFormatter;
-use jacklul\MonologTelegramHandler\TelegramHandler;
+use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Exception\TelegramLogException;
-use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Request;
 use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\DeduplicationHandler;
-use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
-use Monolog\Handler\FingersCrossedHandler;
-use Monolog\Handler\StreamHandler;
 use Monolog\Handler\ErrorLogHandler;
+use Monolog\Handler\FingersCrossedHandler;
+use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
+use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Throwable;
+use jacklul\MonologTelegramHandler\TelegramFormatter;
+use jacklul\MonologTelegramHandler\TelegramHandler;
 
 define("ROOT_PATH", realpath(dirname(__DIR__)));
 define("APP_PATH", ROOT_PATH . '/bot');
@@ -521,7 +521,7 @@ class BotCore
                 $server_response = $this->telegram->handleGetUpdates();
             } catch (TelegramException $e) {
                 if (strpos($e->getMessage(), 'Telegram returned an invalid response') !== false) {
-                    $server_response = new ServerResponse(['ok' => false, 'description' => 'Telegram returned an invalid response'], null);
+                    $server_response = new ServerResponse(['ok' => false, 'description' => 'Telegram returned an invalid response'], '');
                 } else {
                     throw $e;
                 }
@@ -661,9 +661,9 @@ class BotCore
     {
         /** @var File $storage_class */
         $storage_class = Storage::getClass();
-        $storage_class = explode('\\', $storage_class);
+        $storage_class_name = explode('\\', (string) $storage_class);
 
-        print 'Installing storage structure (' . end($storage_class) . ')...' . PHP_EOL;
+        print 'Installing storage structure (' . end($storage_class_name) . ')...' . PHP_EOL;
 
         if ($storage_class::createStructure()) {
             print 'Ok!' . PHP_EOL;

@@ -209,7 +209,7 @@ class GameCore
             $this->notifyAboutTelegramApiFailure();
 
             if (strpos($e->getMessage(), 'Telegram returned an invalid response') !== false) {
-                return new ServerResponse(['ok' => false, 'description' => 'Telegram returned an invalid response'], null);
+                return new ServerResponse(['ok' => false, 'description' => 'Telegram returned an invalid response'], '');
             }
 
             throw $e;
