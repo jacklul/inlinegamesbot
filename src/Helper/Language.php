@@ -65,6 +65,10 @@ class Language
      */
     public static function getDefaultLanguage(): string
     {
+        if (!empty($default_language = getenv('DEFAULT_LANGUAGE'))) {
+            return $default_language;
+        }
+
         return self::$default_language;
     }
 

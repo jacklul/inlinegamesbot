@@ -25,11 +25,9 @@ use Longman\TelegramBot\Entities\ServerResponse;
 use Longman\TelegramBot\Exception\TelegramException;
 use Longman\TelegramBot\Exception\TelegramLogException;
 use Longman\TelegramBot\Request;
-use Longman\TelegramBot\Telegram;
 use Longman\TelegramBot\TelegramLog;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\DeduplicationHandler;
-use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\FingersCrossedHandler;
 use Monolog\Handler\FingersCrossed\ErrorLevelActivationStrategy;
 use Monolog\Handler\StreamHandler;
@@ -90,16 +88,18 @@ class BotCore
             'description' => 'Run scheduled commands every minute',
         ],
     ];
+    
     /**
      * Config array
      *
      * @var array
      */
     private $config = [];
+    
     /**
-     * Telegram object
+     * TelegramBot object
      *
-     * @var Telegram
+     * @var TelegramBot
      */
     private $telegram;
 
@@ -221,7 +221,7 @@ class BotCore
         }
 
         try {
-            if (!$this->telegram instanceof Telegram) {
+            if (!$this->telegram instanceof TelegramBot) {
                 $this->initialize();
             }
 
@@ -253,13 +253,13 @@ class BotCore
      */
     private function initialize(): void
     {
-        if ($this->telegram instanceof Telegram) {
+        if ($this->telegram instanceof TelegramBot) {
             return;
         }
 
         Utilities::debugPrint('DEBUG MODE ACTIVE');
 
-        $this->telegram = new Telegram($this->config['api_key'], $this->config['bot_username']);
+        $this->telegram = new TelegramBot($this->config['api_key'], $this->config['bot_username']);
         $monolog = new Logger($this->config['bot_username']);
 
         if (isset($this->config['logging']['error'])) {

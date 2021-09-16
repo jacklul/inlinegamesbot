@@ -226,8 +226,6 @@ class GameCore
 
         Utilities::debugPrint('GAME HANDLED');
 
-        Language::set(Language::getDefaultLanguage());      // reset language in case running in getUpdates loop
-
         return $result;
     }
 
