@@ -94,7 +94,7 @@ class Language
 
         if (file_exists(ROOT_PATH . '/translations/messages.' . $language . '.po')) {
             if (defined('DATA_PATH')) {
-                if (!file_exists(DATA_PATH . '/translations/messages.' . $language . '.cache') || md5_file(ROOT_PATH . '/translations/messages.' . $language . '.po') != file_get_contents(DATA_PATH . '/translations/messages.' . $language . '.cache')) {
+                if (!file_exists(ROOT_PATH . '/translations/messages.' . $language . '.cache') || md5_file(ROOT_PATH . '/translations/messages.' . $language . '.po') != file_get_contents(DATA_PATH . '/translations/messages.' . $language . '.cache')) {
                     if (!self::compileToArray($language)) {
                         Utilities::debugPrint('Language compilation to PHP array failed!');
                     }
@@ -125,8 +125,8 @@ class Language
      */
     private static function compileToArray(string $language): bool
     {
-        if (defined('DATA_PATH') && !file_exists(DATA_PATH . '/translations/messages.' . $language . '/.php')) {
-            $translation = Translations::fromPoFile(APP_PATH . '/translations/messages.' . $language . '.po');
+        if (defined('DATA_PATH') && !file_exists(ROOT_PATH . '/translations/messages.' . $language . '.php')) {
+            $translation = Translations::fromPoFile(ROOT_PATH . '/translations/messages.' . $language . '.po');
 
             if (!is_dir(DATA_PATH . '/translations/') && !mkdir($concurrentDirectory = DATA_PATH . '/translations/', 0755, true) && !is_dir($concurrentDirectory)) {
                 throw new RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
@@ -134,7 +134,7 @@ class Language
 
             $translation->toPhpArrayFile(DATA_PATH . '/translations/messages.' . $language . '.php');
 
-            return file_put_contents(DATA_PATH . '/translations/messages.' . $language . '.cache', md5_file(APP_PATH . '/translations/messages.' . $language . '.po'));
+            return file_put_contents(DATA_PATH . '/translations/messages.' . $language . '.cache', md5_file(ROOT_PATH . '/translations/messages.' . $language . '.po'));
         }
 
         return false;
