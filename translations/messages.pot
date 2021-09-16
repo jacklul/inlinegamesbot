@@ -8,7 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2020-11-12 14:55+0100\n"
+"POT-Creation-Date: 2021-09-16 16:00+0200\n"
 "PO-Revision-Date: 2017-07-13T17:47:54+00:00\n"
 "X-Poedit-Basepath: ../src\n"
 "X-Poedit-KeywordsList: __\n"
@@ -24,7 +24,7 @@ msgid "This game session has expired."
 msgstr ""
 
 #: Command/Admin/CleansessionsCommand.php:213
-#: Command/System/InlinequeryCommand.php:124 Entity/Game.php:818
+#: Command/System/InlinequeryCommand.php:124 Entity/Game.php:805
 msgid "Create"
 msgstr ""
 
@@ -32,21 +32,21 @@ msgstr ""
 msgid "Bad request!"
 msgstr ""
 
-#: Command/System/InlinequeryCommand.php:49 Entity/Game.php:647
-#: Entity/Game.php:721
+#: Command/System/InlinequeryCommand.php:49 Entity/Game.php:634
+#: Entity/Game.php:708
 msgid "This game session is empty."
 msgstr ""
 
-#: Command/User/HelpCommand.php:58
+#: Command/User/StartCommand.php:60
 msgid "Hi!"
 msgstr ""
 
-#: Command/User/HelpCommand.php:59 Command/User/HelpCommand.php:70
-#: Entity/Game.php:571 Entity/Game.php:800 Entity/Game.php:878
+#: Command/User/StartCommand.php:61 Command/User/StartCommand.php:72
+#: Entity/Game.php:558 Entity/Game.php:787 Entity/Game.php:865
 msgid "Play"
 msgstr ""
 
-#: Command/User/HelpCommand.php:59
+#: Command/User/StartCommand.php:61
 msgid "To begin, start a message with {USAGE} in any of your chats or click the {BUTTON} button and then select a chat to play in."
 msgstr ""
 
@@ -54,50 +54,50 @@ msgstr ""
 msgid "This game session has crashed."
 msgstr ""
 
-#: Entity/Game.php:468
+#: Entity/Game.php:464
 msgid "This game is already created!"
 msgstr ""
 
-#: Entity/Game.php:481 Entity/Game.php:558 Entity/Game.php:636
-#: Entity/Game.php:661 Entity/Game.php:698 Entity/Game.php:803
+#: Entity/Game.php:477 Entity/Game.php:545 Entity/Game.php:623
+#: Entity/Game.php:648 Entity/Game.php:685 Entity/Game.php:790
 #: Entity/Game/Russianroulette.php:166
 msgid "{PLAYER_HOST} is waiting for opponent to join..."
 msgstr ""
 
-#: Entity/Game.php:481 Entity/Game.php:558 Entity/Game.php:636
-#: Entity/Game.php:661 Entity/Game.php:698 Entity/Game.php:803
-#: Entity/Game.php:856 Entity/Game/Russianroulette.php:166
+#: Entity/Game.php:477 Entity/Game.php:545 Entity/Game.php:623
+#: Entity/Game.php:648 Entity/Game.php:685 Entity/Game.php:790
+#: Entity/Game.php:843 Entity/Game/Russianroulette.php:166
 #: Entity/Game/Russianroulette.php:318
 msgid "Join"
 msgstr ""
 
-#: Entity/Game.php:481 Entity/Game.php:558 Entity/Game.php:636
-#: Entity/Game.php:661 Entity/Game.php:698 Entity/Game.php:803
+#: Entity/Game.php:477 Entity/Game.php:545 Entity/Game.php:623
+#: Entity/Game.php:648 Entity/Game.php:685 Entity/Game.php:790
 #: Entity/Game/Russianroulette.php:166
 msgid "Press {BUTTON} button to join."
 msgstr ""
 
-#: Entity/Game.php:571 Entity/Game.php:800
+#: Entity/Game.php:558 Entity/Game.php:787
 msgid "{PLAYER_GUEST} joined..."
 msgstr ""
 
-#: Entity/Game.php:571 Entity/Game.php:800
+#: Entity/Game.php:558 Entity/Game.php:787
 msgid "Waiting for {PLAYER} to start..."
 msgstr ""
 
-#: Entity/Game.php:571 Entity/Game.php:800
+#: Entity/Game.php:558 Entity/Game.php:787
 msgid "Press {BUTTON} button to start."
 msgstr ""
 
-#: Entity/Game.php:577
+#: Entity/Game.php:564
 msgid "You cannot play with yourself!"
 msgstr ""
 
-#: Entity/Game.php:580
+#: Entity/Game.php:567
 msgid "This game is full!"
 msgstr ""
 
-#: Entity/Game.php:623 Entity/Game.php:725 Entity/Game.php:756
+#: Entity/Game.php:610 Entity/Game.php:712 Entity/Game.php:743
 #: Entity/Game/Checkers.php:111 Entity/Game/Checkers.php:372
 #: Entity/Game/Checkers.php:421 Entity/Game/Connectfour.php:87
 #: Entity/Game/Poolcheckers.php:80 Entity/Game/Poolcheckers.php:133
@@ -106,27 +106,27 @@ msgstr ""
 msgid "You're not in this game!"
 msgstr ""
 
-#: Entity/Game.php:636 Entity/Game.php:661
+#: Entity/Game.php:623 Entity/Game.php:648
 msgid "{PLAYER} quit..."
 msgstr ""
 
-#: Entity/Game.php:636
+#: Entity/Game.php:623
 msgid "{PLAYER_HOST} is now the host."
 msgstr ""
 
-#: Entity/Game.php:684 Entity/Game.php:729 Entity/Game.php:774
+#: Entity/Game.php:671 Entity/Game.php:716 Entity/Game.php:761
 msgid "You're not the host!"
 msgstr ""
 
-#: Entity/Game.php:688
+#: Entity/Game.php:675
 msgid "There is no player to kick!"
 msgstr ""
 
-#: Entity/Game.php:698
+#: Entity/Game.php:685
 msgid "{PLAYER_GUEST} was kicked..."
 msgstr ""
 
-#: Entity/Game.php:850 Entity/Game.php:898 Entity/Game.php:974
+#: Entity/Game.php:837 Entity/Game.php:885 Entity/Game.php:961
 #: Entity/Game/Checkers.php:278 Entity/Game/Poolcheckers.php:820
 #: Entity/Game/Rockpaperscissors.php:298
 #: Entity/Game/Rockpaperscissorslizardspock.php:243
@@ -134,20 +134,20 @@ msgstr ""
 msgid "Quit"
 msgstr ""
 
-#: Entity/Game.php:904 Entity/Game.php:980 Entity/Game/Checkers.php:284
+#: Entity/Game.php:891 Entity/Game.php:967 Entity/Game/Checkers.php:284
 #: Entity/Game/Poolcheckers.php:826 Entity/Game/Rockpaperscissors.php:304
 #: Entity/Game/Rockpaperscissorslizardspock.php:249
 #: Entity/Game/Russianroulette.php:303
 msgid "Kick"
 msgstr ""
 
-#: Entity/Game.php:964 Entity/Game/Checkers.php:248
+#: Entity/Game.php:951 Entity/Game/Checkers.php:248
 #: Entity/Game/Poolcheckers.php:790 Entity/Game/Rockpaperscissors.php:277
 #: Entity/Game/Rockpaperscissorslizardspock.php:222
 msgid "Play again!"
 msgstr ""
 
-#: Entity/Game.php:1048
+#: Entity/Game.php:1037
 msgid "Game session not found or expired."
 msgstr ""
 
@@ -269,23 +269,23 @@ msgstr ""
 msgid "Database error!"
 msgstr ""
 
-#: GameCore.php:127 GameCore.php:254 GameCore.php:278 GameCore.php:302
-#: GameCore.php:326
+#: GameCore.php:127 GameCore.php:257 GameCore.php:281 GameCore.php:305
+#: GameCore.php:329
 msgid "Try again in a few seconds."
 msgstr ""
 
-#: GameCore.php:254
+#: GameCore.php:257
 msgid "Process for this game is busy!"
 msgstr ""
 
-#: GameCore.php:278
+#: GameCore.php:281
 msgid "Telegram API error!"
 msgstr ""
 
-#: GameCore.php:302
+#: GameCore.php:305
 msgid "Bot error!"
 msgstr ""
 
-#: GameCore.php:326
+#: GameCore.php:329
 msgid "Unhandled error!"
 msgstr ""
