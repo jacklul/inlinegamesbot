@@ -16,7 +16,7 @@ You can see the bot in action by messaging [@inlinegamesbot](https://telegram.me
 - Checkers
 - Pool Checkers
 
-## Deploying
+## Deploying hi
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/jacklul/inlinegamesbot)
 
