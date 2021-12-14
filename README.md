@@ -1,4 +1,4 @@
-# Inline Games [![Build Status](https://travis-ci.org/jacklul/inlinegamesbot.svg?branch=master)](https://travis-ci.org/jacklul/inlinegamesbot) [![License](https://img.shields.io/github/license/jacklul/inlinegamesbot.svg)](https://github.com/jacklul/inlinegamesbot/blob/master/LICENSE) [![Telegram](https://img.shields.io/badge/Telegram-%40inlinegamesbot-blue.svg)](https://telegram.me/inlinegamesbot)
+# Inline Games [![License](https://img.shields.io/github/license/jacklul/inlinegamesbot.svg)](https://github.com/jacklul/inlinegamesbot/blob/master/LICENSE) [![Telegram](https://img.shields.io/badge/Telegram-%40inlinegamesbot-blue.svg)](https://telegram.me/inlinegamesbot)
 
 A Telegram bot that provides real-time multiplayer games that can be played in any chat.
 
