@@ -29,6 +29,8 @@ If it doesn't you will have to open your app's console and run them manually.
 If you have verified Heroku account you will also want to add **Heroku Scheduler** addon and set up a hourly task to run the following command to clean up expired games from the database:
 - `php bin/console cron`
 
+**It is also possible to deploy this project to Google App Engine, base files are available in the repository.**
+
 ## Note on translations
 
 Translations support is implemented but it is not used mainly because translated text would be displayed to both players - this could be problematic in "gaming" groups - people setting language that other player can't understand!
