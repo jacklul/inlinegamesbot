@@ -1,0 +1,11 @@
+#!include:.gitignore
+.*
+
+# Github actions
+gha-creds-*.json
+DOCKER_ENV
+docker_tag
+*.log
+
+# Exclude logo file
+/logo.*
