@@ -25,9 +25,11 @@ class Storage
      * Supported database engines
      */
     private static $storage_drivers = [
-        'mysql'    => 'MySQL',
-        'pgsql'    => 'PostgreSQL',
-        'postgres' => 'PostgreSQL',
+        'mysql'     => 'MySQL',
+        'pgsql'     => 'PostgreSQL',
+        'postgres'  => 'PostgreSQL',
+        'memcache'  => 'Memcache',
+        'memcached' => 'Memcache',
     ];
 
     /**

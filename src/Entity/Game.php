@@ -163,7 +163,7 @@ class Game
         }
 
         if (!is_array($this->data)) {
-            throw new StorageException();
+            throw new StorageException('Data is not an array');
         }
 
         $this->data_old = $this->data;
