@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2021 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2022 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -238,6 +238,19 @@ class BotCore
                 }
             }
         } catch (Throwable $e) {
+            $ignored_errors = getenv('IGNORED_ERRORS');
+
+            if (!empty($ignored_errors) && !Utilities::isDebugPrintEnabled()) {
+                $ignored_errors = explode(';', $ignored_errors);
+                $ignored_errors = array_map('trim', $ignored_errors);
+
+                foreach ($ignored_errors as $ignored_error) {
+                    if (strpos($e->getMessage(), $ignored_error) !== false) {
+                        return;
+                    }
+                }
+            }
+
             TelegramLog::error($e);
             throw $e;
         }

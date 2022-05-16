@@ -13,20 +13,20 @@ namespace Bot\Storage\Driver;
 use Bot\Entity\TempFile;
 use Bot\Exception\BotException;
 use Bot\Exception\StorageException;
-use PDO;
-use PDOException;
+use Memcache as MemcacheCore;
+use Memcached as MemcachedCore;
 
 /**
- * Class PostgreSQL
+ * Class Memcache
  */
-class PostgreSQL
+class Memcache
 {
     /**
-     * PDO object
+     * Memcache object
      *
-     * @var PDO
+     * @var MemcachedCore|MemcacheCore
      */
-    private static $pdo;
+    private static $memcache;
 
     /**
      * Lock file object
@@ -36,20 +36,6 @@ class PostgreSQL
     private static $lock;
 
     /**
-     * SQL to create database structure
-     *
-     * @var string
-     */
-    private static $structure = 'CREATE TABLE IF NOT EXISTS game (
-        id CHAR(255),
-        data TEXT NOT NULL,
-        created_at timestamp NULL DEFAULT NULL,
-        updated_at timestamp NULL DEFAULT NULL,
-
-        PRIMARY KEY (id)
-    );';
-
-    /**
      * Create table structure
      *
      * @return bool
@@ -57,14 +43,6 @@ class PostgreSQL
      */
     public static function createStructure(): bool
     {
-        if (!self::isDbConnected()) {
-            self::initializeStorage();
-        }
-
-        if (!self::$pdo->query(self::$structure)) {
-            throw new StorageException('Failed to create DB structure!');
-        }
-
         return true;
     }
 
@@ -75,11 +53,13 @@ class PostgreSQL
      */
     public static function isDbConnected(): bool
     {
-        return self::$pdo !== null;
+        return self::$memcache !== null;
     }
 
     /**
-     * Initialize PDO connection
+     * Initialize connection
+     *
+     * @return bool
      *
      * @throws StorageException
      */
@@ -89,17 +69,34 @@ class PostgreSQL
             return true;
         }
 
-        if (!defined('TB_GAME')) {
-            define('TB_GAME', 'game');
-        }
-
         try {
             $dsn = parse_url(getenv('DATABASE_URL'));
 
-            self::$pdo = new PDO('pgsql:' . 'host=' . $dsn['host'] . ';port=' . $dsn['port'] . ';dbname=' . ltrim($dsn['path'], '/'), $dsn['user'], $dsn['pass']);
-            self::$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
-        } catch (PDOException $e) {
-            throw new StorageException('Connection to the database failed: ' . $e->getMessage());
+            if (class_exists(MemcachedCore::class)) {
+                $memcache = new MemcachedCore($persistent_id ?? null);
+
+                $memcache->setOption(MemcachedCore::OPT_BINARY_PROTOCOL, true);
+                $memcache->setOption(MemcachedCore::OPT_NO_BLOCK, true);
+                $memcache->setOption(MemcachedCore::OPT_COMPRESSION, true);
+            } elseif (class_exists(MemcacheCore::class)) {
+                $memcache = new MemcacheCore($persistent_id ?? null);
+            } else {
+                throw new StorageException('Unsupported database type!');
+            }
+
+            $memcache->addServer($dsn['host'], $dsn['port']);
+            
+            if (isset($dsn['username'], $dsn['password'])) {
+                if (!method_exists($memcache, 'setSaslAuthData')) {
+                    throw new \RuntimeException('Memcached extension was not build with SASL support');
+                }
+
+                $memcache->setSaslAuthData($dsn['username'], $dsn['password']);
+            }
+
+            self::$memcache = $memcache;
+        } catch (\Exception $e) {
+            throw new StorageException('Connection to the memcached server failed: ' . $e->getMessage());
         }
 
         return true;
@@ -123,26 +120,13 @@ class PostgreSQL
             throw new StorageException('Id is empty!');
         }
 
-        try {
-            $sth = self::$pdo->prepare(
-                '
-                SELECT * FROM ' . TB_GAME . '
-                WHERE id = :id
-            '
-            );
+        $data = self::$memcache->get('game_' . sha1($id));
 
-            $sth->bindParam(':id', $id);
-
-            if ($result = $sth->execute()) {
-                $result = $sth->fetchAll(PDO::FETCH_ASSOC);
-
-                return isset($result[0]) ? json_decode($result[0]['data'], true) : [];
-            }
-
-            return false;
-        } catch (PDOException $e) {
-            throw new StorageException($e->getMessage());
+        if ($data !== null) {
+            return json_decode($data, true) ?? [];
         }
+
+        return [];
     }
 
     /**
@@ -168,31 +152,7 @@ class PostgreSQL
             throw new StorageException('Data is empty!');
         }
 
-        try {
-            $sth = self::$pdo->prepare(
-                '
-                INSERT INTO ' . TB_GAME . '
-                (id, data, created_at, updated_at)
-                VALUES
-                (:id, :data, :date, :date)
-                ON CONFLICT (id) DO UPDATE
-                  SET   data       = :data,
-                        updated_at = :date
-            '
-            );
-
-            /** @noinspection CallableParameterUseCaseInTypeContextInspection */
-            $data = json_encode($data);
-            $date = date('Y-m-d H:i:s');
-
-            $sth->bindParam(':id', $id);
-            $sth->bindParam(':data', $data);
-            $sth->bindParam(':date', $date);
-
-            return $sth->execute();
-        } catch (PDOException $e) {
-            throw new StorageException($e->getMessage());
-        }
+        return self::$memcache->set('game_' . sha1($id), json_encode($data));
     }
 
     /**
@@ -200,7 +160,7 @@ class PostgreSQL
      *
      * @param string $id
      *
-     * @return array|bool|mixed
+     * @return bool
      * @throws StorageException
      */
     public static function deleteFromGame(string $id): bool
@@ -213,20 +173,7 @@ class PostgreSQL
             throw new StorageException('Id is empty!');
         }
 
-        try {
-            $sth = self::$pdo->prepare(
-                '
-                DELETE FROM ' . TB_GAME . '
-                WHERE id = :id
-            '
-            );
-
-            $sth->bindParam(':id', $id);
-
-            return $sth->execute();
-        } catch (PDOException $e) {
-            throw new StorageException($e->getMessage());
-        }
+        return self::$memcache->delete('game_' . sha1($id));
     }
 
     /**
@@ -301,35 +248,6 @@ class PostgreSQL
             return false;
         }
 
-        if (!is_numeric($time)) {
-            throw new StorageException('Time must be a number!');
-        }
-
-        if ($time >= 0) {
-            $compare_sign = '<=';
-        } else {
-            $compare_sign = '>';
-        }
-
-        try {
-            $sth = self::$pdo->prepare(
-                '
-                SELECT * FROM ' . TB_GAME . '
-                WHERE updated_at ' . $compare_sign . ' :date
-                ORDER BY updated_at ASC
-            '
-            );
-
-            $date = date('Y-m-d H:i:s', strtotime('-' . abs($time) . ' seconds'));
-            $sth->bindParam(':date', $date);
-
-            if ($result = $sth->execute()) {
-                return $sth->fetchAll(PDO::FETCH_ASSOC);
-            }
-
-            return false;
-        } catch (PDOException $e) {
-            throw new StorageException($e->getMessage());
-        }
+        return [];
     }
 }

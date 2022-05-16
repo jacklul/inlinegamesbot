@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2021 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2022 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,9 +25,11 @@ class Storage
      * Supported database engines
      */
     private static $storage_drivers = [
-        'mysql'    => 'MySQL',
-        'pgsql'    => 'PostgreSQL',
-        'postgres' => 'PostgreSQL',
+        'mysql'     => 'MySQL',
+        'pgsql'     => 'PostgreSQL',
+        'postgres'  => 'PostgreSQL',
+        'memcache'  => 'Memcache',
+        'memcached' => 'Memcache',
     ];
 
     /**

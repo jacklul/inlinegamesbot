@@ -1,0 +1,5 @@
+#!include:.gitignore
+.*
+
+# Exclude logo file
+/logo.*

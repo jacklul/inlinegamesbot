@@ -2,7 +2,7 @@
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
- * (c) 2016-2021 Jack'lul <jacklulcat@gmail.com>
+ * (c) 2016-2022 Jack'lul <jacklulcat@gmail.com>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -163,7 +163,7 @@ class Game
         }
 
         if (!is_array($this->data)) {
-            throw new StorageException();
+            throw new StorageException('Data is not an array');
         }
 
         $this->data_old = $this->data;

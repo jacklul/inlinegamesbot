@@ -3,8 +3,8 @@
 
 # Configuration files
 /config.php
-/.env*
-!/.env.example
+/.env
+/env_variables.yaml
 
 # Data directory
 /data/
