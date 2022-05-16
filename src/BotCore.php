@@ -238,6 +238,19 @@ class BotCore
                 }
             }
         } catch (Throwable $e) {
+            $ignored_errors = getenv('IGNORED_ERRORS');
+
+            if (!empty($ignored_errors) && !Utilities::isDebugPrintEnabled()) {
+                $ignored_errors = explode(';', $ignored_errors);
+                $ignored_errors = array_map('trim', $ignored_errors);
+
+                foreach ($ignored_errors as $ignored_error) {
+                    if (strpos($e->getMessage(), $ignored_error) !== false) {
+                        return;
+                    }
+                }
+            }
+
             TelegramLog::error($e);
             throw $e;
         }
