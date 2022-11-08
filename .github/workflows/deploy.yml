@@ -1,0 +1,55 @@
+name: Deploy to Google App Engine
+
+on:
+  push:
+    branches:
+      - 'master'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      packages: 'write'
+      id-token: 'write'
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v3
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v2
+      with:
+        path: /tmp/composer-cache
+        key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+      
+    - name: Install PHP dependencies through Composer
+      uses: php-actions/composer@v6
+      with:
+        version: 2
+        php_version: 7.4
+        php_extensions: curl gettext intl mbstring pdo
+        dev: no
+        args: --optimize-autoloader
+
+    - name: Create config.php file
+      run: echo "$contents" > config.php
+      env:
+        contents: '${{ secrets.CONFIG_PHP }}'
+
+    - name: Create env_variables.yaml file
+      run: echo "$contents" > env_variables.yaml
+      env:
+        contents: '${{ secrets.ENV_VARIABLES_YAML }}'
+
+    - name: Authenticate with Google Cloud
+      uses: 'google-github-actions/auth@v0'
+      with:
+        workload_identity_provider: 'projects/504385050061/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider'
+        service_account: 'github-actions@inlinegamesbot-public.iam.gserviceaccount.com'
+
+    - name: 'Deploy the application'
+      uses: 'google-github-actions/deploy-appengine@v0'
+      with:
+        deliverables: 'app.yaml cron.yaml'
+        version: 'production'

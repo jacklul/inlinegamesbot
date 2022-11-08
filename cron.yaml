@@ -1,0 +1,4 @@
+cron:
+- description: Run cleanup task
+  url: /admin?a=cron
+  schedule: every hour

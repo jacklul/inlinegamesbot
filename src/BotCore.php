@@ -167,7 +167,6 @@ class BotCore
         $this->config = [
             'api_key'      => getenv('BOT_TOKEN'),
             'bot_username' => getenv('BOT_USERNAME'),
-            'secret'       => getenv('BOT_SECRET'),
             'admins'       => [(int)getenv('BOT_ADMIN') ?: 0],
             'commands'     => [
                 'paths'   => [
@@ -188,6 +187,7 @@ class BotCore
                     'chosen_inline_result',
                     'callback_query',
                 ],
+                'secret_token' => getenv('BOT_SECRET'),
             ],
             'mysql'        => [
                 'host'     => getenv('DB_HOST'),
@@ -218,6 +218,8 @@ class BotCore
             $arg = 'handle';    // from webspace allow only handling webhook
         } elseif (isset($_SERVER['argv'][1])) {
             $arg = strtolower(trim($_SERVER['argv'][1]));
+        } elseif (isset($_GET['a'])) {
+            $arg = strtolower(trim($_GET['a']));
         }
 
         try {
@@ -357,6 +359,10 @@ class BotCore
      */
     private function showHelp(): void
     {
+        if (PHP_SAPI !== 'cli') {
+            print '<pre>';
+        }
+        
         print 'Bot Console' . ($this->config['bot_username'] ? ' (@' . $this->config['bot_username'] . ')' : '') . PHP_EOL . PHP_EOL;
         print 'Available commands:' . PHP_EOL;
 
@@ -374,6 +380,10 @@ class BotCore
         }
 
         print $commands . PHP_EOL;
+
+        if (PHP_SAPI !== 'cli') {
+            print '</pre>';
+        }
     }
 
     /**
@@ -405,10 +415,17 @@ class BotCore
     private function validateRequest(): bool
     {
         if (PHP_SAPI !== 'cli') {
-            $secret = getenv('BOT_SECRET');
-            $secret_get = $_GET['s'] ?? '';
+            $header_secret = null;
+            foreach (getallheaders() as $name => $value) {
+                if (stripos($name, 'X-Telegram-Bot-Api-Secret-Token') !== false) {
+                    $header_secret = $value;
+                    break;
+                }
+            }
 
-            if (!isset($secret, $secret_get) || $secret !== $secret_get) {
+            $secret = getenv('BOT_SECRET');
+
+            if (!isset($secret, $header_secret) || $secret !== $header_secret) {
                 return false;
             }
         }
@@ -429,37 +446,12 @@ class BotCore
         if (empty($this->config['webhook']['url'])) {
             throw new BotException('Webhook URL is empty!');
         }
-
-        $options = [];
-
-        if (!empty($this->config['webhook']['max_connections'])) {
-            $options['max_connections'] = $this->config['webhook']['max_connections'];
-        }
-
-        if (!empty($this->config['webhook']['allowed_updates'])) {
-            $options['allowed_updates'] = $this->config['webhook']['allowed_updates'];
-        }
-
-        if (!empty($this->config['webhook']['certificate'])) {
-            $options['certificate'] = $this->config['webhook']['certificate'];
-        }
-
-        $url = $this->config['webhook']['url'];
-        if (!empty($this->config['secret'])) {
-            $query_string_char = '?';
-
-            if (strpos($url, '?') !== false) {
-                $query_string_char = '&';
-            } elseif (substr($url, -1) !== '/') {
-                $url = $url . '/';
-            }
-
-            $url = $url . $query_string_char . 'a=handle&s=' . $this->config['secret'];
-        } else {
+        
+        if (!isset($this->config['webhook']['secret_token'])) {
             throw new BotException('Secret is empty!');
         }
 
-        $result = $this->telegram->setWebhook($url, $options);
+        $result = $this->telegram->setWebhook($this->config['webhook']['url'], $this->config['webhook']);
 
         if ($result->isOk()) {
             print 'Webhook URL: ' . $this->config['webhook']['url'] . PHP_EOL;

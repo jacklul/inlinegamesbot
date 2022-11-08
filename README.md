@@ -18,6 +18,15 @@ You can see the bot in action by messaging [@inlinegamesbot](https://telegram.me
 
 ## Deploying
 
+### Google Cloud Platform
+
+- Copy `env_variables.example.yaml` into `env_variables.yaml` and fill out the details
+- Run the deployment command: `gcloud app deploy --project YOUR-PROJECT-NAME-HERE app.yaml`
+- Visit `https://YOUR-PROJECT-NAME-HERE.appspot.com/admin?a=install` to install database schema (when applicable)
+- Visit `https://YOUR-PROJECT-NAME-HERE.appspot.com/admin?a=set` to set the webhook
+
+### Heroku
+
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/jacklul/inlinegamesbot)
 
 Assuming everything was entered correctly the deploy process should run the following commands automatically and your bot should be instantly working:
@@ -26,10 +35,10 @@ Assuming everything was entered correctly the deploy process should run the foll
 
 If it doesn't you will have to open your app's console and run them manually.
 
-If you have verified Heroku account you will also want to add **Heroku Scheduler** addon and set up a hourly task to run the following command to clean up expired games from the database:
+You will also want to add **Heroku Scheduler** addon and set up a hourly task to run the following command to clean up expired games from the database:
 - `php bin/console cron`
 
-**It is also possible to deploy this project to Google App Engine, base files are available in the repository.**
+If this command times out too fast try using something like this instead: `php -d max_execution_time=2700 bin/console cron`
 
 ## Note on translations
 

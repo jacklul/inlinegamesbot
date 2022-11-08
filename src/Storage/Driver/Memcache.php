@@ -13,6 +13,7 @@ namespace Bot\Storage\Driver;
 use Bot\Entity\TempFile;
 use Bot\Exception\BotException;
 use Bot\Exception\StorageException;
+use MemCachier\MemcacheSASL;
 use Memcache as MemcacheCore;
 use Memcached as MemcachedCore;
 
@@ -72,7 +73,11 @@ class Memcache
         try {
             $dsn = parse_url(getenv('DATABASE_URL'));
 
-            if (class_exists(MemcachedCore::class)) {
+            if (class_exists(MemcacheSASL::class) && stripos($dsn['host'], 'memcachier') !== false) {
+                $memcache = new MemcacheSASL();
+
+                $memcache->setOption(MemcacheSASL::OPT_COMPRESSION, true);
+            } elseif (class_exists(MemcachedCore::class)) {
                 $memcache = new MemcachedCore($persistent_id ?? null);
 
                 $memcache->setOption(MemcachedCore::OPT_BINARY_PROTOCOL, true);
@@ -86,12 +91,12 @@ class Memcache
 
             $memcache->addServer($dsn['host'], $dsn['port']);
             
-            if (isset($dsn['username'], $dsn['password'])) {
+            if (isset($dsn['user'], $dsn['pass'])) {
                 if (!method_exists($memcache, 'setSaslAuthData')) {
                     throw new \RuntimeException('Memcached extension was not build with SASL support');
                 }
 
-                $memcache->setSaslAuthData($dsn['username'], $dsn['password']);
+                $memcache->setSaslAuthData($dsn['user'], $dsn['pass']);
             }
 
             self::$memcache = $memcache;

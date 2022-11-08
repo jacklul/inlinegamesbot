@@ -22,6 +22,11 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
     } catch (\Throwable $e) {
         // Prevent Telegram from retrying
     }
+} elseif ($_SERVER['PATH_INFO'] === '/admin' && isset($_SERVER['GAE_VERSION'])) {
+    require_once __DIR__.'/../vendor/autoload.php';
+
+    $app = new BotCore();
+    $app->run();
 } else {
     header("Location: https://github.com/jacklul/inlinegamesbot");    // Redirect non-POST requests to Github repository
 }

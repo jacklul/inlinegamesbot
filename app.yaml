@@ -9,6 +9,11 @@ automatic_scaling:
 default_expiration: "1d"
 
 handlers:
+- url: /admin.*
+  script: auto
+  login: admin
+  secure: always
+
 - url: /.*
   script: auto
   secure: always
