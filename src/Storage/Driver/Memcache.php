@@ -77,12 +77,18 @@ class Memcache
                 $memcache = new MemcacheSASL();
 
                 $memcache->setOption(MemcacheSASL::OPT_COMPRESSION, true);
+                $memcache->setOption(MemcacheSASL::OPT_CONNECT_TIMEOUT, 1000);
+                $memcache->setOption(MemcacheSASL::OPT_RECV_TIMEOUT, 10000);
+                $memcache->setOption(MemcacheSASL::OPT_SEND_TIMEOUT, 10000);
             } elseif (class_exists(MemcachedCore::class)) {
                 $memcache = new MemcachedCore($persistent_id ?? null);
 
                 $memcache->setOption(MemcachedCore::OPT_BINARY_PROTOCOL, true);
                 $memcache->setOption(MemcachedCore::OPT_NO_BLOCK, true);
                 $memcache->setOption(MemcachedCore::OPT_COMPRESSION, true);
+                $memcache->setOption(MemcachedCore::OPT_CONNECT_TIMEOUT, 1000);
+                $memcache->setOption(MemcachedCore::OPT_RECV_TIMEOUT, 10000);
+                $memcache->setOption(MemcachedCore::OPT_SEND_TIMEOUT, 10000);
             } elseif (class_exists(MemcacheCore::class)) {
                 $memcache = new MemcacheCore($persistent_id ?? null);
             } else {
