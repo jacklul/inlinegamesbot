@@ -1,0 +1,31 @@
+name: Check code
+
+on:
+  push:
+    branches:
+      - 'develop'
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v3
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v2
+      with:
+        path: /tmp/composer-cache
+        key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+      
+    - name: Install PHP dependencies through Composer
+      uses: php-actions/composer@v6
+      with:
+        version: 2
+        php_version: 7.4
+        php_extensions: curl gettext intl mbstring pdo
+
+    - name: Check code using PHP_CodeSniffer 
+      run: composer check-code

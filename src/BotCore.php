@@ -126,7 +126,7 @@ class BotCore
 
             /*$logger = new Logger('console');
             $logger->pushHandler((new ErrorLogHandler())->setFormatter(new LineFormatter('[%datetime%] %message% %context% %extra%', 'Y-m-d H:i:s', false, true)));
-            
+
             Utilities::setDebugPrintLogger($logger);*/
         }
 
