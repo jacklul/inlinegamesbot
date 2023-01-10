@@ -7,12 +7,6 @@
 # Unignore some files
 !/config.php
 
-# Heroku files
-/app.json
-/Procfile
-/nginx.inc.conf
-/public/.user.ini
-
 # Github actions
 gha-creds-*.json
 DOCKER_ENV
