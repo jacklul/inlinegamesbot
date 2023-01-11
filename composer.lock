@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d9d918ab55d10da262b8a9c045f47f05",
+    "content-hash": "7b649a223caa861e48458c83dcaedae7",
     "packages": [
         {
             "name": "gettext/gettext",
@@ -1730,7 +1730,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^7.4|^8.1",
+        "php": "^7.4|^8.0",
         "ext-curl": "*",
         "ext-gettext": "*",
         "ext-intl": "*",
@@ -1739,5 +1739,8 @@
         "ext-pdo": "*"
     },
     "platform-dev": [],
+    "platform-overrides": {
+        "php": "7.4"
+    },
     "plugin-api-version": "2.3.0"
 }
