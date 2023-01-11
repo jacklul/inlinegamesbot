@@ -58,7 +58,12 @@ class Storage
             $storage = File::class;
         }
 
-        if (empty($storage) || !class_exists($storage)) {
+        if (empty($storage)) {
+            /** @noinspection PhpUndefinedVariableInspection */
+            throw new StorageException('Storage class not provided');
+        }
+
+        if (!class_exists($storage)) {
             /** @noinspection PhpUndefinedVariableInspection */
             throw new StorageException('Storage class doesn\'t exist: ' . $storage);
         }
