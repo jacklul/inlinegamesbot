@@ -1,13 +1,11 @@
 #!include:.gitignore
 .*
-
-# Exclude logo file
 /logo.*
 
 # Unignore some files
 !/config.php
 
-# Github actions
+# Files created by Github actions
 gha-creds-*.json
 DOCKER_ENV
 docker_tag
