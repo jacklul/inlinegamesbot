@@ -1,0 +1,2 @@
+# Clean up older games hourly
+0 * * * * php -d max_execution_time=2700 bin/console cron
