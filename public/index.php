@@ -22,7 +22,7 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST') 
     } catch (\Throwable $e) {
         // Prevent Telegram from retrying
     }
-} elseif ($_SERVER['PATH_INFO'] === '/admin' && isset($_SERVER['GAE_VERSION'])) {
+} elseif (isset($_SERVER['GAE_VERSION']) && $_SERVER['PATH_INFO'] === '/admin') {
     require_once __DIR__.'/../vendor/autoload.php';
 
     $app = new BotCore();
