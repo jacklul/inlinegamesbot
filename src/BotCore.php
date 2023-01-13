@@ -97,7 +97,7 @@ class BotCore
         'post-install' => [
             'function'         => 'postComposerInstall',
             'description'      => 'Execute commands after composer install runs',
-            'hidden'           => true, 
+            'hidden'           => true,
         ],
     ];
     
@@ -534,9 +534,10 @@ class BotCore
             $this->telegram->useGetUpdatesWithoutDatabase();
         }
 
-        $dateTimePrefix = static function() {
-            if (getenv('LOG_NO_DATE_PREFIX'))
+        $dateTimePrefix = static function () {
+            if (getenv('LOG_NO_DATE_PREFIX')) {
                 return;
+            }
 
             return '[' . date('Y-m-d H:i:s') . '] ';
         };
@@ -590,9 +591,10 @@ class BotCore
             return;
         }
 
-        $dateTimePrefix = static function() {
-            if (getenv('LOG_NO_DATE_PREFIX'))
+        $dateTimePrefix = static function () {
+            if (getenv('LOG_NO_DATE_PREFIX')) {
                 return;
+            }
 
             return '[' . date('Y-m-d H:i:s') . '] ';
         };
@@ -711,7 +713,7 @@ class BotCore
 
     /**
      * Run some tasks after composer install
-     * 
+     *
      * @return void
      */
     private function postComposerInstall(): void
