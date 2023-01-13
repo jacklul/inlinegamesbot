@@ -131,6 +131,10 @@ class CleansessionsCommand extends AdminCommand
 
                     $game_data = $storage_class::selectFromGame($inactive_game['id']);
 
+                    if (isset($game_data['updated_at']) && $game_data['updated_at'] + $cleanInterval > time()) {
+                        continue;
+                    }
+
                     if (isset($game_data['game_code'])) {
                         $game = new GameCore($inactive_game['id'], $game_data['game_code'], $this);
 
