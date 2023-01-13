@@ -1,0 +1,19 @@
+# Ignore everything by default
+**
+
+# Uningnore only what we need
+!.php.ini.d/*
+!bin/*
+!public/.user.ini
+!public/index.php
+!src/**
+!translations/*.pot
+!translations/*.po
+!vendor/
+!config.php
+!composer.json
+!composer.lock
+!nginx.inc.conf
+!Procfile
+!start.sh
+!worker.sh

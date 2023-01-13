@@ -1,0 +1,62 @@
+app = "inlinegamesbot"
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[build]
+  builder = "heroku/buildpacks:20"
+  #builder = "paketobuildpacks/builder:full"
+  #buildpacks = ["gcr.io/paketo-buildpacks/php"]
+  #[build.args]
+  #  BP_PHP_VERSION = "8.0"
+
+[deploy]
+  release_command = "php bin/console post-install"
+
+[env]
+  STORAGE_CLASS="Bot\\Storage\\Driver\\File"
+  DATA_PATH="/data"
+  LOG_NO_DATE_PREFIX=true
+  WORKER_INTERVAL=300
+  # The following are required by Heroku builder
+  PORT=8080
+  DOCUMENT_ROOT="public/"
+  WEB_CONCURRENCY=10
+
+[mounts]
+  source="data"
+  destination="/data"
+
+#[processes]
+#  app = "php -S 0.0.0.0:8080 -t /workspace/public"
+#  worker_app = "php bin/console worker"
+
+[experimental]
+  allowed_public_ports = []
+  auto_rollback = true
+
+[[services]]
+  http_checks = []
+  internal_port = 8080
+  processes = ["app"]
+  protocol = "tcp"
+  script_checks = []
+  [services.concurrency]
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    grace_period = "1s"
+    interval = "15s"
+    restart_limit = 0
+    timeout = "2s"

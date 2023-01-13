@@ -534,7 +534,14 @@ class BotCore
             $this->telegram->useGetUpdatesWithoutDatabase();
         }
 
-        print '[' . date('Y-m-d H:i:s') . '] Running with getUpdates method...' . PHP_EOL;
+        $dateTimePrefix = static function() {
+            if (getenv('LOG_NO_DATE_PREFIX'))
+                return;
+
+            return '[' . date('Y-m-d H:i:s') . '] ';
+        };
+
+        print $dateTimePrefix . 'Running with getUpdates method...' . PHP_EOL;
         while (true) {
             set_time_limit(0);
 
@@ -552,10 +559,10 @@ class BotCore
                 $update_count = count($server_response->getResult());
 
                 if ($update_count > 0) {
-                    print '[' . date('Y-m-d H:i:s') . '] Processed ' . $update_count . ' updates!' . ' (peak memory usage: ' . Utilities::formatBytes(memory_get_peak_usage()) . ')' . PHP_EOL;
+                    print $dateTimePrefix . 'Processed ' . $update_count . ' updates!' . ' (peak memory usage: ' . Utilities::formatBytes(memory_get_peak_usage()) . ')' . PHP_EOL;
                 }
             } else {
-                print '[' . date('Y-m-d H:i:s') . '] Failed to process updates!' . PHP_EOL;
+                print $dateTimePrefix . 'Failed to process updates!' . PHP_EOL;
                 print 'Error: ' . $server_response->getDescription() . PHP_EOL;
             }
 
@@ -583,15 +590,22 @@ class BotCore
             return;
         }
 
-        print '[' . date('Y-m-d H:i:s') . '] Initializing worker...' . PHP_EOL;
+        $dateTimePrefix = static function() {
+            if (getenv('LOG_NO_DATE_PREFIX'))
+                return;
+
+            return '[' . date('Y-m-d H:i:s') . '] ';
+        };
+
+        print $dateTimePrefix() . 'Initializing worker...' . PHP_EOL;
 
         $interval = 60;
-        $sleep_time = 10;
-        $last_run = time();
-
-        if (getenv('DEBUG')) {
-            $interval = 3;
+        if (!empty($interval_user = getenv('WORKER_INTERVAL'))) {
+            $interval = $interval_user;
         }
+        
+        $sleep_time = ceil($interval / 3);
+        $last_run = time();
 
         while (true) {
             set_time_limit(0);
@@ -604,7 +618,7 @@ class BotCore
                     $sleep_time_this = $next_run;
                 }
 
-                print '[' . date('Y-m-d H:i:s') . '] Next run in ' . $next_run . ' seconds, sleeping for ' . $sleep_time_this . ' seconds...' . PHP_EOL;
+                print $dateTimePrefix() . 'Next scheduled run in ' . $next_run . ' seconds, sleeping for ' . $sleep_time_this . ' seconds...' . PHP_EOL;
 
                 if (function_exists('gc_collect_cycles')) {
                     gc_collect_cycles();
@@ -615,17 +629,15 @@ class BotCore
                 continue;
             }
 
-            print '[' . date('Y-m-d H:i:s') . '] Running...' . PHP_EOL;
+            print $dateTimePrefix() . 'Running scheduled commands...' . PHP_EOL;
 
-            $last_run = time();
-            
             try {
                 $this->handleCron();
             } catch (\Exception $e) {
-                print '[' . date('Y-m-d H:i:s') . '] Exception: ' . $e->getMessage() . PHP_EOL;
+                print $dateTimePrefix() . 'Caught exception: ' . $e->getMessage() . PHP_EOL;
             }
 
-            print '[' . date('Y-m-d H:i:s') . '] Finished!' . PHP_EOL;
+            $last_run = time();
         }
     }
 
