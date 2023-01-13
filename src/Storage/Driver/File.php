@@ -10,6 +10,7 @@
 
 namespace Bot\Storage\Driver;
 
+use Bot\Entity\TempFile;
 use Bot\Exception\StorageException;
 use DirectoryIterator;
 use RuntimeException;
@@ -19,6 +20,13 @@ use RuntimeException;
  */
 class File
 {
+    /**
+     * Lock file object
+     *
+     * @var TempFile
+     */
+    private static $lock;
+
     /**
      * Initialize - define paths
      *
@@ -66,7 +74,7 @@ class File
         }
 
         if (file_exists(STORAGE_GAME_PATH . '/' . $id . '.json')) {
-            return json_decode(file_get_contents(STORAGE_GAME_PATH . '/' . $id . '.json'), true);
+            return json_decode(file_get_contents(STORAGE_GAME_PATH . '/' . $id . '.json'), true) ?? [];
         }
 
         return [];
@@ -135,11 +143,16 @@ class File
             throw new StorageException('Id is empty!');
         }
 
-        if (!file_exists(STORAGE_GAME_PATH . '/' . $id . '.json')) {
-            file_put_contents(STORAGE_GAME_PATH . '/' . $id . '.json', "[]");
+        self::$lock = new TempFile($id);
+        if (self::$lock->getFile() === null) {
+            return false;
         }
 
-        if (flock(fopen(STORAGE_GAME_PATH . '/' . $id . '.json', 'ab+'), LOCK_EX)) {
+        if (flock(fopen(self::$lock->getFile()->getPathname(), 'ab+'), LOCK_EX)) {
+            if (!file_exists(STORAGE_GAME_PATH . '/' . $id . '.json')) {
+                file_put_contents(STORAGE_GAME_PATH . '/' . $id . '.json', json_encode([]));
+            }
+
             return true;
         }
 
@@ -160,11 +173,15 @@ class File
             throw new StorageException('Id is empty!');
         }
 
-        if (flock(fopen(STORAGE_GAME_PATH . '/' . $id . '.json', 'ab+'), LOCK_UN)) {
-            return true;
+        if (self::$lock === null) {
+            throw new StorageException('No lock file object!');
         }
 
-        return false;
+        if (self::$lock->getFile() === null) {
+            return false;
+        }
+
+        return flock(fopen(self::$lock->getFile()->getPathname(), 'ab+'), LOCK_UN);
     }
 
     /**

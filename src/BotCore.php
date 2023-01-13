@@ -542,7 +542,7 @@ class BotCore
             return '[' . date('Y-m-d H:i:s') . '] ';
         };
 
-        print $dateTimePrefix . 'Running with getUpdates method...' . PHP_EOL;
+        print $dateTimePrefix() . 'Running with getUpdates method...' . PHP_EOL;
         while (true) {
             set_time_limit(0);
 
@@ -560,10 +560,10 @@ class BotCore
                 $update_count = count($server_response->getResult());
 
                 if ($update_count > 0) {
-                    print $dateTimePrefix . 'Processed ' . $update_count . ' updates!' . ' (peak memory usage: ' . Utilities::formatBytes(memory_get_peak_usage()) . ')' . PHP_EOL;
+                    print $dateTimePrefix() . 'Processed ' . $update_count . ' updates!' . ' (peak memory usage: ' . Utilities::formatBytes(memory_get_peak_usage()) . ')' . PHP_EOL;
                 }
             } else {
-                print $dateTimePrefix . 'Failed to process updates!' . PHP_EOL;
+                print $dateTimePrefix() . 'Failed to process updates!' . PHP_EOL;
                 print 'Error: ' . $server_response->getDescription() . PHP_EOL;
             }
 
