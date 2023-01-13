@@ -52,40 +52,52 @@ class BotCore
      */
     private static $commands = [
         'help'    => [
-            'function'    => 'showHelp',
-            'description' => 'Shows this help message',
+            'function'         => 'showHelp',
+            'description'      => 'Shows this help message',
         ],
         'set'     => [
-            'function'    => 'setWebhook',
-            'description' => 'Set the webhook',
+            'function'         => 'setWebhook',
+            'description'      => 'Set the webhook',
+            'require_telegram' => true,
         ],
         'unset'   => [
-            'function'    => 'deleteWebhook',
-            'description' => 'Delete the webhook',
+            'function'         => 'deleteWebhook',
+            'description'      => 'Delete the webhook',
+            'require_telegram' => true,
         ],
         'info'    => [
-            'function'    => 'webhookInfo',
-            'description' => 'Print webhookInfo request result',
+            'function'         => 'webhookInfo',
+            'description'      => 'Print webhookInfo request result',
+            'require_telegram' => true,
         ],
         'install' => [
-            'function'    => 'installDb',
-            'description' => 'Execute database creation script',
+            'function'         => 'installDb',
+            'description'      => 'Execute database creation script',
         ],
         'handle'  => [
-            'function'    => 'handleWebhook',
-            'description' => 'Handle incoming webhook update',
+            'function'         => 'handleWebhook',
+            'description'      => 'Handle incoming webhook update',
+            'require_telegram' => true,
         ],
         'run'    => [
-            'function'    => 'handleLongPolling',
-            'description' => 'Run the bot using getUpdates in a loop',
+            'function'         => 'handleLongPolling',
+            'description'      => 'Run the bot using getUpdates in a loop',
+            'require_telegram' => true,
         ],
         'cron'    => [
-            'function'    => 'handleCron',
-            'description' => 'Run scheduled commands once',
+            'function'         => 'handleCron',
+            'description'      => 'Run scheduled commands once',
+            'require_telegram' => true,
         ],
         'worker'  => [
-            'function'    => 'handleWorker',
-            'description' => 'Run scheduled commands every minute',
+            'function'         => 'handleWorker',
+            'description'      => 'Run scheduled commands every minute',
+            'require_telegram' => true,
+        ],
+        'post-install' => [
+            'function'         => 'postComposerInstall',
+            'description'      => 'Execute commands after composer install runs',
+            'hidden'           => true, 
         ],
     ];
     
@@ -223,11 +235,11 @@ class BotCore
         }
 
         try {
-            if (!$this->telegram instanceof TelegramBot) {
-                $this->initialize();
-            }
-
             if (!empty($arg) && isset(self::$commands[$arg]['function'])) {
+                if (!$this->telegram instanceof TelegramBot && isset(self::$commands[$arg]['require_telegram']) && self::$commands[$arg]['require_telegram'] === true) {
+                    $this->initialize();
+                }
+
                 $function = self::$commands[$arg]['function'];
                 $this->$function();
             } else {
@@ -368,6 +380,10 @@ class BotCore
 
         $commands = '';
         foreach (self::$commands as $command => $data) {
+            if (isset($data['hidden']) && $data['hidden'] === true) {
+                continue;
+            }
+
             if (!empty($commands)) {
                 $commands .= PHP_EOL;
             }
@@ -602,8 +618,12 @@ class BotCore
             print '[' . date('Y-m-d H:i:s') . '] Running...' . PHP_EOL;
 
             $last_run = time();
-
-            $this->handleCron();
+            
+            try {
+                $this->handleCron();
+            } catch (\Exception $e) {
+                print '[' . date('Y-m-d H:i:s') . '] Exception: ' . $e->getMessage() . PHP_EOL;
+            }
 
             print '[' . date('Y-m-d H:i:s') . '] Finished!' . PHP_EOL;
         }
@@ -674,6 +694,26 @@ class BotCore
             print 'Ok!' . PHP_EOL;
         } else {
             print 'Error!' . PHP_EOL;
+        }
+    }
+
+    /**
+     * Run some tasks after composer install
+     * 
+     * @return void
+     */
+    private function postComposerInstall(): void
+    {
+        if (!empty(getenv('STORAGE_CLASS')) || !empty(getenv('DATABASE_URL')) || !empty(getenv('DATA_PATH'))) {
+            $this->installDb();
+        }
+
+        if (!empty($this->config['api_key']) && !empty($this->config['bot_username']) && !empty($this->config['webhook']['url']) && !empty($this->config['webhook']['secret_token'])) {
+            if (!$this->telegram instanceof TelegramBot) {
+                $this->initialize();
+            }
+
+            $this->setWebhook();
         }
     }
 }

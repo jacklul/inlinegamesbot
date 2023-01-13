@@ -46,8 +46,7 @@
       "\"vendor/bin/phpcs\" -snp --standard=PSR2 --encoding=utf-8 --report-width=150 src/ bin/ public/"
     ],
     "post-install-cmd": [
-      "@php bin/console install",
-      "@php bin/console set"
+      "@php bin/console post-install"
     ]
   }
 }
