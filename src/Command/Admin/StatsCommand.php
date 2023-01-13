@@ -74,6 +74,11 @@ class StatsCommand extends AdminCommand
 
         foreach ($games as $game) {
             $data = json_decode($game['data'], true);
+            
+            if (empty($data['game_code'])) {
+                continue;
+            }
+
             $game_obj = new GameCore($game['id'], $data['game_code'], $this);
             $game_class = $game_obj->getGame();
             $game_title = $game_class::getTitle();
