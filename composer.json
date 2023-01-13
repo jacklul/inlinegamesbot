@@ -17,10 +17,9 @@
     }
   ],
   "require": {
-    "php": "^7.4|^8.0",
+    "php": "^7.4",
     "ext-curl": "*",
     "ext-gettext": "*",
-    "ext-intl": "*",
     "ext-json": "*",
     "ext-mbstring": "*",
     "ext-pdo": "*",
@@ -40,10 +39,7 @@
     }
   },
   "config": {
-    "sort-packages": true,
-    "platform": {
-      "php":"7.4"
-    }
+    "sort-packages": true
   },
   "scripts": {
     "check-code": [
