@@ -230,7 +230,7 @@ class Poolcheckers extends Checkers
                                 $data['board'][$args[0]][$args[1]] .= 'K';
                             }
 
-                            if ($possibleMoves['kills'][$args[0] . $args[1]] != '') {
+                            if (isset($possibleMoves['kills'][$args[0] . $args[1]]) && $possibleMoves['kills'][$args[0] . $args[1]] != '') {
                                 $data['board'][$possibleMoves['kills'][$args[0] . $args[1]][0]][$possibleMoves['kills'][$args[0] . $args[1]][1]] = '';
                                 $killed = true;
                             }
