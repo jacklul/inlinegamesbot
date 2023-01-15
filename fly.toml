@@ -17,7 +17,7 @@ processes = []
   STORAGE_CLASS="Bot\\Storage\\Driver\\File"
   DATA_PATH="/data"
   LOG_NO_DATE_PREFIX=true
-  WORKER_INTERVAL=300
+  WORKER_INTERVAL=60
   # The following are required by Heroku builder
   PORT=8080
   DOCUMENT_ROOT="public/"
