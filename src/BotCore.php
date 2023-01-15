@@ -321,7 +321,7 @@ class BotCore
             $handler = new TelegramHandler($this->config['api_key'], (int)$this->config['admins'][0], Logger::ERROR);
             $handler->setFormatter(new TelegramFormatter());
 
-            $handler = new DeduplicationHandler($handler, defined('DATA_PATH') ? DATA_PATH . '/monolog-dedup.log' : null);
+            $handler = new DeduplicationHandler($handler);
             $handler->setLevel(Utilities::isDebugPrintEnabled() ? Logger::DEBUG : Logger::ERROR);
 
             $monolog->pushHandler($handler);
