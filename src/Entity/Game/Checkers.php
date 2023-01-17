@@ -447,6 +447,7 @@ class Checkers extends Game
             $data['current_turn'] = 'X';
             $data['move_counter'] = 0;
             $data['current_selection'] = '';
+            $data['current_selection_lock'] = false;
 
             $data['vote']['host']['draw'] = false;
             $data['vote']['host']['surrender'] = false;
