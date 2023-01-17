@@ -18,6 +18,7 @@ processes = []
   DATA_PATH="/data"
   LOG_NO_DATE_PREFIX=true
   WORKER_INTERVAL=60
+  WORKER_MEMORY_LIMIT="64M"
   # The following are required by Heroku builder
   PORT=8080
   DOCUMENT_ROOT="public/"

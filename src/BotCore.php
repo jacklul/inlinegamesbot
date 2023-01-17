@@ -606,6 +606,10 @@ class BotCore
             $interval = $interval_user;
         }
         
+        if (!empty($memory_limit = getenv('WORKER_MEMORY_LIMIT'))) {
+            ini_set('memory_limit', $memory_limit);
+        }
+        
         $sleep_time = ceil($interval / 3);
         $last_run = time();
 
