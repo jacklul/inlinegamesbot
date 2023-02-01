@@ -3,6 +3,7 @@
   "description": "A Telegram bot providing games that can be played in any chat.",
   "repository": "https://github.com/jacklul/inlinegamesbot",
   "logo": "https://raw.githubusercontent.com/jacklul/inlinegamesbot/master/logo.png",
+  "stack": "heroku-20",
   "buildpacks": [
     {
       "url": "https://github.com/heroku/heroku-buildpack-php"
