@@ -71,7 +71,7 @@ class CleansessionsCommand extends AdminCommand
             set_time_limit(10);
         }
 
-        /** @var File $storage_class */
+        /** @var string $storage_class */
         $storage_class = Storage::getClass();
 
         if (class_exists($storage_class)) {
@@ -89,6 +89,10 @@ class CleansessionsCommand extends AdminCommand
                 sleep(1);
             } while (!isset($storage_init));
 
+            if (!defined('IN_WORKER') && !empty($memory_limit = getenv('LIST_MEMORY_LIMIT'))) {
+                ini_set('memory_limit', $memory_limit);
+            }
+    
             $inactive = $storage_class::listFromGame($cleanInterval);
 
             if (is_array($inactive) && count($inactive) > 0) {

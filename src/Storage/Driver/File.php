@@ -201,7 +201,11 @@ class File
         $ids = [];
         foreach (new DirectoryIterator(STORAGE_GAME_PATH) as $file) {
             if (!$file->isDir() && !$file->isDot() && $file->getMTime() + $time < time()) {
-                $ids[] = ['id' => trim(basename($file->getFilename(), '.json')), 'data' => file_get_contents($file->getPathname()), 'updated_at' => date('H:i:s d-m-Y', filemtime($file->getPathname()))];
+                $data = file_get_contents($file->getPathname());
+                $json = json_decode($data, true);
+                $data_stripped = json_encode(['game_code' => $json['game_code'] ?? null]);
+
+                $ids[] = ['id' => trim(basename($file->getFilename(), '.json')), 'data' => $data_stripped, 'updated_at' => date('H:i:s d-m-Y', filemtime($file->getPathname()))];
             }
         }
 

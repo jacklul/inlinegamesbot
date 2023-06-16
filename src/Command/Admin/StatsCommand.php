@@ -64,6 +64,10 @@ class StatsCommand extends AdminCommand
         $storage_class = Storage::getClass();
         $storage_class::initializeStorage();
 
+        if (!empty($memory_limit = getenv('LIST_MEMORY_LIMIT'))) {
+            ini_set('memory_limit', $memory_limit);
+        }
+        
         $games = $storage_class::listFromGame();
         $stats = [
             'games'      => [],
