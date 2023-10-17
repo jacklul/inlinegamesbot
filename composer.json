@@ -28,10 +28,10 @@
     "jacklul/monolog-telegram": "^2.0",
     "longman/telegram-bot": "^0.78.0",
     "memcachier/php-memcache-sasl": "^1.0",
-    "spatie/emoji": "^2.0"
+    "spatie/emoji": "^2.0",
+    "vlucas/phpdotenv": "^5.0"
   },
   "require-dev": {
-    "vlucas/phpdotenv": "^5.0",
     "squizlabs/php_codesniffer": "^3.2"
   },
   "autoload": {
