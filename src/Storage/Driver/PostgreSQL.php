@@ -323,17 +323,18 @@ class PostgreSQL
             $date = date('Y-m-d H:i:s', strtotime('-' . abs($time) . ' seconds'));
             $sth->bindParam(':date', $date);
 
-            if ($result = $sth->execute()) {
+            if ($sth->execute()) {
                 //return $sth->fetchAll(PDO::FETCH_ASSOC);
 
                 $results = [];
-                foreach ($sth->fetchColumn(PDO::FETCH_ASSOC) as $entry) {
+                foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $entry) {
                     $json = json_decode($entry['data'], true);
                     $data_stripped = json_encode(['game_code' => $json['game_code'] ?? null]);
 
                     $results[] = [
                         'id' => $entry['id'],
                         'data' => $data_stripped,
+                        'updated_at' => $entry['updated_at'],
                     ];
                 }
 
