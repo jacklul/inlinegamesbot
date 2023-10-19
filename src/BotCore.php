@@ -489,7 +489,7 @@ class BotCore
         $result = $this->telegram->deleteWebhook();
 
         if ($result->isOk()) {
-            print $result->getDescription();
+            print $result->getDescription() . PHP_EOL;
         } else {
             print 'Request failed: ' . $result->getDescription();
         }
