@@ -6,77 +6,14 @@ on:
       - 'master'
   workflow_dispatch:
 
-env:
-  FTP_SERVER: '${{ secrets.FTP_SERVER }}'
-  FTP_USER: '${{ secrets.FTP_USER }}'
-  FTP_PASSWORD: '${{ secrets.FTP_PASSWORD }}'
-  FTP_PROTOCOL: '${{ secrets.FTP_PROTOCOL }}'
-  FTP_DIR: '${{ secrets.FTP_DIR }}'
-  WEBHOOK_URL: '${{ secrets.WEBHOOK_URL }}'
-  WEBHOOK_SECRET: '${{ secrets.WEBHOOK_SECRET }}'
-  WEBHOOK_AUTH: '${{ secrets.WEBHOOK_AUTH }}'
-  WEBHOOK_DATA: '${{ secrets.WEBHOOK_DATA }}'
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-
-    - name: Cache Composer dependencies
-      uses: actions/cache@v2
-      with:
-        path: /tmp/composer-cache-deploy
-        key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
-
-    - name: Install dependencies
-      uses: php-actions/composer@v6
-      with:
-        php_version: "7.4"
-        args: --optimize-autoloader --ignore-platform-reqs
-        dev: no
-
-    - name: Create config.php
+    - name: Invoke deployment hook
+      uses: distributhor/workflow-webhook@v2
       env:
-        contents: '${{ secrets.CONFIG_PHP }}'
-      if: ${{ env.contents != '' }}
-      run: echo "$contents" > config.php
-
-    - name: Create .env
-      env:
-        contents: '${{ secrets.DOT_ENV }}'
-      if: ${{ env.contents != '' }}
-      run: echo "$contents" > .env
-
-    - name: Prepare files
-      run: |
-        mkdir upload/
-        cp -fr bin/ public/ src/ translations/ vendor/ config.php .env upload/
-        rm -fr upload/public/.user.ini
-
-    - name: Deploy the application (FTP/FTPS)
-      if: ${{ env.FTP_SERVER != '' && env.FTP_USER != '' && env.FTP_PASSWORD != '' && env.FTP_DIR != '' && (env.FTP_PROTOCOL == 'ftp' || env.FTP_PROTOCOL == 'ftps') }}
-      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-      with:
-        server: ${{ env.FTP_SERVER }}
-        username: ${{ env.FTP_USER }}
-        password: ${{ env.FTP_PASSWORD }}
-        protocol: ${{ env.FTP_PROTOCOL }}
-        local-dir: upload/
-        server-dir: ${{ env.FTP_DIR }}
-
-    - name: Deploy the application (SFTP)
-      if: ${{ env.FTP_SERVER != '' && env.FTP_USER != '' && env.FTP_PASSWORD != '' && env.FTP_DIR != '' && env.FTP_PROTOCOL == 'sftp' }}
-      uses: pressidium/lftp-mirror-action@v1
-      with:
-        host: ${{ env.FTP_SERVER }}
-        user: ${{ env.FTP_USER }}
-        pass: ${{ env.FTP_PASSWORD }}
-        onlyNewer: true
-        localDir: 'upload/'
-        remoteDir: ${{ env.FTP_DIR }}
-        reverse: true
-        options: '--verbose'
+        webhook_url: ${{ secrets.WEBHOOK_URL }}
+        webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
+        webhook_auth: ${{ secrets.WEBHOOK_AUTH }}
+        data: ${{ secrets.WEBHOOK_DATA }}
