@@ -126,7 +126,12 @@ class StatsCommand extends AdminCommand
             return Request::sendMessage($data);
         } elseif ($callback_query) {
             $data['message_id'] = $callback_query->getMessage()->getMessageId();
-            Request::editMessageText($data);
+            $result = Request::editMessageText($data);
+
+            if (!$result->isOk()) {
+                $data_query['show_alert'] = true;
+                $data_query['text'] = substr($result->getDescription(), 0, 200);
+            }
 
             return Request::answerCallbackQuery($data_query);
         }
