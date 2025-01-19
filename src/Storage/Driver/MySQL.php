@@ -335,7 +335,7 @@ class MySQL
                 //return $sth->fetchAll(PDO::FETCH_ASSOC);
 
                 $results = [];
-                foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $entry) {
+                while ($entry = $sth->fetch(PDO::FETCH_ASSOC)) {
                     $json = json_decode($entry['data'], true);
                     $data_stripped = json_encode(['game_code' => $json['game_code'] ?? null]);
 
