@@ -4,6 +4,8 @@ A Telegram bot that provides real-time multiplayer games that can be played in a
 
 You can see the bot in action by messaging [@inlinegamesbot](https://telegram.me/inlinegamesbot).
 
+The bot is currently hosted at [DOM Cloud](https://domcloud.co).
+
 #### Currently available games:
 
 - Tic-Tac-Toe
@@ -19,6 +21,7 @@ You can see the bot in action by messaging [@inlinegamesbot](https://telegram.me
 ## Deploying
 
 ### Heroku
+
 <details>
   <summary>Instructions</summary>
 
@@ -31,9 +34,11 @@ You will also want to add **Heroku Scheduler** addon and set up a hourly task to
 - `php bin/console cron`
 
 _If this command times out too fast try using something like this instead: `php -d max_execution_time=2700 bin/console cron`_
+
 </details>
 
 ### Google Cloud Platform
+
 <details>
   <summary>Instructions</summary>
 
@@ -41,6 +46,7 @@ _If this command times out too fast try using something like this instead: `php 
 - Copy `env_variables.example.yaml` into `env_variables.yaml` and fill out the details
 - Run the deployment command: `gcloud app deploy --project YOUR-PROJECT-NAME-HERE app.yaml cron.yaml`
 - Visit `https://YOUR-PROJECT-NAME-HERE.appspot.com/admin?a=post-install` to perform post-install tasks
+
 </details>
 
 ### Fly.io
@@ -56,6 +62,31 @@ _If this command times out too fast try using something like this instead: `php 
 - `flyctl secrets set BOT_SECRET=`
 - If you want to use web+worker setup you have to replace `web:` line in `Procfile`
 - `flyctl deploy`
+
+</details>
+
+### DOM Cloud
+
+<details>
+  <summary>Instructions</summary>
+
+- Copy `.env.example` into `.env` and fill out the details
+- Upload `.env` and `crontab` to `/home/<your-website-name>/config` directory on the FTP
+  - `crontab` will require modifications - use full paths to the script - e.g.: `/home/<your-website-name>/public_html/bin/console`
+- Run this deployment task:
+```
+source: 'https://github.com/jacklul/inlinegamesbot'
+commands:
+  - 'test -f ../config/.env && cp -f ../config/.env .'
+  - 'test -f ../config/config.php && cp -f ../config/config.php . || exit 0'
+  - 'composer install --no-dev --optimize-autoloader --ignore-platform-reqs'
+  - 'php bin/console install'
+  - 'php bin/console set'
+  - 'test -f ../config/crontab && cat ../config/crontab | crontab - || exit 0'
+features:
+  - ssl
+  - 'php 7.4'
+```
 
 </details>
 
