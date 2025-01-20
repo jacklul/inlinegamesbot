@@ -1,2 +1,5 @@
 # Clean up older games hourly
 0 * * * * php -d max_execution_time=2700 bin/console cron
+
+# Alternatively: just remove the records from the database (faster and lighter)
+#0 * * * * php dbcleanup.php
