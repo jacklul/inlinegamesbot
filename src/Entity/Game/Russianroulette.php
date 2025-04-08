@@ -150,7 +150,7 @@ class Russianroulette extends Game
                     $gameOutput .= Emoji::trophy() . ' <b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['X']) . '<b>']) . '</b>';
 
 
-                    if ($data['settings']['X'] === 'host') {
+                    if ($data['settings']['O'] === 'host') {
                         $this->data['players']['host'] = $this->data['players']['guest'];
                         $this->data['players']['guest'] = null;
                     } else {
