@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
@@ -24,8 +25,28 @@ class TelegramBot extends Telegram
      */
     public function processUpdate(Update $update): ServerResponse
     {
-        Language::set(Language::getDefaultLanguage()); // Set default language before handling each update
-        
+        $lang_code = null;
+
+        // Try to detect language from different update types
+        if ($message = $update->getMessage()) {
+            $lang_code = $message->getFrom()->getLanguageCode();
+        } elseif ($callback = $update->getCallbackQuery()) {
+            $lang_code = $callback->getFrom()->getLanguageCode();
+        } elseif ($inline = $update->getInlineQuery()) {
+            $lang_code = $inline->getFrom()->getLanguageCode();
+        } elseif ($chosen = $update->getChosenInlineResult()) {
+            $lang_code = $chosen->getFrom()->getLanguageCode();
+        } elseif ($edited = $update->getEditedMessage()) {
+            $lang_code = $edited->getFrom()->getLanguageCode();
+        }
+
+        // If no language detected, fallback to default
+        if (empty($lang_code)) {
+            $lang_code = Language::getDefaultLanguage();
+        }
+
+        Language::set($lang_code);
+
         return parent::processUpdate($update);
     }
 }
