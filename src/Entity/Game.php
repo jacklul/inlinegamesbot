@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Inline Games - Telegram Bot (@inlinegamesbot)
  *
@@ -178,14 +179,12 @@ class Game
         }
 
         $this->languages = Language::list();
-
-        if (isset($this->data['settings']['language']) && $language = $this->data['settings']['language']) {
-            Language::set($language);
-            Utilities::debugPrint('Set language: ' . $language);
+        Utilities::debugPrint('Set language: ' . $this->languages);
+        if ($this->getUser('host')) {
+            $this->applyHostLanguage();
         } else {
             Language::set(Language::getDefaultLanguage());
         }
-
 
         if (empty($this->data) && $action !== 'newAction') {
             Utilities::debugPrint('Empty game data found with action expecting it to not be');
@@ -342,7 +341,6 @@ class Game
             $this->data['settings']['use_old_mentions'] = true;
 
             if ($this->saveData($this->data)) {
-                //if (preg_match_all("/<a\shref=\"tg:\/\/user\?id=(.*)\">.*<\/a>/Us", $text, $matches)) {
                 if (preg_match_all('/<a\\shref="tg:\\/\\/user\\?id=(.*)">.*<\\/a>/Us', $text, $matches)) {
                     for ($i = 0, $iMax = count($matches[1]); $i < $iMax; $i++) {
                         if ($matches[1][$i] == $this->getUserId('host')) {
@@ -474,6 +472,7 @@ class Game
         $this->data['game_data'] = null;
 
         if ($this->saveData($this->data)) {
+            $this->applyHostLanguage();
             return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
         }
 
@@ -620,6 +619,7 @@ class Game
                 $this->data['players']['guest'] = null;
 
                 if ($this->saveData($this->data)) {
+                    $this->applyHostLanguage();
                     return $this->editMessage(__('{PLAYER} quit...', ['{PLAYER}' => $currentUserMention]) . PHP_EOL . __("{PLAYER_HOST} is now the host.", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("{PLAYER_HOST} is waiting for opponent to join...", ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __("Press {BUTTON} button to join.", ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
                 }
 
@@ -745,9 +745,30 @@ class Game
 
         return $this->answerCallbackQuery();
     }
+    protected function applyHostLanguage(): void
+    {
+        // Fallback
+        $host_lang = 'en';
+
+        if (!empty($this->data['players']['host']['language_code'])) {
+            $host_lang = $this->data['players']['host']['language_code'];
+
+            // Normalize (e.g. en-GB → en)
+            if (strpos($host_lang, '-') !== false) {
+                $host_lang = explode('-', $host_lang)[0];
+            }
+        }
+
+        // Save and apply
+        $this->data['game_data']['settings']['language'] = $host_lang;
+        $this->saveData($this->data);
+        Language::set($host_lang);
+
+        Utilities::debugPrint('Game language applied: ' . $host_lang);
+    }
 
     /**
-     * Change language
+     * Change language based on host’s Telegram language_code
      *
      * @return ServerResponse
      *
@@ -761,34 +782,10 @@ class Game
             return $this->answerCallbackQuery(__("You're not the host!"), true);
         }
 
-        $current_languge = Language::getCurrentLanguage();
-        $selected_language = $this->languages[0];
-
-        $picknext = false;
-        foreach ($this->languages as $language) {
-            if ($picknext) {
-                $selected_language = $language;
-                break;
-            }
-
-            if ($language === $current_languge) {
-                $picknext = true;
-            }
-        }
-
-        $this->data['settings']['language'] = $selected_language;
-
-        if ($this->saveData($this->data)) {
-            Utilities::debugPrint('Set language: ' . $selected_language);
-            Language::set($selected_language);
-        }
-
-        if ($this->getUser('host') && $this->getUser('guest')) {
-            return $this->editMessage(__('{PLAYER_GUEST} joined...', ['{PLAYER_GUEST}' => $this->getUserMention('guest')]) . PHP_EOL . __('Waiting for {PLAYER} to start...', ['{PLAYER}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to start.', ['{BUTTON}' => '<b>\'' . __('Play') . '\'</b>']), $this->getReplyMarkup('pregame'));
-        }
-
-        return $this->editMessage(__('{PLAYER_HOST} is waiting for opponent to join...', ['{PLAYER_HOST}' => $this->getUserMention('host')]) . PHP_EOL . __('Press {BUTTON} button to join.', ['{BUTTON}' => '<b>\'' . __('Join') . '\'</b>']), $this->getReplyMarkup('lobby'));
+        $this->applyHostLanguage();
+        return $this->answerCallbackQuery(__("Language set to host’s language."), true);
     }
+
 
     /**
      * Game empty keyboard
@@ -819,17 +816,6 @@ class Game
     protected function lobbyKeyboard(): array
     {
         $inline_keyboard = [];
-
-        if (count($this->languages) > 1) {
-            $inline_keyboard[] = [
-                new InlineKeyboardButton(
-                    [
-                        'text'          => ucfirst(locale_get_display_language(Language::getCurrentLanguage(), Language::getCurrentLanguage())),
-                        'callback_data' => static::getCode() . ";language",
-                    ]
-                ),
-            ];
-        }
 
         $inline_keyboard[] = [
             new InlineKeyboardButton(
@@ -867,17 +853,6 @@ class Game
                 ]
             ),
         ];
-
-        if (count($this->languages) > 1) {
-            $inline_keyboard[] = [
-                new InlineKeyboardButton(
-                    [
-                        'text'          => ucfirst(locale_get_display_language(Language::getCurrentLanguage(), Language::getCurrentLanguage())),
-                        'callback_data' => static::getCode() . ";language",
-                    ]
-                ),
-            ];
-        }
 
         $inline_keyboard[] = [
             new InlineKeyboardButton(
@@ -1012,7 +987,7 @@ class Game
                 }
 
                 $line = str_replace('_won', '*', $line);
-                
+
                 $board_out .= $line . '|' . PHP_EOL;
                 $board_out .= str_repeat(' ---', $this->max_x) . PHP_EOL;
             }
