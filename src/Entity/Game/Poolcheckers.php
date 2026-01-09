@@ -302,9 +302,9 @@ class Poolcheckers extends Checkers
         $gameOutput = '';
         if (in_array($isOver, ['X', 'O', 'T']) || $moveLimitReached) {
             if ($isOver == 'X' || $piecesLeft['X'] > $piecesLeft['O']) {
-                $gameOutput .= Emoji::trophy() . ' <b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('host') . '<b>']) . '</b>';
+                $gameOutput .= Emoji::trophy() . ' <b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['X']) . '<b>']) . '</b>';
             } elseif ($isOver == 'O' || $piecesLeft['O'] > $piecesLeft['X']) {
-                $gameOutput .= Emoji::trophy() . ' <b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention('guest') . '<b>']) . '</b>';
+                $gameOutput .= Emoji::trophy() . ' <b>' . __("{PLAYER} won!", ['{PLAYER}' => '</b>' . $this->getUserMention($data['settings']['O']) . '<b>']) . '</b>';
             } else {
                 $gameOutput .= Emoji::chequeredFlag() . ' <b>' . __("Game ended with a draw!") . '</b>';
             }
