@@ -471,6 +471,16 @@ class Game
             $this->data['settings']['use_old_mentions'] = false;
         }
 
+        if (!empty($lang_code = $this->data['players']['host']['language_code'])) {
+            $current_lang = Language::getCurrentLanguage();
+            Language::set($lang_code);
+            $new_lang = Language::getCurrentLanguage();
+
+            if ($current_lang != $new_lang) {
+                $this->data['settings']['language'] = $new_lang;
+            }
+        }
+
         $this->data['game_data'] = null;
 
         if ($this->saveData($this->data)) {
