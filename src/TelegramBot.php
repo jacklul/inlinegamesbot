@@ -24,8 +24,19 @@ class TelegramBot extends Telegram
      */
     public function processUpdate(Update $update): ServerResponse
     {
-        Language::set(Language::getDefaultLanguage()); // Set default language before handling each update
-        
+        $lang_code = null;
+        $content = $update->getUpdateContent();
+
+        if ($content && ($from = $content->getFrom())) {
+            $lang_code = $from->getLanguageCode();
+        }
+
+        if (empty($lang_code)) {
+            $lang_code = Language::getDefaultLanguage();
+        }
+
+        Language::set($lang_code);
+
         return parent::processUpdate($update);
     }
 }
