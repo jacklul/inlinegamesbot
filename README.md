@@ -4,8 +4,6 @@ A Telegram bot that provides real-time multiplayer games that can be played in a
 
 You can see the bot in action by messaging [@inlinegamesbot](https://telegram.me/inlinegamesbot).
 
-The bot is currently hosted at [DOM Cloud](https://domcloud.co).
-
 #### Currently available games:
 
 - Tic-Tac-Toe
